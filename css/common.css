@@ -1634,8 +1634,33 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+}
 
-  /* 截圖寬度斷點：字級切換為下拉式選單 */
+/* ==========================================================================
+   平板與手機窄版 (<= 992px) 頂部 Banner 優化：隱藏中央跑馬公告與視圖切換雙按鈕
+   ========================================================================== */
+@media (max-width: 992px) {
+  .header-center {
+    display: none !important;
+  }
+
+  .view-switch-group {
+    display: none !important;
+  }
+
+  .header-left {
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+    overflow: visible;
+  }
+
+  .header-right {
+    gap: 8px;
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+
   /* 窄螢幕字級控制器：【字級】文字在上，下拉選項在下（垂直緊湊排列） */
   .font-size-controller {
     display: flex !important;
@@ -1742,12 +1767,77 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
   }
 }
 
+@media (max-width: 768px) {
+  .main-header {
+    padding: 0 8px;
+    gap: 6px;
+    height: 58px;
+  }
+  .header-left {
+    gap: 6px;
+    min-width: 0;
+    flex: 1;
+    overflow: visible;
+  }
+  .btn-sidebar-toggle {
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  .brand-title {
+    padding: 3px 6px;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+    max-width: 50%;
+    flex-shrink: 1;
+    overflow: hidden;
+  }
+  .brand-logo-img {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  .title-text {
+    font-size: 12px;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+  }
+  .primary-dropdown {
+    padding: 4px 8px;
+    font-size: 12px;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .header-right {
+    gap: 6px;
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+  .header-center {
+    display: none !important;
+  }
+  .view-switch-group {
+    display: none !important;
+  }
+}
+
 /* 極窄手機螢幕 (<= 480px，如 iPhone 375px~430px) */
 @media (max-width: 480px) {
   .main-header {
     padding: 0 6px;
     gap: 4px;
     height: 54px;
+  }
+  .header-center {
+    display: none !important;
+  }
+  .view-switch-group {
+    display: none !important;
   }
   .btn-sidebar-toggle {
     width: 28px;
@@ -1787,8 +1877,14 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
   }
 }
 
-/* 412px 以下超極窄手機視圖：隱藏字級選擇器，釋放空間予標題與選單 */
+/* 412px 以下超極窄手機視圖 */
 @media (max-width: 412px) {
+  .header-center {
+    display: none !important;
+  }
+  .view-switch-group {
+    display: none !important;
+  }
   .font-size-controller {
     display: flex !important;
     min-width: 34px !important;
