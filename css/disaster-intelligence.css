@@ -1,0 +1,625 @@
+/* ==========================================================================
+   應變事件情資 (Disaster Intelligence GIS) 專屬樣式表
+   智慧水網視覺標準化：滿版 GIS 空間圖台、圖層開關面板、AI 彙整小助手
+   ========================================================================== */
+
+/* 全螢幕 GIS 圖台工作區容器 */
+.intel-workspace {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 64px);
+  overflow: hidden;
+  background-color: #061120;
+  display: flex;
+}
+
+/* 底層 Leaflet / Google Map 實體容器 */
+.intel-gis-map {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  background: #0b1726;
+}
+
+/* 左上角：當前情資視圖狀態標籤徽章 (Floating Status Badge) */
+.intel-status-badge {
+  position: absolute;
+  top: 20px;
+  left: 24px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(13, 27, 42, 0.88);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 30px;
+  padding: 8px 18px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  color: #ffffff;
+  pointer-events: auto;
+  transition: var(--transition-fast);
+}
+
+.intel-status-badge .status-icon {
+  font-size: 16px;
+  color: #38bdf8;
+}
+
+.intel-status-badge .status-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #f8fafc;
+  letter-spacing: 0.3px;
+}
+
+.intel-status-badge .status-tag {
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+/* 右上角：情資動態圖例卡片 (支援收合/展開) */
+.intel-legend-stack {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.intel-legend-card {
+  position: relative;
+  background: rgba(13, 27, 42, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+  pointer-events: auto;
+  width: 220px;
+  padding: 12px 16px;
+  transition: var(--transition-fast);
+}
+
+.intel-legend-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.intel-legend-title {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #f1f5f9;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.intel-legend-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.25s ease;
+}
+
+.intel-legend-card.collapsed .intel-legend-content {
+  display: none !important;
+}
+
+.intel-legend-card.collapsed .btn-legend-collapse i {
+  transform: rotate(180deg);
+}
+
+.intel-legend-card.collapsed {
+  padding-bottom: 10px !important;
+}
+
+.intel-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #cbd5e1;
+  white-space: nowrap;
+}
+
+.intel-legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   右下方浮動按鈕群 (FAB Group)
+   1. 圓形圖層開關按鈕 (Layer Switcher)
+   2. 情資彙整小助手 (AI Assistant Robot)
+   ========================================================================== */
+.intel-fab-group {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+.intel-fab-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  background: rgba(13, 27, 42, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #38bdf8;
+  font-size: 19px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.intel-fab-btn:hover {
+  transform: scale(1.1);
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #38bdf8;
+  box-shadow: 0 8px 24px rgba(2, 132, 199, 0.6);
+}
+
+.intel-fab-btn.active {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #7dd3fc;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.35), 0 8px 24px rgba(2, 132, 199, 0.5);
+}
+
+.intel-fab-btn.fab-ai-btn {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+.intel-fab-btn.fab-ai-btn:hover,
+.intel-fab-btn.fab-ai-btn.active {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #ffffff;
+}
+
+/* 提示紅點/徽章 (Notification Pulse Badge) */
+.fab-badge-pulse {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  background-color: #ef4444;
+  border: 2px solid #0b1726;
+  border-radius: 50%;
+  animation: pulseDot 1.5s infinite;
+}
+
+/* ==========================================================================
+   圖層開關清單面板 (Layer Control Floating Panel)
+   ========================================================================== */
+.layer-control-panel {
+  position: absolute;
+  bottom: 84px;
+  right: 24px;
+  width: 260px;
+  max-height: 480px;
+  background: rgba(13, 27, 42, 0.95);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 14px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: bottom right;
+}
+
+.layer-control-panel.hide {
+  display: none !important;
+  opacity: 0;
+  transform: scale(0.9) translateY(10px);
+}
+
+.layer-panel-header {
+  padding: 12px 16px;
+  background: rgba(15, 23, 42, 0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.layer-panel-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #f8fafc;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-panel-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 4px;
+  transition: var(--transition-fast);
+}
+
+.btn-panel-close:hover {
+  color: #ffffff;
+}
+
+.layer-panel-body {
+  padding: 12px 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.layer-group-title {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #38bdf8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.layer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.layer-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.layer-item:hover {
+  background: rgba(2, 132, 199, 0.15);
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.layer-item-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.layer-item-icon {
+  font-size: 13px;
+  color: #38bdf8;
+  width: 16px;
+  text-align: center;
+}
+
+/* 精美 Custom Checkbox */
+.layer-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid #64748b;
+  border-radius: 4px;
+  outline: none;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+  transition: var(--transition-fast);
+}
+
+.layer-checkbox:checked {
+  background: #0284c7;
+  border-color: #38bdf8;
+}
+
+.layer-checkbox:checked::after {
+  content: '\f00c';
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  font-size: 9px;
+  color: #ffffff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ==========================================================================
+   AI 應變情資彙整小助手面板 (AI Assistant Floating Panel)
+   ========================================================================== */
+.ai-assistant-panel {
+  position: absolute;
+  bottom: 84px;
+  right: 24px;
+  width: 340px;
+  max-height: 520px;
+  background: rgba(13, 27, 42, 0.96);
+  border: 1.5px solid rgba(56, 189, 248, 0.4);
+  border-radius: 16px;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.7);
+  color: #ffffff;
+  z-index: 1060;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: bottom right;
+}
+
+.ai-assistant-panel.hide {
+  display: none !important;
+  opacity: 0;
+  transform: scale(0.9) translateY(10px);
+}
+
+.ai-panel-header {
+  padding: 14px 16px;
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.25) 0%, rgba(15, 23, 42, 0.8) 100%);
+  border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ai-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ai-avatar-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #0284c7;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+}
+
+.ai-header-title {
+  display: flex;
+  flex-direction: column;
+}
+
+.ai-name {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+.ai-status {
+  font-size: 10.5px;
+  color: #34d399;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ai-status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: #34d399;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.ai-panel-body {
+  padding: 14px 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.ai-msg-box {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: #cbd5e1;
+}
+
+.ai-msg-box p {
+  margin: 0 0 8px 0;
+}
+
+.ai-msg-box p:last-child {
+  margin-bottom: 0;
+}
+
+.ai-highlight-card {
+  background: rgba(239, 68, 68, 0.12);
+  border-left: 3px solid #ef4444;
+  padding: 8px 10px;
+  border-radius: 0 6px 6px 0;
+  margin: 6px 0;
+}
+
+.ai-highlight-title {
+  font-weight: 800;
+  color: #fca5a5;
+  font-size: 11.5px;
+  margin-bottom: 4px;
+}
+
+.ai-actions-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.btn-ai-action {
+  flex: 1;
+  background: rgba(2, 132, 199, 0.2);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  text-align: center;
+}
+
+.btn-ai-action:hover {
+  background: #0284c7;
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   颱風動態路徑與暴風半徑 Canvas / SVG 特效
+   ========================================================================== */
+.typhoon-pulse-circle {
+  animation: typhoonPulse 2.5s infinite cubic-bezier(0.25, 1, 0.5, 1);
+  transform-origin: center center;
+}
+
+@keyframes typhoonPulse {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 0.4; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+/* ==========================================================================
+   RWD 手機與平板窄螢幕優化 (<= 992px, <= 768px, <= 480px, <= 412px)
+   ========================================================================== */
+@media (max-width: 992px) {
+  .intel-workspace {
+    height: calc(100vh - 58px) !important;
+  }
+
+  .intel-status-badge {
+    top: 12px;
+    left: 12px;
+    padding: 5px 12px;
+    gap: 6px;
+  }
+  .intel-status-badge .status-title {
+    font-size: 12px;
+  }
+  .intel-status-badge .status-tag {
+    font-size: 10px;
+    padding: 1px 6px;
+  }
+
+  .intel-legend-stack {
+    top: 12px;
+    right: 12px;
+    gap: 6px;
+  }
+  .intel-legend-card {
+    width: 175px !important;
+    padding: 6px 10px !important;
+    border-radius: 8px !important;
+  }
+  .intel-legend-title {
+    font-size: 11.5px !important;
+  }
+  .intel-legend-row {
+    font-size: 10px !important;
+  }
+
+  .intel-fab-group {
+    bottom: 16px;
+    right: 16px;
+    gap: 10px;
+  }
+  .intel-fab-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 17px;
+  }
+
+  .layer-control-panel {
+    bottom: 74px;
+    right: 16px;
+    width: 230px;
+    max-height: 400px;
+  }
+
+  .ai-assistant-panel {
+    bottom: 74px;
+    right: 16px;
+    width: 290px;
+    max-height: 440px;
+  }
+}
+
+@media (max-width: 480px) {
+  .intel-workspace {
+    height: calc(100vh - 54px) !important;
+  }
+  .layer-control-panel {
+    width: calc(100vw - 32px);
+    right: 16px;
+    bottom: 70px;
+  }
+  .ai-assistant-panel {
+    width: calc(100vw - 32px);
+    right: 16px;
+    bottom: 70px;
+  }
+}

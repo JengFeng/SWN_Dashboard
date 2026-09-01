@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>智慧水網 - 應變事件情資 (GIS 圖台)</title>
+  <!-- Google Fonts & Font Awesome CDN -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Leaflet GIS Map CDN -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- 基礎共用與專屬樣式表 -->
+  <link rel="stylesheet" href="css/common.css?v=1788254772">
+  <link rel="stylesheet" href="css/disaster-intelligence.css?v=1788254772">
+</head>
+<body class="layout-gis-full font-md">
+
+  <!-- ========================================================================= -->
+  <!-- 側邊欄抽屜 (Sidebar Drawer) -->
+  <!-- ========================================================================= -->
+  <aside id="sidebarDrawer" class="sidebar-drawer" aria-label="系統導航">
+    <div class="sidebar-header">
+      <div class="logo-box">
+        <img src="logo/Taiwan_Water_Corporation_Seal.svg.webp" alt="台水標誌" class="sidebar-logo-img">
+        <span>應變事件情資</span>
+      </div>
+      <button id="closeSidebarBtn" class="btn-icon" title="關閉選單">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <nav class="sidebar-menu">
+      <a href="index.html" class="menu-item">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>災情事件彙總</span>
+      </a>
+      <a href="#" class="menu-item active" data-mode="typhoon">
+        <i class="fa-solid fa-hurricane"></i>
+        <span>颱風路徑動態圖</span>
+      </a>
+      <a href="#" class="menu-item" data-mode="rain">
+        <i class="fa-solid fa-cloud-showers-heavy"></i>
+        <span>雨量資訊</span>
+      </a>
+      <a href="#" class="menu-item" data-mode="sea">
+        <i class="fa-solid fa-house-flood-water"></i>
+        <span>海水警戒</span>
+      </a>
+      <a href="#" class="menu-item" data-mode="forecast">
+        <i class="fa-solid fa-cloud-bolt"></i>
+        <span>降雨預報</span>
+      </a>
+      <a href="#" class="menu-item" data-mode="debris">
+        <i class="fa-solid fa-hill-rockslide"></i>
+        <span>土石流警戒</span>
+      </a>
+      
+      <!-- 外部情資 (點擊展開下拉子選單) -->
+      <div class="sidebar-dropdown">
+        <button type="button" class="menu-item dropdown-toggle" id="sidebarExternalToggle" aria-expanded="false">
+          <i class="fa-solid fa-globe"></i>
+          <span>外部情資</span>
+          <i class="fa-solid fa-caret-down dropdown-arrow"></i>
+        </button>
+        <div class="sidebar-submenu" id="sidebarExternalSubmenu">
+          <a href="#" class="submenu-item" data-mode="rain"><i class="fa-solid fa-cloud-sun"></i> <span>氣象署氣象情資</span></a>
+          <a href="#" class="submenu-item" data-mode="typhoon"><i class="fa-solid fa-bell"></i> <span>NCDR 災防情資</span></a>
+          <a href="supply-overview.html#tab-reservoir" class="submenu-item"><i class="fa-solid fa-water"></i> <span>水利署水情資訊</span></a>
+          <a href="#" class="submenu-item" data-mode="typhoon"><i class="fa-solid fa-bolt"></i> <span>台電電力狀況</span></a>
+          <a href="#" class="submenu-item" data-mode="debris"><i class="fa-solid fa-road"></i> <span>公路局災阻情資</span></a>
+        </div>
+      </div>
+    </nav>
+  </aside>
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <!-- ========================================================================= -->
+  <!-- 主版面容器 -->
+  <!-- ========================================================================= -->
+  <div class="app-layout">
+    
+    <!-- 頂部導航列 (Header) -->
+    <header class="main-header">
+      <div class="header-left">
+        <!-- 側邊欄展開切換鈕 -->
+        <button id="openSidebarBtn" class="btn-icon header-toggle-btn" title="展開選單">
+          <i class="fa-solid fa-angles-left"></i>
+        </button>
+        <!-- 機關單位 Logo 與標題 -->
+        <div class="brand-title">
+          <div class="brand-logo">
+            <img src="logo/Taiwan_Water_Corporation_Seal.svg.webp" alt="台灣自來水公司標誌" class="brand-logo-img">
+          </div>
+          <span class="title-text" id="headerTitleText">總管理處-平時</span>
+          <button id="globalSearchBtn" class="btn-icon search-trigger-btn" title="選擇應變事件">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </div>
+
+        <!-- 模組功能下拉切換 (客製化原生風格下拉選單) -->
+        <div class="header-dropdown-wrap">
+          <button id="viewDropdownBtn" class="btn-dropdown primary-dropdown" title="點擊切換系統功能模組">
+            <span id="currentViewText">應變事件情資</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          
+          <!-- 二級串聯選單面板 -->
+          <div id="viewDropdownMenu" class="cascading-menu-wrapper">
+            <ul class="cascading-menu-level1">
+              <li class="menu-parent-item" data-submenu="menu-sub-emergency">
+                <div class="menu-item-content">
+                  <span>緊急應變戰情儀表板</span>
+                  <i class="fa-solid fa-caret-right"></i>
+                </div>
+                <ul class="cascading-menu-level2" id="menu-sub-emergency">
+                  <li class="menu-sub-item" onclick="location.href='index.html'">
+                    <i class="fa-regular fa-circle radio-icon"></i>
+                    <span class="sub-text">災情事件彙總</span>
+                  </li>
+                  <li class="menu-sub-item active" onclick="location.href='disaster-intelligence.html'">
+                    <i class="fa-solid fa-circle-dot radio-icon"></i>
+                    <span class="sub-text">應變事件情資</span>
+                  </li>
+                  <li class="menu-sub-item" onclick="location.href='customer-service.html'">
+                    <i class="fa-regular fa-circle radio-icon"></i>
+                    <span class="sub-text">客服進線分析</span>
+                  </li>
+                </ul>
+              </li>
+              <li class="menu-parent-item" data-submenu="menu-sub-supply">
+                <div class="menu-item-content">
+                  <span>供水營運概況</span>
+                  <i class="fa-solid fa-caret-right"></i>
+                </div>
+                <ul class="cascading-menu-level2" id="menu-sub-supply">
+                  <li class="menu-sub-item" onclick="location.href='supply-overview.html'">
+                    <i class="fa-regular fa-circle radio-icon"></i>
+                    <span class="sub-text">全台供水狀態總覽</span>
+                  </li>
+                  <li class="menu-sub-item" onclick="location.href='supply-overview.html#tab-dispatch'">
+                    <i class="fa-regular fa-circle radio-icon"></i>
+                    <span class="sub-text">跨區水源調度</span>
+                  </li>
+                  <li class="menu-sub-item" onclick="location.href='supply-overview.html#tab-reservoir'">
+                    <i class="fa-regular fa-circle radio-icon"></i>
+                    <span class="sub-text">水庫蓄水量</span>
+                  </li>
+                </ul>
+              </li>
+              <li class="menu-direct-item" data-title="綜合案件分析" onclick="location.href='case-analysis.html'">
+                <span>綜合案件分析</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 中央公告跑馬燈 (桌機展示，窄版自動隱藏) -->
+      <div class="header-center">
+        <div class="alert-badge">
+          <span class="pulse-dot"></span>
+        </div>
+        <div class="announcement-content">
+          <span class="announcement-label">今日重要公告：</span>
+          <span class="announcement-text" id="announcementTicker">凱米颱風暴風圈逼近，各區處已啟動一級緊急防汛整備應變作業。</span>
+        </div>
+      </div>
+
+      <!-- 右側使用者與字級調整欄 (垂直緊湊字級控制器) -->
+      <div class="header-right">
+        
+        <!-- 字級調整控制器 (【字級】在上下拉在下) -->
+        <div class="font-size-controller" title="調整全站字級大小">
+          <span class="fs-label">字級</span>
+          <div class="fs-options">
+            <button type="button" class="fs-btn" data-size="sm">小</button>
+            <button type="button" class="fs-btn active" data-size="md">中</button>
+            <button type="button" class="fs-btn" data-size="lg">大</button>
+          </div>
+          <div class="fs-select-wrap">
+            <select id="fontSizeSelect" class="fs-select" aria-label="選擇字級大小">
+              <option value="sm">小</option>
+              <option value="md" selected>中</option>
+              <option value="lg">大</option>
+            </select>
+            <i class="fa-solid fa-chevron-down fs-select-arrow"></i>
+          </div>
+        </div>
+
+        <!-- 視圖切換快捷按鈕 (桌機展示，窄版自動隱藏) -->
+        <div class="view-switch-group">
+          <button id="toggleDashboardView" class="btn-toggle" title="切換至儀表板視圖" onclick="location.href='index.html'">
+            <i class="fa-solid fa-table-cells-large"></i>
+          </button>
+          <button id="toggleMapView" class="btn-toggle active" title="切換至 GIS 空間圖台">
+            <i class="fa-solid fa-map"></i>
+          </button>
+        </div>
+
+        <!-- 使用者資訊 (點擊展開登入浮動視窗) -->
+        <div class="user-profile" id="userProfileBtn" title="點擊登入緊急應變戰情儀表板" role="button" tabindex="0">
+          <div class="user-meta">
+            <span class="user-role" id="headerUserRole">一般使用者</span>
+            <span class="system-time" id="systemClock">2025/05/23 14:45</span>
+          </div>
+          <div class="avatar-box" id="userAvatarBtn">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="使用者頭像">
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ========================================================================= -->
+    <!-- 主要內容區 (應變事件情資滿版 GIS 圖台) -->
+    <!-- ========================================================================= -->
+    <main class="intel-workspace">
+      
+      <!-- 底層 Leaflet / Google Map 實體容器 -->
+      <div id="gisIntelMap" class="intel-gis-map"></div>
+
+      <!-- 左上角：當前情資狀態徽章 (Floating Status Badge) -->
+      <div class="intel-status-badge" id="intelStatusBadge">
+        <i class="fa-solid fa-hurricane status-icon" id="intelStatusIcon"></i>
+        <span class="status-title" id="intelStatusTitle">颱風路徑動態圖</span>
+        <span class="status-tag" id="intelStatusTag">強烈颱風 (第 03 號 凱米)</span>
+      </div>
+
+      <!-- 右上角：動態情資圖例卡片 (支援收合/展開) -->
+      <div class="intel-legend-stack" id="intelLegendStack">
+        <div class="intel-legend-card" id="intelLegendCard">
+          <div class="intel-legend-header" id="toggleIntelLegendBtn">
+            <div class="intel-legend-title" id="intelLegendTitle"><i class="fa-solid fa-layer-group"></i> 颱風暴風半徑圖例</div>
+            <button type="button" class="btn-legend-collapse" title="收合/展開圖例">
+              <i class="fa-solid fa-chevron-up" id="intelLegendArrow"></i>
+            </button>
+          </div>
+          <div class="intel-legend-content" id="intelLegendContent">
+            <!-- 動態生成圖例項目 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 右下角浮動工具按鈕群 (FAB Group) -->
+      <div class="intel-fab-group">
+        <!-- 1. 圓形圖層開關圖示按鈕 (點擊開闔套疊圖層清單) -->
+        <button type="button" class="intel-fab-btn" id="fabLayerBtn" title="開啟/關閉套疊圖層清單">
+          <i class="fa-solid fa-layer-group"></i>
+        </button>
+
+        <!-- 2. 情資彙整小助手 (機器人) 圖示按鈕 (點擊開闔 AI 智慧情資助理) -->
+        <button type="button" class="intel-fab-btn fab-ai-btn" id="fabAiBtn" title="AI 應變情資彙整小助手">
+          <i class="fa-solid fa-robot"></i>
+          <span class="fab-badge-pulse"></span>
+        </button>
+      </div>
+
+      <!-- 浮動面板 1：套疊圖層開關清單面板 (可勾選圖層) -->
+      <div class="layer-control-panel hide" id="layerControlPanel">
+        <div class="layer-panel-header">
+          <div class="layer-panel-title">
+            <i class="fa-solid fa-layer-group text-cyan"></i>
+            <span>空間套疊圖層清單</span>
+          </div>
+          <button type="button" class="btn-panel-close" id="closeLayerPanelBtn" title="關閉面板">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="layer-panel-body">
+          <div class="layer-group-box">
+            <div class="layer-group-title">氣象與災害情資</div>
+            <div class="layer-list">
+              <label class="layer-item">
+                <div class="layer-item-left">
+                  <i class="fa-solid fa-hurricane layer-item-icon"></i>
+                  <span>颱風動態路徑與暴風圈</span>
+                </div>
+                <input type="checkbox" class="layer-checkbox" data-layer="typhoon" checked>
+              </label>
+              <label class="layer-item">
+                <div class="layer-item-left">
+                  <i class="fa-solid fa-cloud-showers-heavy layer-item-icon"></i>
+                  <span>全台即時雨量測站 (24hr)</span>
+                </div>
+                <input type="checkbox" class="layer-checkbox" data-layer="rain" checked>
+              </label>
+              <label class="layer-item">
+                <div class="layer-item-left">
+                  <i class="fa-solid fa-house-flood-water layer-item-icon"></i>
+                  <span>海水與沿海潮位警戒站</span>
+                </div>
+                <input type="checkbox" class="layer-checkbox" data-layer="sea" checked>
+              </label>
+              <label class="layer-item">
+                <div class="layer-item-left">
+                  <i class="fa-solid fa-cloud-bolt layer-item-icon"></i>
+                  <span>定量降水預報 (QPF)</span>
+                </div>
+                <input type="checkbox" class="layer-checkbox" data-layer="forecast" checked>
+              </label>
+              <label class="layer-item">
+                <div class="layer-item-left">
+                  <i class="fa-solid fa-hill-rockslide layer-item-icon"></i>
+                  <span>土石流警戒溪流分佈</span>
+                </div>
+                <input type="checkbox" class="layer-checkbox" data-layer="debris" checked>
+              </label>
+            </div>
+          </div>
+
+          <div class="layer-group-box">
+            <div class="layer-group-title">自來水供水設施</div>
+            <div class="layer-list">
+              <label class="layer-item">
+                <div class="layer-item-left">
+                  <i class="fa-solid fa-faucet-drip layer-item-icon"></i>
+                  <span>淨水場與取水站設施</span>
+                </div>
+                <input type="checkbox" class="layer-checkbox" data-layer="facilities" checked>
+              </label>
+            </div>
+          </div>
+
+          <div class="layer-group-box">
+            <div class="layer-group-title">底圖樣式切換</div>
+            <select id="baseMapSelect" class="fs-select" style="width:100%; padding:6px 10px; border-radius:6px;">
+              <option value="satellite" selected>Google 衛星混合底圖</option>
+              <option value="roadmap">Google 標準道路底圖</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 浮動面板 2：AI 應變情資彙整小助手面板 -->
+      <div class="ai-assistant-panel hide" id="aiAssistantPanel">
+        <div class="ai-panel-header">
+          <div class="ai-header-left">
+            <div class="ai-avatar-icon">
+              <i class="fa-solid fa-robot"></i>
+            </div>
+            <div class="ai-header-title">
+              <span class="ai-name">智慧水網 AI 應變小助手</span>
+              <span class="ai-status">即時情報分析在線</span>
+            </div>
+          </div>
+          <button type="button" class="btn-panel-close" id="closeAiPanelBtn" title="關閉小助手">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="ai-panel-body" id="aiAssistantBody">
+          <!-- 動態載入情資摘要 -->
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- 引用主核心共用腳本與專屬腳本 -->
+  <script src="js/main.js?v=1788254772"></script>
+  <script src="js/disaster-intelligence.js?v=1788254772"></script>
+</body>
+</html>
