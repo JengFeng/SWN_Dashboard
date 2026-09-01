@@ -334,7 +334,9 @@ function initPanelTabs() {
 
       if (targetView === 'map') {
         setTimeout(refreshAllMaps, 50);
-        setTimeout(refreshAllMaps, 200);
+        setTimeout(refreshAllMaps, 150);
+        setTimeout(refreshAllMaps, 300);
+        setTimeout(refreshAllMaps, 600);
       }
     });
   });

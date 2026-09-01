@@ -2345,13 +2345,14 @@ body.font-lg .source-num-val { font-size: 26px; }
 
 /* 11.2 當視窗處於窄寬度時 (<= 992px) */
 @media (max-width: 992px) {
-  /* 顯示二級切換頁籤列 */
+  /* 顯示 RWD 二級視圖切換列 (資訊卡片 / 空間圖台) */
   .rwd-view-switcher {
     display: flex !important;
   }
 
   .split-view-container {
-    display: flex;
+    display: flex !important;
+    flex-direction: column !important;
     height: calc(100vh - 64px) !important;
     width: 100% !important;
     overflow: hidden !important;
@@ -2364,7 +2365,7 @@ body.font-lg .source-num-val { font-size: 26px; }
     display: none !important;
   }
 
-  /* 預設情況下 (或 data-rwd-view="card")：顯示資訊卡片，隱藏圖台 */
+  /* 預設情況下 (或 data-rwd-view="card")：顯示資訊卡片，隱藏右側圖台 */
   .left-panel-card {
     width: 100% !important;
     max-width: 100% !important;
@@ -2375,6 +2376,10 @@ body.font-lg .source-num-val { font-size: 26px; }
     margin-left: 0 !important;
     display: flex !important;
     flex-direction: column;
+  }
+
+  .right-map-panel {
+    display: none !important;
   }
 
   .tab-content {
@@ -2463,12 +2468,9 @@ body.font-lg .source-num-val { font-size: 26px; }
     padding-bottom: 20px !important;
   }
 
-  /* 預設圖台隱藏 */
-  .workspace-container {
-    display: none !important;
-  }
-
-  /* 當使用者切換至【空間圖台】模式 (body.rwd-show-map 或 .split-view-container[data-rwd-view="map"]) */
+  /* =========================================================================
+     當使用者切換至【空間圖台】模式 (.split-view-container[data-rwd-view="map"])
+     ========================================================================= */
   .split-view-container[data-rwd-view="map"] .left-panel-card {
     height: auto !important;
     flex: none !important;
@@ -2479,35 +2481,40 @@ body.font-lg .source-num-val { font-size: 26px; }
     display: none !important;
   }
 
-  .split-view-container[data-rwd-view="map"] .workspace-container {
+  .split-view-container[data-rwd-view="map"] .right-map-panel {
     display: flex !important;
     flex: 1 !important;
     width: 100% !important;
     height: calc(100% - 94px) !important;
+    min-height: 480px !important;
     position: relative !important;
     background-color: #0b1726 !important;
-    overflow: hidden;
+    overflow: hidden !important;
   }
 
+  /* 3 大頁籤對應的 3 大圖台視圖容器與 SVG 水位視圖 */
   .split-view-container[data-rwd-view="map"] .satellite-map-container,
-  .split-view-container[data-rwd-view="map"] .dispatch-map-view,
-  .split-view-container[data-rwd-view="map"] .water-level-svg-view,
-  .split-view-container[data-rwd-view="map"] .reservoir-map-view {
+  .split-view-container[data-rwd-view="map"] .dispatch-static-map-view,
+  .split-view-container[data-rwd-view="map"] .reservoir-map-view,
+  .split-view-container[data-rwd-view="map"] .water-level-svg-view {
     width: 100% !important;
     height: 100% !important;
-    position: relative !important;
+    position: absolute !important;
+    top: 0;
+    left: 0;
     display: flex !important;
+    flex-direction: column !important;
   }
 
   .split-view-container[data-rwd-view="map"] .satellite-map-container.hide,
-  .split-view-container[data-rwd-view="map"] .dispatch-map-view.hide,
-  .split-view-container[data-rwd-view="map"] .water-level-svg-view.hide,
-  .split-view-container[data-rwd-view="map"] .reservoir-map-view.hide {
+  .split-view-container[data-rwd-view="map"] .dispatch-static-map-view.hide,
+  .split-view-container[data-rwd-view="map"] .reservoir-map-view.hide,
+  .split-view-container[data-rwd-view="map"] .water-level-svg-view.hide {
     display: none !important;
   }
 
-  .split-view-container[data-rwd-view="map"] .dispatch-google-map-bg,
-  .split-view-container[data-rwd-view="map"] #gisMap,
+  /* 3 大圖台底層地圖（Leaflet / Google Maps）容器滿版渲染 */
+  .split-view-container[data-rwd-view="map"] #gisGoogleMap,
   .split-view-container[data-rwd-view="map"] #dispatchGoogleMap,
   .split-view-container[data-rwd-view="map"] #reservoirGoogleMap {
     width: 100% !important;
@@ -2515,13 +2522,36 @@ body.font-lg .source-num-val { font-size: 26px; }
     position: absolute !important;
     top: 0;
     left: 0;
+    z-index: 1;
   }
 
+  /* SVG 與圖資拓撲層覆蓋 */
+  .split-view-container[data-rwd-view="map"] .taiwan-county-map-svg,
+  .split-view-container[data-rwd-view="map"] .dispatch-map-canvas-wrap,
+  .split-view-container[data-rwd-view="map"] .reservoir-canvas-overlay {
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    z-index: 5;
+    pointer-events: auto;
+  }
+
+  /* 手機窄螢幕下縮放與適配 */
   .split-view-container[data-rwd-view="map"] .reservoir-floating-cards {
-    transform: translate(-50%, -50%) scale(0.75);
+    transform: translate(-50%, -50%) scale(0.65);
   }
   .split-view-container[data-rwd-view="map"] .reservoir-taiwan-svg {
-    transform: scale(0.75);
+    transform: scale(0.65);
+  }
+  .split-view-container[data-rwd-view="map"] .county-cards-overlay {
+    transform: scale(0.68);
+    transform-origin: center center;
+  }
+  .split-view-container[data-rwd-view="map"] .dispatch-taiwan-svg {
+    transform: scale(0.68);
+    transform-origin: center center;
   }
 
   .split-view-container[data-rwd-view="map"] .map-fab-group {
@@ -2534,6 +2564,8 @@ body.font-lg .source-num-val { font-size: 26px; }
     height: 44px;
     font-size: 17px;
   }
+}
+
 /* ==========================================================================
    18. 左側資訊面板精緻滾動條樣式 (增強滑鼠滾動視覺反饋與拖曳手感)
    ========================================================================== */
