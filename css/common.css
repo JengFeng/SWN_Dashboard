@@ -46,8 +46,9 @@
 
 html {
   width: 100%;
-  max-width: 100vw;
   overflow-x: hidden;
+  overflow-y: auto;
+  scroll-behavior: smooth;
 }
 
 .hide {
@@ -56,15 +57,22 @@ html {
 
 body {
   width: 100%;
-  max-width: 100vw;
+  min-height: 100vh;
   font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background-color: var(--body-bg);
   color: var(--dark-text);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  overflow-y: visible;
   position: relative;
   transition: font-size 0.2s ease;
+}
+
+.layout-dashboard {
+  min-height: 100vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ==========================================================================
@@ -698,7 +706,8 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
 }
 
 .sidebar-overlay {
-  display: none;
+  display: none !important;
+  pointer-events: none;
   position: fixed;
   top: 0;
   left: 0;
@@ -709,7 +718,8 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
 }
 
 .sidebar-overlay.show {
-  display: block;
+  display: block !important;
+  pointer-events: auto;
 }
 
 .sidebar-header {

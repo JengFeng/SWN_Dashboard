@@ -2,14 +2,26 @@
    今日營運概況 (首頁儀表板) - 專屬樣式表 (css/dashboard.css)
    ========================================================================== */
 
+.layout-dashboard .dashboard-container,
 .dashboard-container {
-  padding: 16px 20px;
+  padding: 16px 20px 60px 20px;
   display: flex;
   flex-direction: column;
   gap: 16px;
   max-width: 1920px;
   margin: 0 auto;
   width: 100%;
+  flex: 1;
+}
+
+/* 確保圖表與表格不阻礙垂直滾輪事件 */
+canvas {
+  touch-action: pan-y;
+}
+
+.table-responsive {
+  touch-action: pan-y;
+  overscroll-behavior-x: contain;
 }
 
 .card {
