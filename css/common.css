@@ -1603,12 +1603,13 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
 }
 
 
-   Header 全尺寸防跑版 RWD 斷點 (適配截圖寬度與響應式切換)
+/* ==========================================================================
+   Header 全尺寸防跑版 RWD 斷點 (適配平板與各解析度視窗)
    ========================================================================== */
-@media (max-width: 1200px) {
+@media (max-width: 1366px) {
   .header-center {
-    max-width: 360px;
-    margin: 0 8px;
+    max-width: 320px;
+    margin: 0 6px;
     flex-shrink: 1;
     min-width: 0;
   }
@@ -1632,11 +1633,12 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
   .font-size-controller {
     padding: 3px 6px;
     gap: 4px;
+    flex-shrink: 0;
   }
 
   /* 騰出空間：隱藏一般使用者與時間文字，完整保留並顯示登入使用者頭像/圖示 */
   .header-right {
-    gap: 10px;
+    gap: 8px;
     flex-shrink: 0;
   }
 
@@ -1647,16 +1649,18 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
   .user-profile {
     display: flex !important;
     padding: 2px 4px;
+    flex-shrink: 0;
   }
 
   .avatar-box {
     display: block !important;
     width: 36px;
     height: 36px;
+    flex-shrink: 0;
   }
 }
 
-@media (max-width: 980px) {
+@media (max-width: 1100px) {
   .header-center {
     display: none !important;
   }

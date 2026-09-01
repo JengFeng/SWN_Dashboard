@@ -658,25 +658,32 @@
 }
 
 
+/* ==========================================================================
+   8. 儀表板專屬 RWD 斷點 (適配桌面、平板與行動裝置)
+   ========================================================================== */
 @media (max-width: 1440px) {
   .reservoir-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
-@media (max-width: 1200px) {
+/* 平板橫向與中型螢幕 (1024px ~ 1366px)：上下分割，統計圖表展開為充裕雙欄 */
+@media (max-width: 1366px) {
   .dashboard-top-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
   .right-stats-column {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .reservoir-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
-@media (max-width: 900px) {
-  .header-center {
-    display: none;
-  }
+/* 直向平板與小型螢幕 (601px ~ 992px) */
+@media (max-width: 992px) {
   .kpi-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -688,10 +695,8 @@
   }
 }
 
+/* 手機直向窄螢幕 (<= 600px) */
 @media (max-width: 600px) {
-  .main-header {
-    padding: 0 12px;
-  }
   .dashboard-container {
     padding: 12px 10px;
   }
@@ -700,12 +705,6 @@
   }
   .reservoir-grid {
     grid-template-columns: 1fr;
-  }
-  .user-meta {
-    display: none;
-  }
-  .font-size-controller {
-    display: none;
   }
 }
 
