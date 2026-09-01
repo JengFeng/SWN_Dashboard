@@ -4,7 +4,7 @@
 
 .layout-dashboard .dashboard-container,
 .dashboard-container {
-  padding: 16px 20px 60px 20px;
+  padding: 16px 20px 80px 20px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -12,6 +12,7 @@
   margin: 0 auto;
   width: 100%;
   flex: 1;
+  min-height: min-content;
 }
 
 /* 確保圖表與表格不阻礙垂直滾輪事件 */

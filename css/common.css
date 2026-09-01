@@ -46,9 +46,11 @@
 
 html {
   width: 100%;
+  min-height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
   scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 .hide {
@@ -58,135 +60,23 @@ html {
 body {
   width: 100%;
   min-height: 100vh;
+  margin: 0;
+  padding: 0;
   font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background-color: var(--body-bg);
   color: var(--dark-text);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
-  overflow-y: visible;
   position: relative;
   transition: font-size 0.2s ease;
 }
 
-.layout-dashboard {
-  min-height: 100vh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* ==========================================================================
-   全域字級大小階梯切換 (小 / 中[預設] / 大)
-   原【中】改為【小】；原【大】改為【中】；依比例放大新【大】字級
-   ========================================================================== */
-/* 小（原中字級基準） */
-body.font-sm {
-  font-size: 15px;
-}
-body.font-sm .title-text { font-size: 18.5px; }
-body.font-sm .card-title { font-size: 18.5px; }
-body.font-sm .kpi-label { font-size: 14px; }
-body.font-sm .kpi-sublabel { font-size: 11.5px; }
-body.font-sm .kpi-number { font-size: 24px; }
-body.font-sm .kpi-unit { font-size: 11.5px; }
-body.font-sm .kpi-trend { font-size: 11.5px; }
-body.font-sm .custom-table { font-size: 14.5px; }
-body.font-sm .custom-table th,
-body.font-sm .custom-table td { padding: 9px 10px; }
-body.font-sm .stat-card-title { font-size: 16px; }
-body.font-sm .sub-date { font-size: 12.5px; }
-body.font-sm .legend-row { font-size: 13px; }
-body.font-sm .donut-total { font-size: 15px; }
-body.font-sm .big-stat-val .num { font-size: 25px; }
-body.font-sm .list-block-title { font-size: 13.5px; }
-body.font-sm .bar-item { font-size: 12.5px; }
-body.font-sm .bar-value { font-size: 11.5px; }
-body.font-sm .topic-item { font-size: 12.5px; }
-body.font-sm .reservoir-name { font-size: 14.5px; }
-body.font-sm .reservoir-stat-row .stat-num { font-size: 12.5px; }
-
-/* 中（原大字級基準，系統預設） */
-body,
-body.font-md {
-  font-size: 17.5px;
-}
-body .title-text,
-body.font-md .title-text { font-size: 21.5px; }
-body .card-title,
-body.font-md .card-title { font-size: 21.5px; }
-body .kpi-label,
-body.font-md .kpi-label { font-size: 16.5px; }
-body .kpi-sublabel,
-body.font-md .kpi-sublabel { font-size: 13.5px; }
-body .kpi-number,
-body.font-md .kpi-number { font-size: 29px; }
-body .kpi-unit,
-body.font-md .kpi-unit { font-size: 13.5px; }
-body .kpi-trend,
-body.font-md .kpi-trend { font-size: 13.5px; }
-body .custom-table,
-body.font-md .custom-table { font-size: 17px; }
-body .custom-table th,
-body .custom-table td,
-body.font-md .custom-table th,
-body.font-md .custom-table td { padding: 12px 12px; }
-body .stat-card-title,
-body.font-md .stat-card-title { font-size: 18.5px; }
-body .sub-date,
-body.font-md .sub-date { font-size: 14.5px; }
-body .legend-row,
-body.font-md .legend-row { font-size: 15px; }
-body .donut-total,
-body.font-md .donut-total { font-size: 17.5px; }
-body .big-stat-val .num,
-body.font-md .big-stat-val .num { font-size: 29px; }
-body .list-block-title,
-body.font-md .list-block-title { font-size: 15.5px; }
-body .bar-item,
-body.font-md .bar-item { font-size: 14.5px; }
-body .bar-value,
-body.font-md .bar-value { font-size: 13.5px; }
-body .topic-item,
-body.font-md .topic-item { font-size: 14.5px; }
-body .reservoir-name,
-body.font-md .reservoir-name { font-size: 17px; }
-body .reservoir-stat-row .stat-num,
-body.font-md .reservoir-stat-row .stat-num { font-size: 14.5px; }
-
-/* 大（依比例放大新字級，兼顧版面平衡） */
-body.font-lg {
-  font-size: 19.5px;
-}
-body.font-lg .title-text { font-size: 23px; }
-body.font-lg .card-title { font-size: 23px; }
-body.font-lg .kpi-label { font-size: 17.5px; }
-body.font-lg .kpi-sublabel { font-size: 14.5px; }
-body.font-lg .kpi-number { font-size: 31px; }
-body.font-lg .kpi-unit { font-size: 14.5px; }
-body.font-lg .kpi-trend { font-size: 14.5px; }
-body.font-lg .custom-table { font-size: 17.5px; }
-body.font-lg .custom-table th, 
-body.font-lg .custom-table td { padding: 13px 13px; }
-body.font-lg .stat-card-title { font-size: 19.5px; }
-body.font-lg .sub-date { font-size: 15.5px; }
-body.font-lg .legend-row { font-size: 16px; }
-body.font-lg .donut-total { font-size: 18.5px; }
-body.font-lg .big-stat-val .num { font-size: 31px; }
-body.font-lg .list-block-title { font-size: 16.5px; }
-body.font-lg .bar-item { font-size: 14.5px; }
-body.font-lg .bar-value { font-size: 13.5px; }
-body.font-lg .topic-item { font-size: 14.5px; }
-body.font-lg .reservoir-name { font-size: 18px; }
-body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
-
-/* 2. 佈局容器 */
 .app-layout {
   width: 100%;
-  max-width: 100%;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
+  flex: 1;
 }
 
 /* 3. Header 頂部導航列 */
@@ -1806,4 +1696,38 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
   justify-content: flex-end;
   gap: 10px;
   background: #f8fafc;
+}
+
+
+/* ==========================================================================
+   全域 Modal 浮動視窗標準權威樣式 (包含通用彈窗、登入視窗、事件切換視窗)
+   ========================================================================== */
+.modal-overlay,
+.login-modal-overlay,
+.event-modal-overlay {
+  display: none !important;
+  pointer-events: none !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  background: rgba(15, 23, 42, 0.55) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+  z-index: 9999 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 16px !important;
+  box-sizing: border-box !important;
+}
+
+.modal-overlay.show,
+.login-modal-overlay.show,
+.event-modal-overlay.show {
+  display: flex !important;
+  pointer-events: auto !important;
 }
