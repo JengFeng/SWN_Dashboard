@@ -191,14 +191,14 @@
           <button class="btn-icon active" title="客服進線地圖圖台"><i class="fa-solid fa-map-location-dot"></i></button>
         </div>
 
-        <!-- 登入使用者狀態 -->
-        <div class="user-status-card">
+        <!-- 使用者資訊 (點擊展開登入浮動視窗) -->
+        <div class="user-profile" id="userProfileBtn" title="點擊登入緊急應變戰情儀表板" role="button" tabindex="0">
           <div class="user-meta">
-            <span class="user-role-badge">一般使用者</span>
-            <span class="login-timestamp">2026/05/23 14:45</span>
+            <span class="user-role" id="headerUserRole">一般使用者</span>
+            <span class="system-time" id="systemClock">2026/05/23 14:45</span>
           </div>
-          <div class="avatar-box">
-            <img src="img/user-avatar.png" alt="使用者頭像" class="user-avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%230284c7\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>'">
+          <div class="avatar-box" id="userAvatarBtn">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="使用者頭像">
           </div>
         </div>
       </div>
@@ -657,6 +657,175 @@
           <button type="button" class="btn-submit" id="submitCaseBtn">確認成立並後送</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- 緊急應變戰情儀表板 登入浮動視窗 (淺藍風格) -->
+  <div id="loginModal" class="modal-overlay login-modal-overlay" aria-hidden="true">
+    <div class="login-modal-box" role="dialog" aria-modal="true" aria-labelledby="loginSystemTitle">
+      <!-- 頂部標頭 -->
+      <div class="login-modal-header">
+        <div class="login-brand-group">
+          <img src="logo/Taiwan_Water_Corporation_Seal.svg.webp" alt="台灣自來水公司標誌" class="login-logo-img">
+          <div class="login-brand-text">
+            <span class="company-zh">台灣自來水公司</span>
+            <span class="company-en">TAIWAN WATER CORPORATION</span>
+          </div>
+        </div>
+        <h2 class="login-system-title" id="loginSystemTitle">緊急應變戰情儀表板</h2>
+        <button id="closeLoginModalBtn" class="login-close-btn" type="button" title="關閉視窗">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="login-modal-divider"></div>
+
+      <!-- 單位切換頁籤 -->
+      <div class="login-tabs">
+        <button type="button" class="login-tab-btn active" data-unit="hq">總管理處</button>
+        <button type="button" class="login-tab-btn" data-unit="branch">區管理處</button>
+      </div>
+
+      <!-- 登入表單 -->
+      <form class="login-form" id="loginForm" onsubmit="event.preventDefault();">
+        <!-- 登入方式 -->
+        <div class="login-form-group">
+          <label class="login-form-label" for="loginMethodSelect">登入方式</label>
+          <div class="login-select-wrapper">
+            <select id="loginMethodSelect" class="login-form-select">
+              <option value="local">本機登入</option>
+              <option value="sso">公務 SSO 單一簽入</option>
+              <option value="ad">AD 網域驗證</option>
+            </select>
+            <i class="fa-solid fa-chevron-down select-arrow-icon"></i>
+          </div>
+        </div>
+
+        <!-- 管理單位 (區管理處專屬欄位) -->
+        <div class="login-form-group branch-only-field" id="branchUnitGroup" style="display: none;">
+          <label class="login-form-label" for="loginBranchUnitSelect">管理單位</label>
+          <div class="login-select-wrapper">
+            <select id="loginBranchUnitSelect" class="login-form-select">
+              <option value="">請選擇管理單位</option>
+              <option value="1">第一區管理處 (基隆、新北)</option>
+              <option value="2">第二區管理處 (桃園、新北)</option>
+              <option value="3">第三區管理處 (新竹、苗栗)</option>
+              <option value="4">第四區管理處 (台中、南投)</option>
+              <option value="5">第五區管理處 (嘉義、雲林)</option>
+              <option value="6">第六區管理處 (台南)</option>
+              <option value="7">第七區管理處 (高雄、澎湖)</option>
+              <option value="8">第八區管理處 (宜蘭)</option>
+              <option value="9">第九區管理處 (花蓮)</option>
+              <option value="10">第十區管理處 (台東)</option>
+              <option value="11">第十一區管理處 (彰化)</option>
+              <option value="12">第十二區管理處 (新北)</option>
+            </select>
+            <i class="fa-solid fa-chevron-down select-arrow-icon"></i>
+          </div>
+        </div>
+
+        <!-- 地區 (區管理處專屬欄位) -->
+        <div class="login-form-group branch-only-field" id="branchRegionGroup" style="display: none;">
+          <label class="login-form-label" for="loginBranchRegionSelect">地區</label>
+          <div class="login-select-wrapper">
+            <select id="loginBranchRegionSelect" class="login-form-select">
+              <option value="">請選擇地區</option>
+              <option value="reg-all">全部轄區</option>
+              <option value="reg-1">基隆服務所 / 汐止營運所</option>
+              <option value="reg-2">桃園服務所 / 中壢服務所</option>
+              <option value="reg-3">新竹服務所 / 竹東營運所</option>
+              <option value="reg-4">台中服務所 / 豐原給水廠</option>
+              <option value="reg-5">嘉義服務所 / 斗六營運所</option>
+              <option value="reg-6">台南服務所 / 新營營運所</option>
+              <option value="reg-7">高雄給水廠 / 楠梓服務所</option>
+            </select>
+            <i class="fa-solid fa-chevron-down select-arrow-icon"></i>
+          </div>
+        </div>
+
+        <!-- 帳號 -->
+        <div class="login-form-group">
+          <label class="login-form-label" for="loginUsername">帳號</label>
+          <input type="text" id="loginUsername" class="login-form-input" placeholder="請輸入帳號" autocomplete="username">
+        </div>
+
+        <!-- 密碼 -->
+        <div class="login-form-group">
+          <label class="login-form-label" for="loginPassword">密碼</label>
+          <input type="password" id="loginPassword" class="login-form-input" placeholder="請輸入密碼" autocomplete="current-password">
+        </div>
+
+        <!-- 驗證碼 -->
+        <div class="login-form-group">
+          <label class="login-form-label" for="loginCaptcha">驗證碼</label>
+          <div class="captcha-input-row">
+            <input type="text" id="loginCaptcha" class="login-form-input captcha-input-field" placeholder="驗證碼" maxlength="5">
+            <div class="captcha-display-box" id="captchaDisplayBox" title="點擊刷新驗證碼">
+              <span class="captcha-code-text" id="captchaCodeText">95172</span>
+            </div>
+            <button type="button" id="refreshCaptchaBtn" class="captcha-refresh-btn" title="重新產生驗證碼">
+              <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 登入按鈕 -->
+        <div class="login-action-group">
+          <button type="submit" id="submitLoginBtn" class="btn-login-submit">登入</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 選擇應變事件 浮動視窗 (淺藍科技風格，參照登入視窗設計) -->
+  <div id="eventSelectModal" class="modal-overlay event-modal-overlay" aria-hidden="true">
+    <div class="event-modal-box" role="dialog" aria-modal="true" aria-labelledby="eventModalTitle">
+      <!-- 頂部標頭 -->
+      <div class="event-modal-header">
+        <div class="event-brand-group">
+          <img src="logo/Taiwan_Water_Corporation_Seal.svg.webp" alt="台灣自來水公司標誌" class="event-logo-img">
+          <div class="event-brand-text">
+            <span class="company-zh">台灣自來水公司</span>
+            <span class="company-en">TAIWAN WATER CORPORATION</span>
+          </div>
+        </div>
+        <h2 class="event-system-title" id="eventModalTitle">請選擇應變事件</h2>
+        <button id="closeEventModalBtn" class="event-close-btn" type="button" title="關閉視窗">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="event-modal-divider"></div>
+
+      <!-- 開設狀態切換頁籤 (開設中 / 已撤除) -->
+      <div class="event-tabs">
+        <button type="button" class="event-tab-btn active" data-status="active">開設中事件</button>
+        <button type="button" class="event-tab-btn" data-status="closed">已撤除事件</button>
+      </div>
+
+      <!-- 事件選擇表單區 -->
+      <div class="event-form-group">
+        <div class="event-label-row">
+          <label class="event-form-label" for="incidentSelectDropdown">應變事件清單</label>
+          <button type="button" id="refreshEventListBtn" class="btn-event-refresh" title="重新整理事件清單">
+            <i class="fa-solid fa-arrows-rotate"></i> 更新
+          </button>
+        </div>
+        <div class="event-select-wrapper">
+          <select id="incidentSelectDropdown" class="event-form-select">
+            <option value="農業部萬里溪堰塞湖-災害緊急應變小組">農業部萬里溪堰塞湖-災害緊急應變小組</option>
+            <option value="0831豪雨">0831豪雨</option>
+            <option value="山陀兒颱風應變專案">山陀兒颱風應變專案</option>
+            <option value="南部地區水情乾旱專案應變小組">南部地區水情乾旱專案應變小組</option>
+          </select>
+          <i class="fa-solid fa-chevron-down select-arrow-icon"></i>
+        </div>
+      </div>
+
+      <!-- 確定切換按鈕 (居中水藍按鈕) -->
+      <div class="event-action-group">
+        <button type="button" id="confirmEventSwitchBtn" class="btn-event-submit">確定切換</button>
+      </div>
     </div>
   </div>
 
