@@ -2554,6 +2554,87 @@ body.font-lg .source-num-val { font-size: 26px; }
     transform-origin: center center;
   }
 
+  /* 空間圖台懸浮卡片手機極窄化自適應 (圖例縮小與全台總計縮小) */
+  .split-view-container[data-rwd-view="map"] .map-legend-card {
+    top: 10px !important;
+    right: 10px !important;
+    width: 145px !important;
+    padding: 6px 10px !important;
+    border-radius: 8px !important;
+  }
+  .split-view-container[data-rwd-view="map"] .legend-card-title {
+    font-size: 11px !important;
+    gap: 4px !important;
+  }
+  .split-view-container[data-rwd-view="map"] .btn-legend-collapse {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 9.5px !important;
+  }
+  .split-view-container[data-rwd-view="map"] .legend-card-item {
+    font-size: 10px !important;
+    gap: 5px !important;
+    padding: 2px 0 !important;
+  }
+  .split-view-container[data-rwd-view="map"] .legend-box {
+    width: 9px !important;
+    height: 9px !important;
+  }
+
+  /* 全臺總計供水量 KPI 卡片窄版自適應縮小化 */
+  .split-view-container[data-rwd-view="map"] .map-kpi-card {
+    top: 50px !important;
+    right: 10px !important;
+    width: 145px !important;
+    padding: 6px 8px !important;
+    border-radius: 8px !important;
+    text-align: center !important;
+  }
+  .split-view-container[data-rwd-view="map"] .kpi-card-header {
+    font-size: 10.5px !important;
+    color: #94a3b8 !important;
+    margin-bottom: 2px !important;
+  }
+  .split-view-container[data-rwd-view="map"] .kpi-title-line {
+    font-size: 10.5px !important;
+    gap: 3px !important;
+  }
+  .split-view-container[data-rwd-view="map"] .kpi-main-number {
+    margin: 1px 0 !important;
+  }
+  .split-view-container[data-rwd-view="map"] .kpi-main-number .num {
+    font-size: 18px !important;
+    font-weight: 800 !important;
+  }
+  .split-view-container[data-rwd-view="map"] .kpi-main-number .unit {
+    font-size: 9.5px !important;
+  }
+  .split-view-container[data-rwd-view="map"] .kpi-card-trend {
+    font-size: 9px !important;
+    gap: 2px !important;
+    margin-top: 1px !important;
+  }
+  .split-view-container[data-rwd-view="map"] .trend-sub {
+    display: none !important;
+  }
+
+  /* 跨區調度與水庫圖例面板手機縮小 */
+  .split-view-container[data-rwd-view="map"] .dispatch-legend-panel,
+  .split-view-container[data-rwd-view="map"] .reservoir-legend-card {
+    width: 140px !important;
+    padding: 6px 8px !important;
+    border-radius: 8px !important;
+  }
+  .split-view-container[data-rwd-view="map"] .legend-panel-title,
+  .split-view-container[data-rwd-view="map"] .reservoir-legend-card .legend-card-title {
+    font-size: 10.5px !important;
+  }
+  .split-view-container[data-rwd-view="map"] .dispatch-legend-row,
+  .split-view-container[data-rwd-view="map"] .reservoir-legend-card .legend-item {
+    font-size: 9.5px !important;
+    gap: 4px !important;
+  }
+
   .split-view-container[data-rwd-view="map"] .map-fab-group {
     bottom: 16px;
     right: 16px;

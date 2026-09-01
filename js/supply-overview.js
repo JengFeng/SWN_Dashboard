@@ -1014,12 +1014,17 @@ function initFabButtons() {
 }
 
 /**
- * 12. 圖例面板開合切換事件 (三大頁籤圖例全面支援一鍵收合與展開)
+ * 12. 圖例面板開合切換事件 (三大頁籤圖例全面支援一鍵收合與展開，窄螢幕預設收闔)
  */
 function initCollapsibleLegends() {
+  const isMobileView = window.innerWidth <= 992;
+
   // 1. 全台供水狀態圖例 (Tab 1)
   const toggleOverviewLegendBtn = document.getElementById('toggleOverviewLegendBtn');
   const overviewLegendCard = document.getElementById('overviewLegendCard');
+  if (overviewLegendCard && isMobileView) {
+    overviewLegendCard.classList.add('collapsed');
+  }
   if (toggleOverviewLegendBtn && overviewLegendCard) {
     toggleOverviewLegendBtn.addEventListener('click', () => {
       overviewLegendCard.classList.toggle('collapsed');
@@ -1029,6 +1034,9 @@ function initCollapsibleLegends() {
   // 2. 跨區水源調度圖例 (Tab 2)
   const toggleDispatchLegendBtn = document.getElementById('toggleDispatchLegendBtn');
   const dispatchLegendPanel = document.getElementById('dispatchLegendPanel');
+  if (dispatchLegendPanel && isMobileView) {
+    dispatchLegendPanel.classList.add('collapsed');
+  }
   if (toggleDispatchLegendBtn && dispatchLegendPanel) {
     toggleDispatchLegendBtn.addEventListener('click', () => {
       dispatchLegendPanel.classList.toggle('collapsed');
@@ -1038,6 +1046,9 @@ function initCollapsibleLegends() {
   // 3. 水庫蓄水量百分比圖例 (Tab 3)
   const toggleReservoirLegendBtn = document.getElementById('toggleReservoirLegendBtn');
   const reservoirLegendCard = document.getElementById('reservoirLegendCard');
+  if (reservoirLegendCard && isMobileView) {
+    reservoirLegendCard.classList.add('collapsed');
+  }
   if (toggleReservoirLegendBtn && reservoirLegendCard) {
     toggleReservoirLegendBtn.addEventListener('click', () => {
       reservoirLegendCard.classList.toggle('collapsed');
