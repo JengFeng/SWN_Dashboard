@@ -13,8 +13,8 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <!-- 基礎共用與專屬樣式表 -->
-  <link rel="stylesheet" href="css/common.css?v=1788254772">
-  <link rel="stylesheet" href="css/disaster-intelligence.css?v=1788254772">
+  <link rel="stylesheet" href="css/common.css?v=1788254990">
+  <link rel="stylesheet" href="css/disaster-intelligence.css?v=1788254990">
 </head>
 <body class="layout-gis-full font-md">
 
@@ -100,55 +100,53 @@
         </div>
 
         <!-- 模組功能下拉切換 (客製化原生風格下拉選單) -->
-        <div class="header-dropdown-wrap">
-          <button id="viewDropdownBtn" class="btn-dropdown primary-dropdown" title="點擊切換系統功能模組">
-            <span id="currentViewText">應變事件情資</span>
+        <div class="dropdown-wrapper">
+          <button id="viewDropdownBtn" class="dropdown-btn primary-dropdown">
+            <span id="currentViewText">事件應變情資</span>
             <i class="fa-solid fa-chevron-down"></i>
           </button>
           
-          <!-- 二級串聯選單面板 -->
+          <!-- 選單容器 -->
           <div id="viewDropdownMenu" class="cascading-menu-wrapper">
             <ul class="cascading-menu-level1">
-              <li class="menu-parent-item" data-submenu="menu-sub-emergency">
-                <div class="menu-item-content">
-                  <span>緊急應變戰情儀表板</span>
-                  <i class="fa-solid fa-caret-right"></i>
-                </div>
-                <ul class="cascading-menu-level2" id="menu-sub-emergency">
-                  <li class="menu-sub-item" onclick="location.href='index.html'">
-                    <i class="fa-regular fa-circle radio-icon"></i>
-                    <span class="sub-text">災情事件彙總</span>
-                  </li>
-                  <li class="menu-sub-item active" onclick="location.href='disaster-intelligence.html'">
-                    <i class="fa-solid fa-circle-dot radio-icon"></i>
-                    <span class="sub-text">應變事件情資</span>
-                  </li>
-                  <li class="menu-sub-item" onclick="location.href='customer-service.html'">
-                    <i class="fa-regular fa-circle radio-icon"></i>
-                    <span class="sub-text">客服進線分析</span>
-                  </li>
-                </ul>
+              <!-- 1. 今日營運概況 (首頁入口) -->
+              <li class="menu-direct-item" data-title="今日營運概況" onclick="location.href='index.html'">
+                <span>今日營運概況</span>
               </li>
-              <li class="menu-parent-item" data-submenu="menu-sub-supply">
-                <div class="menu-item-content">
-                  <span>供水營運概況</span>
-                  <i class="fa-solid fa-caret-right"></i>
-                </div>
-                <ul class="cascading-menu-level2" id="menu-sub-supply">
+
+              <!-- 2. 供水營運概況 (保留子選單) -->
+              <li class="menu-parent-item" data-parent="water-supply">
+                <span>供水營運概況</span>
+                <i class="fa-solid fa-caret-right"></i>
+                
+                <!-- 第二層：供水營運概況 子項目 -->
+                <ul class="cascading-menu-level2">
                   <li class="menu-sub-item" onclick="location.href='supply-overview.html'">
+                    <span class="sub-text">全台供水狀況總覽</span>
                     <i class="fa-regular fa-circle radio-icon"></i>
-                    <span class="sub-text">全台供水狀態總覽</span>
                   </li>
                   <li class="menu-sub-item" onclick="location.href='supply-overview.html#tab-dispatch'">
-                    <i class="fa-regular fa-circle radio-icon"></i>
                     <span class="sub-text">跨區水源調度</span>
+                    <i class="fa-regular fa-circle radio-icon"></i>
                   </li>
                   <li class="menu-sub-item" onclick="location.href='supply-overview.html#tab-reservoir'">
-                    <i class="fa-regular fa-circle radio-icon"></i>
                     <span class="sub-text">水庫蓄水量</span>
+                    <i class="fa-regular fa-circle radio-icon"></i>
                   </li>
                 </ul>
               </li>
+
+              <!-- 3. 客服進線狀況 (單一功能，點擊跳轉至客服進線分析) -->
+              <li class="menu-direct-item" data-title="客服進線狀況" onclick="location.href='customer-service.html'">
+                <span>客服進線狀況</span>
+              </li>
+
+              <!-- 4. 事件應變情資 (當前啟用) -->
+              <li class="menu-direct-item active" data-title="事件應變情資" onclick="location.href='disaster-intelligence.html'">
+                <span>事件應變情資</span>
+              </li>
+
+              <!-- 5. 綜合案件分析 (單一功能，點擊跳轉至綜合案件分析) -->
               <li class="menu-direct-item" data-title="綜合案件分析" onclick="location.href='case-analysis.html'">
                 <span>綜合案件分析</span>
               </li>
@@ -357,7 +355,7 @@
   </div>
 
   <!-- 引用主核心共用腳本與專屬腳本 -->
-  <script src="js/main.js?v=1788254772"></script>
-  <script src="js/disaster-intelligence.js?v=1788254772"></script>
+  <script src="js/main.js?v=1788254990"></script>
+  <script src="js/disaster-intelligence.js?v=1788254990"></script>
 </body>
 </html>
