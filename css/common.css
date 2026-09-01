@@ -207,7 +207,7 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
   gap: 10px;
   flex: 1;
   min-width: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .header-toggle-btn {
@@ -1706,7 +1706,7 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
     gap: 6px;
     min-width: 0;
     flex: 1;
-    overflow: hidden;
+    overflow: visible;
   }
   .btn-sidebar-toggle {
     width: 30px;
