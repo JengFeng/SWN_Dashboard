@@ -13,8 +13,8 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <!-- 基礎共用與專屬樣式表 -->
-  <link rel="stylesheet" href="css/common.css?v=1788253126">
-  <link rel="stylesheet" href="css/supply-overview.css?v=1788253126">
+  <link rel="stylesheet" href="css/common.css?v=1788253500">
+  <link rel="stylesheet" href="css/supply-overview.css?v=1788253500">
 </head>
 <body class="layout-gis-split font-md">
 
@@ -840,44 +840,47 @@
           <!-- Google Map 實體圖台容器 -->
           <div id="gisGoogleMap" class="gis-google-map"></div>
 
-          <!-- 右上角：供水區域狀態圖例卡片 (Legend Card - 支援一鍵收合與展開) -->
-          <div class="map-floating-card map-legend-card" id="overviewLegendCard">
-            <div class="legend-card-header" id="toggleOverviewLegendBtn">
-              <div class="legend-card-title"><i class="fa-solid fa-layer-group"></i> 供水區域狀態圖例</div>
-              <button type="button" class="btn-legend-collapse" title="收合/展開圖例">
-                <i class="fa-solid fa-chevron-up" id="overviewLegendArrow"></i>
-              </button>
-            </div>
-            <div class="legend-card-list" id="overviewLegendContent">
-              <div class="legend-card-item">
-                <span class="legend-box box-warning"></span>
-                <span>警戒供水區域</span>
+          <!-- 右上角懸浮資訊堆疊區（自動流式排列，圖例展開/收合時 KPI 卡片自動順推，全版與窄版絕不重疊） -->
+          <div class="map-floating-stack" id="mapFloatingStack">
+            <!-- 1. 供水區域圖例卡片 (支援一鍵收合與展開) -->
+            <div class="map-floating-card map-legend-card" id="overviewLegendCard">
+              <div class="legend-card-header" id="toggleOverviewLegendBtn">
+                <div class="legend-card-title"><i class="fa-solid fa-layer-group"></i> 供水區域圖例</div>
+                <button type="button" class="btn-legend-collapse" title="收合/展開圖例">
+                  <i class="fa-solid fa-chevron-up" id="overviewLegendArrow"></i>
+                </button>
               </div>
-              <div class="legend-card-item">
-                <span class="legend-box box-danger"></span>
-                <span>異常供水區域</span>
+              <div class="legend-card-list" id="overviewLegendContent">
+                <div class="legend-card-item">
+                  <span class="legend-box box-warning"></span>
+                  <span>警戒供水區域</span>
+                </div>
+                <div class="legend-card-item">
+                  <span class="legend-box box-danger"></span>
+                  <span>異常供水區域</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- 中右側：全台總計 KPI 卡片 (Summary Card) -->
-          <div class="map-floating-card map-kpi-card">
-            <div class="kpi-card-header">全台總計</div>
-            <div class="kpi-card-content">
-              <div class="kpi-title-line">
-                <i class="fa-solid fa-droplet text-primary"></i>
-                <span>總供水量</span>
-              </div>
-              <div class="kpi-main-number">
-                <span class="num">944.6</span>
-                <span class="unit">萬噸 / 日</span>
-              </div>
-              <div class="kpi-card-trend">
-                <span class="trend-lbl">較前一日</span>
-                <span class="trend-delta text-success">
-                  <i class="fa-solid fa-arrow-down"></i> -0.83%
-                </span>
-                <span class="trend-sub">(-7.9 萬噸 / 日)</span>
+            <!-- 2. 全台總計 總供水量 KPI 卡片 -->
+            <div class="map-floating-card map-kpi-card">
+              <div class="kpi-card-header">全台總計</div>
+              <div class="kpi-card-content">
+                <div class="kpi-title-line">
+                  <i class="fa-solid fa-droplet text-primary"></i>
+                  <span>總供水量</span>
+                </div>
+                <div class="kpi-main-number">
+                  <span class="num">944.6</span>
+                  <span class="unit">萬噸 / 日</span>
+                </div>
+                <div class="kpi-card-trend">
+                  <span class="trend-lbl">較前一日</span>
+                  <span class="trend-delta text-success">
+                    <i class="fa-solid fa-arrow-down"></i> -0.83%
+                  </span>
+                  <span class="trend-sub">(-7.9 萬噸 / 日)</span>
+                </div>
               </div>
             </div>
           </div>
@@ -1814,7 +1817,7 @@
   </div>
 
   <!-- 腳本載入 -->
-  <script src="js/main.js?v=1788253126"></script>
-  <script src="js/supply-overview.js?v=1788253126"></script>
+  <script src="js/main.js?v=1788253500"></script>
+  <script src="js/supply-overview.js?v=1788253500"></script>
 </body>
 </html>
