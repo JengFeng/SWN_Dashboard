@@ -1787,6 +1787,21 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
   }
 }
 
+/* 412px 以下超極窄手機視圖：隱藏字級選擇器，釋放空間予標題與選單 */
+@media (max-width: 412px) {
+  .font-size-controller {
+    display: none !important;
+  }
+  .main-header {
+    padding: 0 8px;
+    gap: 6px;
+  }
+  .header-right {
+    gap: 4px;
+    margin-left: auto;
+  }
+}
+
 
 
 
