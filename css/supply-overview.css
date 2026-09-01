@@ -1,0 +1,2570 @@
+/* ==========================================================================
+   全台供水狀態總覽 (GIS 空間圖台) - 專屬樣式表 (css/supply-overview.css)
+   ========================================================================== */
+
+/* 1. 左右分割版面配置 */
+.split-view-container {
+  display: flex;
+  height: calc(100vh - 64px);
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  background-color: #0b1726;
+}
+
+/* 2. 左側表格資訊面板 (預設調整為畫面 30% 寬度，高 100%) */
+.left-panel-card {
+  width: 30%;
+  min-width: 320px;
+  height: 100%;
+  background: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 16px rgba(0, 0, 0, 0.08);
+  z-index: 20;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.left-panel-card.collapsed {
+  margin-left: -30%;
+}
+
+/* Tab 頁籤 */
+.panel-tabs {
+  display: flex;
+  background: #ffffff;
+  border-bottom: 2px solid #f1f5f9;
+  padding: 0 8px;
+  flex-shrink: 0;
+}
+
+.tab-item {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 14px 10px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  position: relative;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+  text-align: center;
+}
+
+.tab-item:hover {
+  color: var(--primary-color);
+}
+
+.tab-item.active {
+  color: #0284c7;
+  font-weight: 700;
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 10%;
+  width: 80%;
+  height: 3px;
+  background-color: #0284c7;
+  border-radius: var(--radius-full);
+}
+
+/* Tab 內容區塊 (Flex 1 1 0 空間分配，確保任何解析度下內部滾動順暢) */
+.tab-content {
+  display: none;
+  flex: 1 1 0;
+  min-height: 0;
+  height: 0;
+  flex-direction: column;
+  overflow: hidden;
+  background: #ffffff;
+  position: relative;
+}
+
+.tab-content.active {
+  display: flex;
+}
+
+.empty-tab-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 12px;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+/* 3. 各區處供水清冊表格 (雙層圖層縱向滿版) */
+.overview-layer,
+.system-layer {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.overview-layer.hide,
+.system-layer.hide {
+  display: none !important;
+}
+
+.table-scroll-wrap {
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.district-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.district-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #f8fafc;
+}
+
+.district-table th {
+  padding: 12px 10px;
+  color: #334155;
+  font-weight: 700;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: center;
+  background: #f8fafc;
+  line-height: 1.3;
+}
+
+.district-table th.th-district { width: 17%; text-align: center; padding: 12px 4px; }
+.district-table th.th-status   { width: 23%; text-align: center; padding: 12px 4px; }
+.district-table th.th-supply   { width: 30%; text-align: right; padding-right: 28px !important; }
+.district-table th.th-lastyear { width: 30%; text-align: right; padding-right: 12px !important; }
+.unit-th { font-size: 11px; font-weight: normal; color: #64748b; }
+
+.district-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.clickable-row {
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.clickable-row:hover {
+  background-color: #f0fdfa !important;
+}
+
+.clickable-row.highlighted {
+  background-color: #e0f2fe !important;
+}
+
+.td-district {
+  text-align: center;
+  font-weight: 700;
+  color: #1e293b;
+  padding-left: 4px !important;
+  padding-right: 4px !important;
+}
+
+.district-link {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.td-number {
+  text-align: right;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* 第 3 欄總供水量向左靠攏，縮小與供水狀態間距 */
+.td-supply,
+.district-table td:nth-child(3) {
+  text-align: right;
+  padding-right: 28px !important;
+}
+
+/* 第 4 欄去年同日供水量 */
+.td-lastyear,
+.district-table td:nth-child(4) {
+  text-align: right;
+  padding-right: 12px !important;
+}
+
+.text-muted {
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* 狀態指示燈標籤 */
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-normal { color: #15803d; }
+.status-normal i { font-size: 10px; color: #16a34a; }
+
+.status-danger { color: #dc2626; }
+.status-danger i { font-size: 10px; color: #ef4444; }
+
+/* 第三區異常紅色高亮行 */
+.row-danger {
+  background-color: #fff1f2 !important;
+}
+
+.row-danger:hover {
+  background-color: #fee2e2 !important;
+}
+
+.text-danger { color: #e11d48 !important; }
+.font-bold { font-weight: 800 !important; }
+
+/* 表格底部單位備註 */
+.table-footer-note {
+  padding: 10px 16px;
+  background: #ffffff;
+  border-top: 1px solid #f1f5f9;
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* 4. 垂直可拖曳調整寬度分割條 (Resizer Bar) */
+.panel-resizer-bar {
+  width: 12px;
+  margin: 0 -6px;
+  background: transparent;
+  cursor: col-resize;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+  transition: background-color 0.2s ease;
+}
+
+.panel-resizer-bar:hover,
+.panel-resizer-bar.is-dragging {
+  background: rgba(2, 132, 199, 0.2);
+}
+
+.resizer-line {
+  width: 2px;
+  height: 100%;
+  background: #cbd5e1;
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.panel-resizer-bar:hover .resizer-line,
+.panel-resizer-bar.is-dragging .resizer-line {
+  background: #0284c7;
+  width: 3px;
+  box-shadow: 0 0 8px rgba(2, 132, 199, 0.6);
+}
+
+/* 內嵌面板收合按鈕 */
+.collapse-toggle-bar {
+  position: absolute;
+  top: 50%;
+  left: 6px;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 48px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #475569;
+  box-shadow: 3px 0 8px rgba(0, 0, 0, 0.1);
+  z-index: 35;
+  transition: all 0.2s ease;
+}
+
+.collapse-toggle-bar:hover {
+  background: #f1f5f9;
+  color: var(--primary-color);
+  width: 24px;
+}
+
+.collapse-toggle-bar.collapsed i {
+  transform: rotate(180deg);
+}
+
+/* 拖曳中樣式防選取 */
+.split-view-container.is-resizing {
+  user-select: none !important;
+  cursor: col-resize !important;
+}
+
+.split-view-container.is-resizing * {
+  user-select: none !important;
+  pointer-events: none !important;
+}
+
+.split-view-container.is-resizing .panel-resizer-bar,
+.split-view-container.is-resizing #gisGoogleMap {
+  pointer-events: auto !important;
+}
+
+/* 5. 右側 Google Map GIS 衛星地圖工作區 */
+.right-map-panel {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  min-width: 0;
+}
+
+.satellite-map-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #061322;
+  overflow: hidden;
+}
+
+/* 全域與各工作區視圖切換隱藏規則 */
+.hide,
+.satellite-map-container.hide,
+.dispatch-static-map-view.hide,
+.water-level-svg-view.hide,
+.reservoir-map-view.hide {
+  display: none !important;
+}
+
+/* Google Map 實體圖台 */
+.gis-google-map {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  background: #0b1726;
+}
+
+/* 自訂 Leaflet 區處標籤 (District Marker Label) */
+.leaflet-district-label {
+  background: rgba(15, 30, 54, 0.88) !important;
+  border: 1px solid #38bdf8 !important;
+  border-radius: 4px !important;
+  color: #ffffff !important;
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  padding: 2px 6px !important;
+  white-space: nowrap !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+  pointer-events: none !important;
+  text-align: center !important;
+}
+
+.leaflet-district-label.danger-label {
+  background: rgba(220, 38, 38, 0.92) !important;
+  border-color: #fca5a5 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.8) !important;
+  animation: pulseDanger 2s infinite;
+}
+
+@keyframes pulseDanger {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(239, 68, 68, 0.8); }
+  50% { transform: scale(1.06); box-shadow: 0 0 16px rgba(239, 68, 68, 1); }
+}
+
+/* 傳訊點自訂 Marker */
+.telemetry-spot-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #0284c7;
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  font-size: 12px;
+  box-shadow: 0 0 12px rgba(2, 132, 199, 0.8);
+  animation: markerBounce 2s infinite;
+}
+
+@keyframes markerBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* 7. 右側浮動卡片 (半透明深色玻璃擬態，套疊於 Google Map 上) */
+.map-floating-card {
+  position: absolute;
+  background: rgba(13, 27, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+  z-index: 1000;
+}
+
+/* 7.1 右上角圖例卡片 */
+.map-legend-card {
+  top: 24px;
+  right: 28px;
+  width: 210px;
+  padding: 16px 18px;
+}
+
+.legend-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 8px;
+}
+
+.legend-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.legend-card-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.legend-box {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.box-warning {
+  background-color: #eab308;
+  box-shadow: 0 0 6px rgba(234, 179, 8, 0.6);
+}
+
+.box-danger {
+  background-color: #ef4444;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.8);
+}
+
+/* 7.2 中右側全台總計 KPI 卡片 */
+.map-kpi-card {
+  top: 170px;
+  right: 28px;
+  width: 210px;
+  padding: 18px;
+  text-align: center;
+}
+
+.kpi-card-header {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #94a3b8;
+  margin-bottom: 8px;
+}
+
+.kpi-title-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 13.5px;
+  color: #f1f5f9;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.kpi-main-number {
+  margin: 6px 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+}
+
+.kpi-main-number .num {
+  font-size: 32px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+.kpi-main-number .unit {
+  font-size: 11.5px;
+  color: #94a3b8;
+}
+
+.kpi-card-trend {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 11px;
+}
+
+.trend-lbl { color: #94a3b8; }
+
+.trend-delta {
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.text-success { color: #4ade80; }
+
+.trend-sub {
+  color: #64748b;
+  font-size: 10px;
+}
+
+/* 8. 右下角浮動工具按鈕群 (FAB) */
+.map-fab-group {
+  position: absolute;
+  bottom: 28px;
+  right: 28px;
+  display: flex;
+  gap: 14px;
+  z-index: 15;
+}
+
+.fab-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1.5px solid rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fab-btn:hover {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #ffffff;
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 25px rgba(2, 132, 199, 0.5);
+}
+
+.fab-robot {
+  border-color: rgba(56, 189, 248, 0.6);
+}
+
+/* 9. 懸浮 Tooltip */
+.district-tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #ffffff;
+  font-size: 12.5px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  z-index: 30;
+  backdrop-filter: blur(6px);
+  min-width: 170px;
+  transition: opacity 0.15s ease;
+}
+
+.district-tooltip.hide {
+  display: none;
+}
+
+.tooltip-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: #38bdf8;
+  margin-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: 4px;
+}
+
+.tooltip-row {
+  margin: 3px 0;
+  color: #cbd5e1;
+}
+
+/* ==========================================================================
+   10. 字級縮放專屬適配 (中 / 大)
+   ========================================================================== */
+body.font-md .tab-item { font-size: 16px; padding: 15px 12px; }
+body.font-md .district-table { font-size: 15px; }
+body.font-md .district-table th, 
+body.font-md .district-table td { padding: 12px 10px; }
+body.font-md .table-footer-note { font-size: 13.5px; }
+body.font-md .legend-card-title { font-size: 15.5px; }
+body.font-md .legend-card-item { font-size: 14px; }
+body.font-md .kpi-card-header { font-size: 15px; }
+body.font-md .kpi-title-line { font-size: 15px; }
+body.font-md .kpi-main-number .num { font-size: 36px; }
+
+body.font-lg .tab-item { font-size: 17.5px; padding: 16px 12px; }
+body.font-lg .district-table { font-size: 16.5px; }
+body.font-lg .district-table th, 
+body.font-lg .district-table td { padding: 14px 12px; }
+body.font-lg .table-footer-note { font-size: 15px; }
+body.font-lg .legend-card-title { font-size: 17px; }
+body.font-lg .legend-card-item { font-size: 15.5px; }
+body.font-lg .kpi-card-header { font-size: 16.5px; }
+body.font-lg .kpi-title-line { font-size: 16.5px; }
+/* ==========================================================================
+   12. 跨區水源調度左側面板樣式 (Dispatch Left Panel)
+   ========================================================================== */
+.dispatch-panel-scroll {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  overflow-y: scroll !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 16px 14px 40px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: #f8fafc;
+  box-sizing: border-box;
+}
+
+.dispatch-stat-card,
+.dispatch-source-card {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05);
+  padding: 16px 18px;
+}
+
+.dispatch-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  border-bottom: 1.5px solid #f1f5f9;
+  padding-bottom: 8px;
+}
+
+.dispatch-card-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f2744;
+  margin: 0;
+  letter-spacing: 0.3px;
+}
+
+.dispatch-unit-badge {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.dispatch-stat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dispatch-stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #ffffff;
+  border-bottom: 1px solid #f8fafc;
+  transition: var(--transition-fast);
+}
+
+.dispatch-stat-row:hover {
+  background: #f0f9ff;
+}
+
+.stat-left-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stat-icon-wrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+
+.icon-water {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.icon-users {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+.icon-sync {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.icon-ban {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.icon-chart {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.stat-label {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.stat-right-item {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.stat-num-val {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0369a1;
+  letter-spacing: 0.5px;
+  font-family: 'Roboto', 'Noto Sans TC', sans-serif;
+}
+
+.stat-unit-txt {
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.stat-right-stacked {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.stat-sub-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0284c7;
+}
+
+.stat-val-inline {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+#tab-dispatch {
+  container-type: inline-size;
+  container-name: dispatchContainer;
+}
+
+/* 下半部：支援水源統計卡片 (Container Queries 智慧自適應：面板 <440px 單欄滿版，>=440px 雙欄並排) */
+.dispatch-source-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+@container dispatchContainer (min-width: 440px) {
+  .dispatch-source-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.source-item-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  transition: var(--transition-fast);
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.source-item-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.card-blue-glow {
+  border-color: #bae6fd;
+  background: linear-gradient(145deg, #ffffff 0%, #f0f9ff 100%);
+}
+
+.card-green-glow {
+  border-color: #bbf7d0;
+  background: linear-gradient(145deg, #ffffff 0%, #f0fdf4 100%);
+}
+
+.source-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.icon-blue-water {
+  background: #0284c7;
+  color: #ffffff;
+}
+
+.icon-green-water {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.source-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.source-item-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.source-tag {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.source-val-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.source-num-val {
+  font-size: 16.5px;
+  font-weight: 800;
+  font-family: 'Roboto', 'Noto Sans TC', sans-serif;
+}
+
+.val-blue { color: #0284c7; }
+.val-green { color: #16a34a; }
+
+.source-unit-txt {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+/* ==========================================================================
+   13. 全臺各縣市供水支援與受支援量 Google Map 衛星底圖套疊拓撲圖
+   ========================================================================== */
+.dispatch-static-map-view {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #061120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.dispatch-static-map-view.hide {
+  display: none !important;
+}
+
+/* 底層 Google Map 實體圖台 */
+.dispatch-google-map-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* 半透明深色科技感對比遮罩，使背景 Google 衛星地圖與前景發光卡片層次分明 */
+.dispatch-map-overlay-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 50%, rgba(6, 17, 32, 0.38) 0%, rgba(3, 8, 16, 0.72) 100%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* 右上角：支援水量統計下拉切換器 (統一配置於右上角) */
+.dispatch-mode-dropdown-box {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  left: auto;
+  z-index: 30;
+}
+
+.btn-dispatch-mode {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(15, 30, 54, 0.9);
+  border: 1.5px solid #0284c7;
+  color: #ffffff;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+  backdrop-filter: blur(8px);
+  transition: var(--transition-fast);
+}
+
+.btn-dispatch-mode:hover {
+  background: rgba(2, 132, 199, 0.3);
+  border-color: #38bdf8;
+}
+
+.text-cyan { color: #38bdf8; }
+
+.mode-current-badge {
+  background: #0284c7;
+  color: #ffffff;
+  padding: 1px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dispatch-mode-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  left: auto;
+  width: 140px;
+  background: #0d213a;
+  border: 1px solid #0284c7;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  backdrop-filter: blur(8px);
+  z-index: 40;
+}
+
+.dispatch-mode-menu.hide {
+  display: none;
+}
+
+.mode-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  border-radius: 6px;
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.mode-menu-item:hover {
+  background: rgba(2, 132, 199, 0.25);
+  color: #ffffff;
+}
+
+.mode-menu-item.active {
+  background: #0284c7;
+  color: #ffffff;
+}
+
+.mode-check-icon {
+  font-size: 13px;
+}
+
+/* 右上角：支援水源圖例面板 (統一配置於右上角模式切換器下方，支援開合) */
+.dispatch-legend-panel {
+  position: absolute;
+  top: 68px;
+  right: 20px;
+  left: auto;
+  background: rgba(10, 24, 44, 0.9);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  z-index: 25;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.legend-panel-header,
+.legend-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.legend-panel-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-legend-collapse {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #94a3b8;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10.5px;
+  transition: all 0.25s ease;
+}
+
+.btn-legend-collapse:hover {
+  background: rgba(56, 189, 248, 0.25);
+  color: #38bdf8;
+  border-color: #38bdf8;
+}
+
+.legend-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.25s ease;
+}
+
+/* 圖例收合樣式 (三大視圖圖例通用) */
+.dispatch-legend-panel.collapsed .legend-items-list,
+.reservoir-legend-card.collapsed .legend-card-list,
+.map-legend-card.collapsed .legend-card-list {
+  display: none !important;
+}
+
+.dispatch-legend-panel.collapsed .btn-legend-collapse i,
+.reservoir-legend-card.collapsed .btn-legend-collapse i,
+.map-legend-card.collapsed .btn-legend-collapse i {
+  transform: rotate(180deg);
+}
+
+.dispatch-legend-panel.collapsed,
+.reservoir-legend-card.collapsed,
+.map-legend-card.collapsed {
+  padding-bottom: 10px !important;
+}
+
+.dispatch-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.legend-color-block {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.color-orange { background: #f97316; box-shadow: 0 0 6px #f97316; }
+.color-blue   { background: #3b82f6; box-shadow: 0 0 6px #3b82f6; }
+.color-red    { background: #ef4444; box-shadow: 0 0 6px #ef4444; }
+.color-green  { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+
+/* 中央拓撲畫布與卡片網格 (絕對覆蓋在 Google Map 衛星底圖之上) */
+.dispatch-map-canvas-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.dispatch-taiwan-svg {
+  width: 100%;
+  max-width: 1000px;
+  height: 100%;
+  max-height: 800px;
+  overflow: visible;
+  filter: drop-shadow(0 0 20px rgba(2, 132, 199, 0.25));
+  pointer-events: none;
+}
+
+/* 各縣市 SVG Path 樣式 (允許點擊互動，空白區域允許拖曳平移地圖) */
+.county-shape {
+  pointer-events: auto;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  stroke-width: 1.5;
+}
+
+.shape-blue   { fill: #1e3a8a; stroke: #60a5fa; fill-opacity: 0.65; }
+.shape-orange { fill: #7c2d12; stroke: #fb923c; fill-opacity: 0.65; }
+.shape-red    { fill: #7f1d1d; stroke: #f87171; fill-opacity: 0.65; }
+.shape-green  { fill: #14532d; stroke: #4ade80; fill-opacity: 0.65; }
+
+.county-shape:hover {
+  filter: brightness(1.35) drop-shadow(0 0 10px #38bdf8);
+  stroke-width: 2.5;
+}
+
+/* 連線箭頭 */
+.leader-line {
+  fill: none;
+  stroke: rgba(226, 232, 240, 0.65);
+  stroke-width: 1.4;
+  stroke-dasharray: 4 3;
+}
+
+/* 17 個縣市立體卡片 (絕對定位疊加層) */
+.county-cards-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 1000px;
+  height: 100%;
+  max-height: 800px;
+  pointer-events: none;
+  z-index: 25;
+}
+
+.county-stat-card {
+  pointer-events: auto;
+  position: absolute;
+  width: 110px;
+  background: rgba(8, 19, 36, 0.92);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  overflow: hidden;
+  transition: all 0.25s ease;
+  border-width: 1.5px;
+  border-style: solid;
+}
+
+.county-stat-card:hover {
+  transform: scale(1.06);
+  z-index: 35 !important;
+}
+
+.card-border-red {
+  border-color: #ef4444;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.45);
+}
+
+.card-border-orange {
+  border-color: #f97316;
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.45);
+}
+
+.card-border-blue {
+  border-color: #3b82f6;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.45);
+}
+
+.card-border-green {
+  border-color: #22c55e;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.45);
+}
+
+.card-header-tag {
+  padding: 2px 4px;
+  text-align: center;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+}
+
+.tag-red    { background: linear-gradient(90deg, #dc2626 0%, #ef4444 100%); }
+.tag-orange { background: linear-gradient(90deg, #ea580c 0%, #f97316 100%); }
+.tag-blue   { background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%); }
+.tag-green  { background: linear-gradient(90deg, #16a34a 0%, #22c55e 100%); }
+
+.card-data-grid {
+  padding: 3px 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.grid-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10.5px;
+}
+
+.grid-row .lbl {
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.grid-row .val {
+  color: #f1f5f9;
+  font-weight: 700;
+  font-family: 'Roboto', 'Noto Sans TC', sans-serif;
+  transition: color 0.3s ease;
+}
+
+.grid-row .val.flash {
+  color: #38bdf8;
+  text-shadow: 0 0 6px #38bdf8;
+}
+
+/* 17 個縣市絕對定位座標 (精確對齊截圖位置) */
+/* 右側縱列 */
+.pos-keelung   { top: 5%;  right: 18%; }
+.pos-taipei    { top: 15%; right: 15%; }
+.pos-newtaipei { top: 26%; right: 14%; }
+.pos-yilan     { top: 38%; right: 13%; }
+.pos-nantou    { top: 49%; right: 14%; }
+.pos-hualien   { top: 60%; right: 15%; }
+.pos-taitung   { top: 71%; right: 17%; }
+.pos-pingtung  { top: 82%; right: 28%; }
+
+/* 左側縱列 */
+.pos-taoyuan   { top: 6%;  left: 22%; }
+.pos-hsinchu   { top: 17%; left: 21%; }
+.pos-miaoli    { top: 28%; left: 20%; }
+.pos-taichung  { top: 39%; left: 18%; }
+.pos-changhua  { top: 50%; left: 16%; }
+.pos-yunlin    { top: 61%; left: 15%; }
+.pos-chiayi    { top: 72%; left: 14%; }
+.pos-tainan    { top: 82%; left: 24%; }
+.pos-kaohsiung { top: 86%; left: 37%; }
+
+/* ==========================================================================
+   14. 細部供水系統顯示區塊清單 (Systems Detail Layer - 一列3個、淺藍/淺紅主題)
+   ========================================================================== */
+.overview-layer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.overview-layer.hide {
+  display: none !important;
+}
+
+.systems-top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #ffffff;
+  border-bottom: 1.5px solid #f1f5f9;
+}
+
+.systems-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f2744;
+}
+
+.crumb-district {
+  color: #0284c7;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.crumb-district:hover {
+  text-decoration: underline;
+}
+
+.crumb-sep {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.crumb-current {
+  color: #334155;
+}
+
+.btn-back-prev {
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  color: #475569;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition-fast);
+}
+
+.btn-back-prev:hover {
+  background: #f0f9ff;
+  border-color: #0284c7;
+  color: #0284c7;
+}
+
+.systems-grid-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 12px;
+  background: #f8fafc;
+  container-type: inline-size;
+  container-name: sysGridContainer;
+}
+
+/* 供水系統網格佈局 (智慧自適應欄位：寬度足夠排 3 列，拖曳變窄自動換行至 2 列或 1 列，不被切到) */
+.systems-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px 10px;
+}
+
+@container sysGridContainer (max-width: 590px) {
+  .systems-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@container sysGridContainer (max-width: 380px) {
+  .systems-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 供水系統卡片主體 (加深高度、淺藍光澤背景) */
+.system-card-box {
+  min-width: 0;
+  min-height: 98px;
+  box-sizing: border-box;
+  background: linear-gradient(145deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 1.5px solid #bae6fd;
+  border-radius: 10px;
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.08);
+  position: relative;
+}
+
+.system-card-box:hover {
+  border-color: #38bdf8;
+  box-shadow: 0 6px 18px rgba(2, 132, 199, 0.2);
+  transform: translateY(-2px);
+}
+
+/* 正常狀態選中高亮 (淺藍發光) */
+.system-card-box.active-selected {
+  border-color: #0284c7;
+  background: linear-gradient(145deg, #e0f2fe 0%, #bae6fd 100%);
+  box-shadow: 0 0 0 2.5px rgba(2, 132, 199, 0.35), 0 6px 16px rgba(2, 132, 199, 0.2);
+}
+
+/* 異常狀態供水系統卡片 (淺紅色系背景) */
+.system-card-box.state-danger {
+  background: linear-gradient(145deg, #fff1f2 0%, #fee2e2 100%);
+  border-color: #fca5a5;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.12);
+}
+
+.system-card-box.state-danger:hover {
+  border-color: #ef4444;
+  box-shadow: 0 6px 18px rgba(239, 68, 68, 0.25);
+}
+
+/* 異常狀態選中高亮 (淺紅發光) */
+.system-card-box.state-danger.active-selected {
+  border-color: #dc2626;
+  background: linear-gradient(145deg, #fee2e2 0%, #fecdd3 100%);
+  box-shadow: 0 0 0 2.5px rgba(220, 38, 38, 0.35), 0 6px 16px rgba(220, 38, 38, 0.22);
+}
+
+.sys-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.sys-title-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.sys-dot-icon {
+  font-size: 13px;
+  color: #0284c7;
+  flex-shrink: 0;
+}
+
+.system-card-box.state-danger .sys-dot-icon {
+  color: #ef4444;
+}
+
+.sys-name-text {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f2744;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.2px;
+}
+
+.system-card-box.state-danger .sys-name-text {
+  color: #991b1b;
+}
+
+.sys-status-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.badge-normal {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.badge-danger {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+  animation: badgeBlink 2s infinite;
+}
+
+@keyframes badgeBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
+
+.sys-actions-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.btn-sys-action {
+  flex: 1;
+  padding: 5px 4px;
+  border-radius: 6px;
+  border: 1.5px solid #bae6fd;
+  background: #ffffff;
+  color: #0369a1;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.btn-sys-action i {
+  font-size: 11px;
+}
+
+.btn-sys-action:hover {
+  background: #0284c7;
+  border-color: #0284c7;
+  color: #ffffff;
+}
+
+/* 正常供水系統：點擊【水位關係】或【傳訊點分布】統一為藍色背景、白色文字 */
+.system-card-box:not(.state-danger) .btn-sys-action.active {
+  background: #0284c7 !important;
+  border-color: #0284c7 !important;
+  color: #ffffff !important;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35);
+}
+
+.system-card-box:not(.state-danger) .btn-sys-action.active i {
+  color: #ffffff !important;
+}
+
+/* 異常供水系統卡片按鈕預設樣式 */
+.system-card-box.state-danger .btn-sys-action {
+  border-color: #fca5a5;
+  background: #ffffff;
+  color: #dc2626;
+}
+
+.system-card-box.state-danger .btn-sys-action:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #ffffff;
+}
+
+/* 異常供水系統：點擊【水位關係】或【傳訊點分布】統一為紅色背景、白色文字 */
+.system-card-box.state-danger .btn-sys-action.active {
+  background: #dc2626 !important;
+  border-color: #dc2626 !important;
+  color: #ffffff !important;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.35);
+}
+
+.system-card-box.state-danger .btn-sys-action.active i {
+  color: #ffffff !important;
+}
+
+.btn-page-nav,
+.btn-page-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+}
+
+.btn-page-num.active {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+}
+
+.btn-page-nav:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   15. SVG 格式水位關係圖視圖 (Water Level SVG View)
+   ========================================================================== */
+.water-level-svg-view {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #060e1a;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.water-level-svg-view.hide {
+  display: none !important;
+}
+
+.water-level-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  background: rgba(10, 24, 44, 0.9);
+  border-bottom: 1px solid rgba(56, 189, 248, 0.3);
+  backdrop-filter: blur(8px);
+  z-index: 20;
+}
+
+.water-level-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.water-level-badge {
+  background: rgba(2, 132, 199, 0.25);
+  border: 1px solid #0284c7;
+  color: #38bdf8;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.water-level-sys-name {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+}
+
+.btn-level-toggle-view {
+  background: #0284c7;
+  border: none;
+  color: #ffffff;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: var(--transition-fast);
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.35);
+}
+
+.btn-level-toggle-view:hover {
+  background: #0369a1;
+  transform: translateY(-1px);
+}
+
+.water-level-canvas-wrap {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  overflow: auto;
+}
+
+.water-level-svg {
+  width: 95%;
+  max-width: 1100px;
+  height: 95%;
+  max-height: 720px;
+  background: #060e1a;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8);
+  border-radius: 8px;
+}
+
+/* ==========================================================================
+   16. supply-overview 專屬字級階梯 (小 / 中[預設] / 大)
+   ========================================================================== */
+/* 小（原中字級基準） */
+body.font-sm .district-table th,
+body.font-sm .district-table td { font-size: 13.5px; padding: 8px 6px; }
+body.font-sm .sys-name-text { font-size: 12px; }
+body.font-sm .btn-sys-action { font-size: 11px; padding: 4px 3px; }
+body.font-sm .dispatch-card-title { font-size: 14.5px; }
+body.font-sm .stat-num-val { font-size: 16.5px; }
+body.font-sm .source-num-val { font-size: 18px; }
+
+/* 中（原大字級基準，系統預設） */
+body .district-table th,
+body .district-table td,
+body.font-md .district-table th,
+body.font-md .district-table td { font-size: 15.5px; padding: 11px 8px; }
+body .sys-name-text,
+body.font-md .sys-name-text { font-size: 14px; }
+body .btn-sys-action,
+body.font-md .btn-sys-action { font-size: 12.5px; padding: 6px 5px; }
+body .dispatch-card-title,
+body.font-md .dispatch-card-title { font-size: 17px; }
+body .stat-num-val,
+body.font-md .stat-num-val { font-size: 19px; }
+body .source-num-val,
+body.font-md .source-num-val { font-size: 22px; }
+
+/* 大（依比例再放大新字級） */
+body.font-lg .district-table th,
+body.font-lg .district-table td { font-size: 18px; padding: 13px 10px; }
+body.font-lg .sys-name-text { font-size: 16px; }
+body.font-lg .btn-sys-action { font-size: 14px; padding: 7px 6px; }
+body.font-lg .dispatch-card-title { font-size: 19.5px; }
+body.font-lg .stat-num-val { font-size: 22px; }
+body.font-lg .source-num-val { font-size: 26px; }
+
+
+
+/* ==========================================================================
+   17. 水庫蓄水量專屬樣式 (Tab 3 - 左側水庫面板 & 右側 GIS 地圖套疊視圖)
+   ========================================================================== */
+
+/* 左側水庫資訊滾動區 (調整為淺藍色戰情資訊面板) */
+.reservoir-panel-scroll {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  overflow-y: scroll !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 12px 14px 40px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #f0f7ff;
+  color: #1e293b;
+  box-sizing: border-box;
+}
+
+/* 上方控制與篩選列 (淺色精緻風格) */
+.reservoir-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  border: 1px solid #bae6fd;
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.06);
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.filter-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #334155;
+  white-space: nowrap;
+}
+
+.filter-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-res-filter {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.btn-res-filter:hover {
+  background: #e0f2fe;
+  color: #0284c7;
+  border-color: #7dd3fc;
+}
+
+.btn-res-filter.active {
+  background: #0284c7;
+  border-color: #0284c7;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35);
+}
+
+/* 左側容器啟用 Container Queries 實現動態平滑 RWD */
+#tab-reservoir {
+  container-type: inline-size;
+  container-name: resContainer;
+}
+
+/* 水庫卡片網格清單：預設雙欄（一列 2 個水庫） */
+.reservoir-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+/* 當左側面板拖曳拉寬 >= 680px 時，自適應變為 3 欄（一列 3 個水庫，空間充裕不切邊） */
+@container resContainer (min-width: 680px) {
+  .reservoir-cards-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* 當左側面板拖曳拉寬 >= 920px 時，自適應變為 4 欄 */
+@container resContainer (min-width: 920px) {
+  .reservoir-cards-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* 當左側面板在超窄寬度 (< 380px) 時，自適應變為單欄 */
+@container resContainer (max-width: 380px) {
+  .reservoir-cards-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* 水庫卡片主體 (淺色白底 / 淺藍陰影，防裁切 min-width: 0) */
+.res-card-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: var(--transition-fast);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.res-card-box:hover {
+  border-color: #38bdf8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.18);
+}
+
+/* 鯉魚潭等低水位紅色警示卡片 (淺紅警戒底色) */
+.res-card-box.card-danger {
+  border: 1.5px solid #ef4444 !important;
+  box-shadow: 0 2px 10px rgba(239, 68, 68, 0.18) !important;
+  background: #fff5f5 !important;
+}
+
+.res-card-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 4px;
+  min-width: 0;
+}
+
+.res-num-badge {
+  background: #0284c7;
+  color: #ffffff;
+  font-size: 10.5px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.card-danger .res-num-badge {
+  background: #ef4444;
+}
+
+.res-name-title {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-danger .res-name-title {
+  color: #991b1b;
+}
+
+.res-card-body {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* 水波蓄水球體 (52px 緊緻防裁切尺寸) */
+.res-wave-circle {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12);
+  border: 2px solid #0284c7;
+}
+
+.wave-blue {
+  background: #e0f2fe;
+  border-color: #0284c7;
+  box-shadow: 0 0 8px rgba(2, 132, 199, 0.3);
+}
+
+.wave-red {
+  background: #fee2e2;
+  border-color: #ef4444;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.35);
+}
+
+.water-wave {
+  position: absolute;
+  top: 15%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  border-radius: 40%;
+  opacity: 0.9;
+  animation: waveRotate 5s linear infinite;
+}
+
+.wave-blue .water-wave {
+  background: #0284c7;
+}
+
+.wave-red .water-wave {
+  background: #ef4444;
+}
+
+@keyframes waveRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.wave-percent-txt {
+  position: relative;
+  z-index: 5;
+  font-size: 11.5px;
+  font-weight: 900;
+  color: #ffffff;
+  font-family: 'Roboto', 'Noto Sans TC', sans-serif;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+/* 右側詳細指標數據 (深色文字易讀性) */
+.res-meta-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.meta-row {
+  font-size: 10px;
+  color: #475569;
+  display: flex;
+  align-items: baseline;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text-danger-drop {
+  color: #dc2626;
+  font-weight: 700;
+  font-size: 10.5px;
+  margin-bottom: 1px;
+}
+
+.meta-lbl {
+  color: #64748b;
+  font-weight: 500;
+  font-size: 9.5px;
+  flex-shrink: 0;
+}
+
+.meta-val {
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 9.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta-time {
+  font-size: 9px;
+  color: #94a3b8;
+  margin-top: 1px;
+}
+
+/* ==========================================================================
+   右側水庫蓄水量 Google Map 衛星底圖套疊視圖 (Reservoir Map View)
+   ========================================================================== */
+.reservoir-map-view {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #061120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* 右上角：蓄水量百分比圖例 (統一配置於右上角，支援開合) */
+.reservoir-legend-card {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  bottom: auto;
+  left: auto;
+  background: rgba(8, 20, 36, 0.9);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 8px;
+  padding: 10px 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  z-index: 30;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.reservoir-legend-card .legend-card-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: #cbd5e1;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 4px;
+}
+
+.reservoir-legend-card .legend-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.reservoir-legend-card .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot-red    { background: #ef4444; box-shadow: 0 0 6px #ef4444; }
+.dot-orange { background: #f97316; box-shadow: 0 0 6px #f97316; }
+.dot-yellow { background: #eab308; box-shadow: 0 0 6px #eab308; }
+.dot-blue   { background: #0284c7; box-shadow: 0 0 6px #0284c7; }
+
+/* 中央拓撲畫布與連線 */
+.reservoir-canvas-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.reservoir-taiwan-svg {
+  width: 100%;
+  max-width: 1000px;
+  height: 100%;
+  max-height: 800px;
+  overflow: visible;
+  filter: drop-shadow(0 0 20px rgba(2, 132, 199, 0.25));
+}
+
+.res-leader-line {
+  fill: none;
+  stroke: rgba(226, 232, 240, 0.65);
+  stroke-width: 1.2;
+  stroke-dasharray: 4 3;
+}
+
+/* 左右側水庫浮動卡片 */
+.reservoir-floating-cards {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 1000px;
+  height: 100%;
+  max-height: 800px;
+  pointer-events: none;
+  z-index: 25;
+}
+
+.res-float-card {
+  pointer-events: auto;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.res-float-card:hover {
+  transform: scale(1.05);
+  z-index: 35 !important;
+}
+
+.res-float-card.res-left {
+  flex-direction: row;
+}
+
+.res-float-card.res-right {
+  flex-direction: row;
+}
+
+/* 水庫圓形水晶發光 Badge */
+.res-gauge-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11.5px;
+  font-weight: 900;
+  color: #ffffff;
+  font-family: 'Roboto', 'Noto Sans TC', sans-serif;
+  flex-shrink: 0;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+  border: 2px solid;
+}
+
+.badge-blue {
+  background: radial-gradient(circle at 35% 35%, #38bdf8 0%, #0369a1 70%, #082f49 100%);
+  border-color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+}
+
+.badge-yellow {
+  background: radial-gradient(circle at 35% 35%, #fde047 0%, #ca8a04 70%, #713f12 100%);
+  border-color: #facc15;
+  box-shadow: 0 0 12px rgba(250, 204, 21, 0.6);
+}
+
+.badge-red {
+  background: radial-gradient(circle at 35% 35%, #f87171 0%, #b91c1c 70%, #450a0a 100%);
+  border-color: #ef4444;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+}
+
+/* 水庫文字資訊框 */
+.res-float-info {
+  background: rgba(8, 19, 36, 0.88);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 6px;
+  padding: 4px 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  min-width: 130px;
+}
+
+.float-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 2px;
+  white-space: nowrap;
+}
+
+.float-val {
+  font-size: 10px;
+  font-weight: 700;
+  color: #38bdf8;
+  font-family: 'Roboto', 'Noto Sans TC', sans-serif;
+  white-space: nowrap;
+}
+
+.float-cap {
+  font-size: 9px;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+/* === 左側 10 座水庫絕對定位座標 === */
+.pos-shimen       { top: 4%;  left: 6%; }
+.pos-baoshan      { top: 13%; left: 6%; }
+.pos-baoshan2     { top: 22%; left: 6%; }
+.pos-yonghe       { top: 31%; left: 6%; }
+.pos-mingde-map   { top: 40%; left: 6%; }
+.pos-liyutan-map  { top: 49%; left: 6%; }
+.pos-deji-map     { top: 58%; left: 6%; }
+.pos-wushe        { top: 67%; left: 6%; }
+.pos-renyitan     { top: 76%; left: 6%; }
+.pos-zengwen-map  { top: 85%; left: 6%; }
+
+/* === 右側 8 座水庫絕對定位座標 === */
+.pos-xinshan-map  { top: 5%;  right: 8%; }
+.pos-feicui-map   { top: 15%; right: 8%; }
+.pos-wushantou-map{ top: 26%; right: 8%; }
+.pos-sunmoon-map  { top: 37%; right: 8%; }
+.pos-baihe        { top: 48%; right: 8%; }
+.pos-hushan       { top: 59%; right: 8%; }
+.pos-nanhua-map   { top: 70%; right: 8%; }
+.pos-mudan-map    { top: 81%; right: 8%; }
+
+/* ==========================================================================
+   11. RWD 自適應適配 (窄寬度專屬：【資訊卡片】與【空間圖台】二級頁籤切換)
+   ========================================================================== */
+
+/* 11.1 窄寬度專屬二級切換器 (預設桌面隱藏) */
+.rwd-view-switcher {
+  display: none;
+  background: #f1f5f9;
+  padding: 6px 12px;
+  border-bottom: 1px solid #e2e8f0;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.rwd-switch-btn {
+  flex: 1;
+  max-width: 220px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: var(--transition-fast);
+}
+
+.rwd-switch-btn:hover {
+  background: #e0f2fe;
+  color: #0284c7;
+  border-color: #7dd3fc;
+}
+
+.rwd-switch-btn.active {
+  background: #0284c7;
+  border-color: #0284c7;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.3);
+}
+
+/* 11.2 當視窗處於窄寬度時 (<= 992px) */
+@media (max-width: 992px) {
+  /* 顯示二級切換頁籤列 */
+  .rwd-view-switcher {
+    display: flex !important;
+  }
+
+  .split-view-container {
+    display: flex;
+    height: calc(100vh - 64px) !important;
+    width: 100% !important;
+    overflow: hidden !important;
+    position: relative;
+    background-color: #ffffff;
+  }
+
+  /* 隱藏桌面端左右拖曳分割條 */
+  .panel-resizer-bar {
+    display: none !important;
+  }
+
+  /* 預設情況下 (或 data-rwd-view="card")：顯示資訊卡片，隱藏圖台 */
+  .left-panel-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    height: 100% !important;
+    border-right: none;
+    box-shadow: none;
+    margin-left: 0 !important;
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  .tab-content {
+    flex: 1 1 auto !important;
+    height: calc(100% - 94px) !important; /* 扣除主頁籤 50px + 切換列 44px */
+    min-height: 0 !important;
+    overflow: hidden !important;
+    background: #ffffff;
+  }
+
+  /* Tab 1 供水清冊表格滿版滾動，下方無任何留白 */
+  .overview-layer,
+  .system-layer {
+    height: 100% !important;
+    flex: 1 !important;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .table-scroll-wrap {
+    flex: 1 1 auto !important;
+    height: calc(100% - 38px) !important;
+    overflow-y: auto !important;
+  }
+
+  .table-footer-note {
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    flex-shrink: 0;
+  }
+
+  /* Tab 2 跨區調度統計滿版滾動與破版修復 */
+  .dispatch-panel-scroll {
+    flex: 1 1 auto !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px 14px 70px 14px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+  }
+
+  .dispatch-source-card {
+    margin-bottom: 24px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 窄寬度下將支援水源卡片轉為單欄 100% 滿版堆疊，徹底解決右側文字破版被截斷 */
+  .dispatch-source-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .source-item-card {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 10px 14px !important;
+  }
+
+  .source-item-name {
+    white-space: normal !important;
+    word-break: break-word !important;
+  }
+
+  /* Tab 3 水庫蓄水量滿版滾動 (修復滾動屬性與 60px 底部安全間距) */
+  .reservoir-panel-scroll {
+    flex: 1 1 auto !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px 14px 60px 14px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .reservoir-filter-bar {
+    flex-shrink: 0 !important;
+  }
+
+  .reservoir-cards-grid {
+    padding-bottom: 20px !important;
+  }
+
+  /* 預設圖台隱藏 */
+  .workspace-container {
+    display: none !important;
+  }
+
+  /* 當使用者切換至【空間圖台】模式 (body.rwd-show-map 或 .split-view-container[data-rwd-view="map"]) */
+  .split-view-container[data-rwd-view="map"] .left-panel-card {
+    height: auto !important;
+    flex: none !important;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .split-view-container[data-rwd-view="map"] .tab-content {
+    display: none !important;
+  }
+
+  .split-view-container[data-rwd-view="map"] .workspace-container {
+    display: flex !important;
+    flex: 1 !important;
+    width: 100% !important;
+    height: calc(100% - 94px) !important;
+    position: relative !important;
+    background-color: #0b1726 !important;
+    overflow: hidden;
+  }
+
+  .split-view-container[data-rwd-view="map"] .satellite-map-container,
+  .split-view-container[data-rwd-view="map"] .dispatch-map-view,
+  .split-view-container[data-rwd-view="map"] .water-level-svg-view,
+  .split-view-container[data-rwd-view="map"] .reservoir-map-view {
+    width: 100% !important;
+    height: 100% !important;
+    position: relative !important;
+    display: flex !important;
+  }
+
+  .split-view-container[data-rwd-view="map"] .satellite-map-container.hide,
+  .split-view-container[data-rwd-view="map"] .dispatch-map-view.hide,
+  .split-view-container[data-rwd-view="map"] .water-level-svg-view.hide,
+  .split-view-container[data-rwd-view="map"] .reservoir-map-view.hide {
+    display: none !important;
+  }
+
+  .split-view-container[data-rwd-view="map"] .dispatch-google-map-bg,
+  .split-view-container[data-rwd-view="map"] #gisMap,
+  .split-view-container[data-rwd-view="map"] #dispatchGoogleMap,
+  .split-view-container[data-rwd-view="map"] #reservoirGoogleMap {
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute !important;
+    top: 0;
+    left: 0;
+  }
+
+  .split-view-container[data-rwd-view="map"] .reservoir-floating-cards {
+    transform: translate(-50%, -50%) scale(0.75);
+  }
+  .split-view-container[data-rwd-view="map"] .reservoir-taiwan-svg {
+    transform: scale(0.75);
+  }
+
+  .split-view-container[data-rwd-view="map"] .map-fab-group {
+    bottom: 16px;
+    right: 16px;
+    gap: 10px;
+  }
+  .split-view-container[data-rwd-view="map"] .fab-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 17px;
+  }
+/* ==========================================================================
+   18. 左側資訊面板精緻滾動條樣式 (增強滑鼠滾動視覺反饋與拖曳手感)
+   ========================================================================== */
+.table-scroll-wrap::-webkit-scrollbar,
+.dispatch-panel-scroll::-webkit-scrollbar,
+.reservoir-panel-scroll::-webkit-scrollbar,
+.systems-grid-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.table-scroll-wrap::-webkit-scrollbar-track,
+.dispatch-panel-scroll::-webkit-scrollbar-track,
+.reservoir-panel-scroll::-webkit-scrollbar-track,
+.systems-grid-scroll::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.table-scroll-wrap::-webkit-scrollbar-thumb,
+.dispatch-panel-scroll::-webkit-scrollbar-thumb,
+.reservoir-panel-scroll::-webkit-scrollbar-thumb,
+.systems-grid-scroll::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.table-scroll-wrap::-webkit-scrollbar-thumb:hover,
+.dispatch-panel-scroll::-webkit-scrollbar-thumb:hover,
+.reservoir-panel-scroll::-webkit-scrollbar-thumb:hover,
+.systems-grid-scroll::-webkit-scrollbar-thumb:hover {
+  background: #0284c7;
+}

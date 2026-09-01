@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>智慧水網 - 全台供水狀態總覽 (GIS 圖台)</title>
+  <!-- Google Fonts & Font Awesome CDN -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Leaflet GIS Map CDN (載入 Google Map 衛星與圖資) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- 樣式表 -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/supply-overview.css">
+</head>
+<body class="font-md">
+
+  <!-- ========================================================================= -->
+  <!-- ========================================================================= -->
+  <!-- 側邊欄抽屜 (Sidebar Drawer) -->
+  <!-- ========================================================================= -->
+  <aside id="sidebarDrawer" class="sidebar-drawer" aria-label="系統導航">
+    <div class="sidebar-header">
+      <div class="logo-box">
+        <img src="logo/Taiwan_Water_Corporation_Seal.svg.webp" alt="台水標誌" class="sidebar-logo-img">
+        <span>應變事件情資</span>
+      </div>
+      <button id="closeSidebarBtn" class="btn-icon" title="關閉選單">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <nav class="sidebar-menu">
+      <a href="index.html" class="menu-item">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>災情事件彙總</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-solid fa-hurricane"></i>
+        <span>颱風路徑動態圖</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-solid fa-cloud-showers-heavy"></i>
+        <span>雨量資訊</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-solid fa-house-flood-water"></i>
+        <span>海水警戒</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-solid fa-cloud-bolt"></i>
+        <span>降雨預報</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-solid fa-hill-rockslide"></i>
+        <span>土石流警戒</span>
+      </a>
+      
+      <!-- 外部情資 (點擊展開下拉子選單) -->
+      <div class="sidebar-dropdown">
+        <button type="button" class="menu-item dropdown-toggle" id="sidebarExternalToggle" aria-expanded="false">
+          <i class="fa-solid fa-globe"></i>
+          <span>外部情資</span>
+          <i class="fa-solid fa-caret-down dropdown-arrow"></i>
+        </button>
+        <div class="sidebar-submenu" id="sidebarExternalSubmenu">
+          <a href="#" class="submenu-item"><i class="fa-solid fa-cloud-sun"></i> <span>氣象署氣象情資</span></a>
+          <a href="#" class="submenu-item"><i class="fa-solid fa-bell"></i> <span>NCDR 災防情資</span></a>
+          <a href="#" class="submenu-item"><i class="fa-solid fa-water"></i> <span>水利署水情資訊</span></a>
+          <a href="#" class="submenu-item"><i class="fa-solid fa-bolt"></i> <span>台電電力狀況</span></a>
+          <a href="#" class="submenu-item"><i class="fa-solid fa-road"></i> <span>公路局災阻情資</span></a>
+        </div>
+      </div>
+    </nav>
+  </aside>
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <!-- ========================================================================= -->
+  <!-- 主版面容器 -->
+  <!-- ========================================================================= -->
+  <div class="app-layout">
+    
+    <!-- 頂部導航列 (Header - 與 index.html 100% 統一規範) -->
+    <header class="main-header">
+      <div class="header-left">
+        <!-- 側邊欄展開切換鈕 -->
+        <button id="openSidebarBtn" class="btn-icon header-toggle-btn" title="展開選單">
+          <i class="fa-solid fa-angles-left"></i>
+        </button>
+        <!-- 機關單位 Logo 與標題 -->
+        <div class="brand-title">
+          <div class="brand-logo">
+            <img src="logo/Taiwan_Water_Corporation_Seal.svg.webp" alt="台灣自來水公司標誌" class="brand-logo-img">
+          </div>
+          <span class="title-text" id="headerTitleText">總管理處-平時</span>
+          <button id="globalSearchBtn" class="btn-icon search-trigger-btn" title="選擇應變事件">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </div>
+
+        <!-- 頂部主模組切換下拉選單 -->
+        <div class="dropdown-wrapper">
+          <button id="viewDropdownBtn" class="dropdown-btn primary-dropdown">
+            <span id="currentViewText">全台供水狀況總覽</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          
+          <!-- 選單容器：僅供水營運概況保留二級子選單，其餘為單一功能連結 -->
+          <div id="viewDropdownMenu" class="cascading-menu-wrapper">
+            <ul class="cascading-menu-level1">
+              <!-- 1. 今日營運概況 (首頁入口) -->
+              <li class="menu-direct-item" data-title="今日營運概況" onclick="location.href='index.html'">
+                <span>今日營運概況</span>
+              </li>
+
+              <!-- 2. 供水營運概況 (保留子選單) -->
+              <li class="menu-parent-item active" data-parent="water-supply">
+                <span>供水營運概況</span>
+                <i class="fa-solid fa-caret-right"></i>
+                
+                <ul class="cascading-menu-level2">
+                  <li class="menu-sub-item active" data-tab-target="tab-overview">
+                    <span class="sub-text">全台供水狀況總覽</span>
+                    <i class="fa-solid fa-circle-dot radio-icon"></i>
+                  </li>
+                  <li class="menu-sub-item" data-tab-target="tab-dispatch">
+                    <span class="sub-text">跨區水源調度</span>
+                    <i class="fa-regular fa-circle radio-icon"></i>
+                  </li>
+                  <li class="menu-sub-item" data-tab-target="tab-reservoir">
+                    <span class="sub-text">水庫蓄水量</span>
+                    <i class="fa-regular fa-circle radio-icon"></i>
+                  </li>
+                </ul>
+              </li>
+
+              <!-- 3. 客服進線狀況 (單一功能，點擊跳轉至客服進線分析) -->
+              <li class="menu-direct-item" data-title="客服進線狀況" onclick="location.href='customer-service.html'">
+                <span>客服進線狀況</span>
+              </li>
+
+              <!-- 4. 事件應變情資 (單一功能，無子選單) -->
+              <li class="menu-direct-item" data-title="事件應變情資">
+                <span>事件應變情資</span>
+              </li>
+
+              <!-- 5. 綜合案件分析 (單一功能，點擊跳轉至綜合案件分析) -->
+              <li class="menu-direct-item" data-title="綜合案件分析" onclick="location.href='case-analysis.html'">
+                <span>綜合案件分析</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 中央公告跑馬燈 -->
+      <div class="header-center">
+        <div class="alert-badge">
+          <span class="pulse-dot"></span>
+        </div>
+        <div class="announcement-content">
+          <span class="announcement-label">今日重要公告：</span>
+          <span class="announcement-text" id="announcementTicker">全台供水情形整體正常，請持續留意最新供水與氣象資訊。</span>
+        </div>
+      </div>
+
+      <!-- 右側使用者與字級調整欄 (淺色系字級控制器) -->
+      <div class="header-right">
+        
+        <!-- 字級調整控制器 (預設為中字級，支援寬版按鈕與 RWD 下拉式選取) -->
+        <div class="font-size-controller" title="調整全站字級大小">
+          <span class="fs-label">字級</span>
+          <div class="fs-options">
+            <button type="button" class="fs-btn" data-size="sm">小</button>
+            <button type="button" class="fs-btn active" data-size="md">中</button>
+            <button type="button" class="fs-btn" data-size="lg">大</button>
+          </div>
+          <div class="fs-select-wrap">
+            <select id="fontSizeSelect" class="fs-select" aria-label="選擇字級大小">
+              <option value="sm">小</option>
+              <option value="md" selected>中</option>
+              <option value="lg">大</option>
+            </select>
+            <i class="fa-solid fa-chevron-down fs-select-arrow"></i>
+          </div>
+        </div>
+
+        <!-- 視圖切換快捷按鈕 -->
+        <div class="view-switch-group">
+          <button id="toggleDashboardView" class="btn-toggle" title="切換至儀表板視圖" onclick="location.href='index.html'">
+            <i class="fa-solid fa-table-cells-large"></i>
+          </button>
+          <button id="toggleMapView" class="btn-toggle active" title="切換至 GIS 空間圖台">
+            <i class="fa-solid fa-map"></i>
+          </button>
+        </div>
+
+        <!-- 使用者資訊 (點擊展開登入浮動視窗) -->
+        <div class="user-profile" id="userProfileBtn" title="點擊登入緊急應變戰情儀表板" role="button" tabindex="0">
+          <div class="user-meta">
+            <span class="user-role" id="headerUserRole">一般使用者</span>
+            <span class="system-time" id="systemClock">2025/05/23 14:45</span>
+          </div>
+          <div class="avatar-box" id="userAvatarBtn">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="使用者頭像">
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ========================================================================= -->
+    <!-- 主要內容區 (全台供水狀態總覽 - 左右分割工作區) -->
+    <!-- ========================================================================= -->
+    <main class="split-view-container">
+      
+      <!-- 左側表格資訊面板 (可收合) -->
+      <section id="leftTablePanel" class="left-panel-card">
+        
+        <!-- Tab 頁籤列 -->
+        <div class="panel-tabs">
+          <button class="tab-item active" data-tab="tab-overview">全台供水狀態總覽</button>
+          <button class="tab-item" data-tab="tab-dispatch">跨區水源調度</button>
+          <button class="tab-item" data-tab="tab-reservoir">水庫蓄水量</button>
+        </div>
+
+        <!-- 窄寬度專屬：【資訊卡片】與【空間圖台】切換頁籤 (RWD 雙視圖切換) -->
+        <div class="rwd-view-switcher" id="rwdViewSwitcher">
+          <button type="button" class="rwd-switch-btn active" data-rwd-target="card">
+            <i class="fa-solid fa-table-list"></i>
+            <span>資訊卡片</span>
+          </button>
+          <button type="button" class="rwd-switch-btn" data-rwd-target="map">
+            <i class="fa-solid fa-map-location-dot"></i>
+            <span>空間圖台</span>
+          </button>
+        </div>
+
+        <!-- Tab 1 內容：全台供水狀態總覽 (雙層結構：各區處清冊 -> 供水系統清單) -->
+        <div class="tab-content active" id="tab-overview">
+          
+          <!-- 第 1 層：各區處供水清冊表格 -->
+          <div class="overview-layer" id="districtOverviewLayer">
+            <div class="table-scroll-wrap">
+              <table class="district-table" id="districtTable">
+                <thead>
+                  <tr>
+                    <th class="th-district">區處</th>
+                    <th class="th-status">供水狀態</th>
+                    <th class="th-supply">總供水量<br><span class="unit-th">(CMD)</span></th>
+                    <th class="th-lastyear">去年同日<br>總供水量 (CMD)</th>
+                  </tr>
+                </thead>
+                <tbody id="districtTableBody">
+                  <tr data-district="1" class="clickable-row">
+                    <td class="td-district"><span class="district-link">一區</span></td>
+                    <td><span class="status-indicator status-normal"><i class="fa-solid fa-circle"></i> 正常</span></td>
+                    <td class="td-number">396,000</td>
+                    <td class="td-number text-muted">382,000</td>
+                  </tr>
+                  <tr data-district="2" class="clickable-row">
+                    <td class="td-district"><span class="district-link">二區</span></td>
+                    <td><span class="status-indicator status-normal"><i class="fa-solid fa-circle"></i> 正常</span></td>
+                    <td class="td-number">1,393,000</td>
+                    <td class="td-number text-muted">1,285,000</td>
+                  </tr>
+                  <!-- 第三區：異常高亮列 -->
+                  <tr data-district="3" class="clickable-row row-danger">
+                    <td class="td-district"><span class="district-link text-danger font-bold">三區</span></td>
+                    <td><span class="status-indicator status-danger"><i class="fa-solid fa-circle"></i> 異常</span></td>
+                    <td class="td-number text-danger font-bold">939,000</td>
+                    <td class="td-number text-danger font-bold">988,000</td>
+                  </tr>
+                  <tr data-district="4" class="clickable-row">
+                    <td class="td-district"><span class="district-link">四區</span></td>
+                    <td><span class="status-indicator status-normal"><i class="fa-solid fa-circle"></i> 正常</span></td>
+                    <td class="td-number">1,402,000</td>
+                    <td class="td-number text-muted">1,388,000</td>
+                  </tr>
+                  <tr data-district="5" class="clickable-row">
+                    <td class="td-district"><span class="district-link">五區</span></td>
+                    <td><span class="status-indicator status-normal"><i class="fa-solid fa-circle"></i> 正常</span></td>
+                    <td class="td-number">594,000</td>
+                    <td class="td-number text-muted">582,000</td>
+                  </tr>
+                  <tr data-district="6" class="clickable-row">
+                    <td class="td-district"><span class="district-link">六區</span></td>
+                    <td><span class="status-indicator status-normal"><i class="fa-solid fa-circle"></i> 正常</span></td>
+                    <td class="td-number">933,000</td>
+                    <td class="td-number text-muted">920,000</td>
+                  </tr>
+                  <tr data-district="7" class="clickable-row">
+                    <td class="td-district"><span class="district-link">七區</span></td>
+                    <td><span class="status-indicator status-normal"><i class="fa-solid fa-circle"></i> 正常</span></td>
+                    <td class="td-number">1,713,000</td>
+                    <td class="td-number text-muted">1,675,000</td>
+                  </tr>
+                  <tr data-district="8" class="clickable-row">
+                    <td class="td-district"><span class="district-link">八區</span></td>
+                    <td><span class="status-indicator status-normal"><i class="fa-solid fa-circle"></i> 正常</span></td>
+                    <td class="td-number">181,000</td>
+                    <td class="td-number text-muted">176,000</td>
+                  </tr>
+                  <tr data-district="9" class="clickable-row">
+                    <td class="td-district"><span class="district-link">九區</span></td>
+                    <td><span class="status-indicator status-normal"><i class="fa-solid fa-circle"></i> 正常</span></td>
+                    <td class="td-number">129,000</td>
+                    <td class="td-number text-muted">118,000</td>
+                  </tr>
+                  <tr data-district="10" class="clickable-row">
+                    <td class="td-district"><span class="district-link">十區</span></td>
+                    <td><span class="status-indicator status-normal"><i class="fa-solid fa-circle"></i> 正常</span></td>
+                    <td class="td-number">75,000</td>
+                    <td class="td-number text-muted">72,000</td>
+                  </tr>
+                  <tr data-district="11" class="clickable-row">
+                    <td class="td-district"><span class="district-link">十一區</span></td>
+                    <td><span class="status-indicator status-normal"><i class="fa-solid fa-circle"></i> 正常</span></td>
+                    <td class="td-number">596,000</td>
+                    <td class="td-number text-muted">583,000</td>
+                  </tr>
+                  <tr data-district="12" class="clickable-row">
+                    <td class="td-district"><span class="district-link">十二區</span></td>
+                    <td><span class="status-indicator status-normal"><i class="fa-solid fa-circle"></i> 正常</span></td>
+                    <td class="td-number">879,000</td>
+                    <td class="td-number text-muted">836,000</td>
+                  </tr>
+                  <tr data-district="13" class="clickable-row">
+                    <td class="td-district"><span class="district-link">屏東區</span></td>
+                    <td><span class="status-indicator status-normal"><i class="fa-solid fa-circle"></i> 正常</span></td>
+                    <td class="td-number">216,000</td>
+                    <td class="td-number text-muted">198,000</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- 底部單位備註 -->
+            <div class="table-footer-note">
+              註：數值單位為 CMD（立方公尺/日）
+            </div>
+          </div>
+
+          <!-- 第 2 層：細部該區供水系統顯示區塊清單 (依據截圖實作) -->
+          <div class="overview-layer hide" id="systemDetailLayer">
+            <!-- 頂部導航列與返回按鈕 -->
+            <div class="systems-top-nav">
+              <div class="systems-breadcrumb">
+                <span class="crumb-district" id="crumbDistrictName">三區</span>
+                <i class="fa-solid fa-chevron-right crumb-sep"></i>
+                <span class="crumb-current">供水系統總覽</span>
+              </div>
+              <button type="button" class="btn-back-prev" id="btnBackToDistrictOverview">
+                <i class="fa-solid fa-arrow-left"></i> 返回上一頁
+              </button>
+            </div>
+
+            <!-- 20 個供水系統區塊卡片網格 (自然滾動展示) -->
+            <div class="systems-grid-scroll">
+              <div class="systems-cards-grid" id="systemsCardsGrid">
+                <!-- 由 JavaScript 自動動態生成 20 個供水系統卡片 -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Tab 2: 跨區水源調度統計 (依據截圖實作) -->
+        <div class="tab-content" id="tab-dispatch">
+          <div class="dispatch-panel-scroll">
+            
+            <!-- 上半部卡片：跨區支援水量統計總覽 -->
+            <div class="dispatch-stat-card">
+              <div class="dispatch-card-header">
+                <h3 class="dispatch-card-title">跨區支援水量統計總覽</h3>
+                <span class="dispatch-unit-badge">單位：CMD (立方公尺/日)</span>
+              </div>
+
+              <div class="dispatch-stat-list">
+                <!-- 總支援量 -->
+                <div class="dispatch-stat-row">
+                  <div class="stat-left-item">
+                    <div class="stat-icon-wrap icon-water">
+                      <i class="fa-solid fa-droplet"></i>
+                    </div>
+                    <span class="stat-label">總支援量</span>
+                  </div>
+                  <div class="stat-right-item">
+                    <span class="stat-num-val" id="totalSupportVal">993,083</span>
+                    <span class="stat-unit-txt">CMD</span>
+                  </div>
+                </div>
+
+                <!-- 總受支援量 -->
+                <div class="dispatch-stat-row">
+                  <div class="stat-left-item">
+                    <div class="stat-icon-wrap icon-water">
+                      <i class="fa-solid fa-droplet"></i>
+                    </div>
+                    <span class="stat-label">總受支援量</span>
+                  </div>
+                  <div class="stat-right-item">
+                    <span class="stat-num-val" id="totalReceivedVal">993,083</span>
+                    <span class="stat-unit-txt">CMD</span>
+                  </div>
+                </div>
+
+                <!-- 支援區域數 -->
+                <div class="dispatch-stat-row">
+                  <div class="stat-left-item">
+                    <div class="stat-icon-wrap icon-users">
+                      <i class="fa-solid fa-users"></i>
+                    </div>
+                    <span class="stat-label">支援區域數</span>
+                  </div>
+                  <div class="stat-right-item">
+                    <span class="stat-num-val" id="supportAreaCount">8</span>
+                    <span class="stat-unit-txt">處</span>
+                  </div>
+                </div>
+
+                <!-- 受支援區域數 -->
+                <div class="dispatch-stat-row">
+                  <div class="stat-left-item">
+                    <div class="stat-icon-wrap icon-users">
+                      <i class="fa-solid fa-users"></i>
+                    </div>
+                    <span class="stat-label">受支援區域數</span>
+                  </div>
+                  <div class="stat-right-item">
+                    <span class="stat-num-val" id="receivedAreaCount">9</span>
+                    <span class="stat-unit-txt">處</span>
+                  </div>
+                </div>
+
+                <!-- 雙向支援區域數 -->
+                <div class="dispatch-stat-row">
+                  <div class="stat-left-item">
+                    <div class="stat-icon-wrap icon-sync">
+                      <i class="fa-solid fa-arrows-rotate"></i>
+                    </div>
+                    <span class="stat-label">雙向支援區域數</span>
+                  </div>
+                  <div class="stat-right-item">
+                    <span class="stat-num-val" id="biSupportAreaCount">5</span>
+                    <span class="stat-unit-txt">處</span>
+                  </div>
+                </div>
+
+                <!-- 無跨區支援區域數 -->
+                <div class="dispatch-stat-row">
+                  <div class="stat-left-item">
+                    <div class="stat-icon-wrap icon-ban">
+                      <i class="fa-solid fa-ban"></i>
+                    </div>
+                    <span class="stat-label">無跨區支援區域數</span>
+                  </div>
+                  <div class="stat-right-item">
+                    <span class="stat-num-val" id="noSupportAreaCount">5</span>
+                    <span class="stat-unit-txt">處</span>
+                  </div>
+                </div>
+
+                <!-- 最大支援區域 -->
+                <div class="dispatch-stat-row row-two-line">
+                  <div class="stat-left-item">
+                    <div class="stat-icon-wrap icon-chart">
+                      <i class="fa-solid fa-chart-simple"></i>
+                    </div>
+                    <span class="stat-label">最大支援區域</span>
+                  </div>
+                  <div class="stat-right-stacked">
+                    <span class="stat-sub-label" id="maxSupportArea">臺北市</span>
+                    <div class="stat-val-inline">
+                      <span class="stat-num-val" id="maxSupportVal">386,757</span>
+                      <span class="stat-unit-txt">CMD</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 最大受支援區域 -->
+                <div class="dispatch-stat-row row-two-line">
+                  <div class="stat-left-item">
+                    <div class="stat-icon-wrap icon-chart">
+                      <i class="fa-solid fa-chart-simple"></i>
+                    </div>
+                    <span class="stat-label">最大受支援區域</span>
+                  </div>
+                  <div class="stat-right-stacked">
+                    <span class="stat-sub-label" id="maxReceivedArea">新北市</span>
+                    <div class="stat-val-inline">
+                      <span class="stat-num-val" id="maxReceivedVal">368,612</span>
+                      <span class="stat-unit-txt">CMD</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 下半部卡片：支援水源統計總覽 -->
+            <div class="dispatch-source-card">
+              <div class="dispatch-card-header">
+                <h4 class="dispatch-card-title">支援水源統計總覽</h4>
+                <span class="dispatch-unit-badge">單位：CMD (立方公尺/日)</span>
+              </div>
+
+              <div class="dispatch-source-grid">
+                <!-- 北水支援量 -->
+                <div class="source-item-card card-blue-glow">
+                  <div class="source-icon-box icon-blue-water">
+                    <i class="fa-solid fa-droplet"></i>
+                  </div>
+                  <div class="source-item-info">
+                    <span class="source-item-name">北水支援量 <span class="source-tag">(北部區域供水)</span></span>
+                    <div class="source-val-row">
+                      <span class="source-num-val val-blue" id="beishuiSupportVal">386,757</span>
+                      <span class="source-unit-txt">CMD</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 南化供水量 -->
+                <div class="source-item-card card-green-glow">
+                  <div class="source-icon-box icon-green-water">
+                    <i class="fa-solid fa-droplet"></i>
+                  </div>
+                  <div class="source-item-info">
+                    <span class="source-item-name">南化供水量 <span class="source-tag">(南化高屏聯通管通水量)</span></span>
+                    <div class="source-val-row">
+                      <span class="source-num-val val-green" id="nanhuaSupplyVal">38</span>
+                      <span class="source-unit-txt">CMD</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Tab 3: 水庫蓄水量 (依據截圖 1 實作) -->
+        <div class="tab-content" id="tab-reservoir">
+          <div class="reservoir-panel-scroll">
+            
+            <!-- 上方控制與篩選列 -->
+            <div class="reservoir-filter-bar">
+              <div class="filter-group">
+                <span class="filter-label">快速篩選：</span>
+                <div class="filter-btn-group" id="reservoirRegionFilter">
+                  <button type="button" class="btn-res-filter" data-region="all">全部</button>
+                  <button type="button" class="btn-res-filter active" data-region="north">北部</button>
+                  <button type="button" class="btn-res-filter" data-region="central">中部</button>
+                  <button type="button" class="btn-res-filter" data-region="south">南部</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 水庫卡片網格清單 -->
+            <div class="reservoir-cards-grid" id="reservoirCardsGrid">
+              
+              <!-- 01 新山水庫 (北部) -->
+              <div class="res-card-box" data-id="xinshan" data-region="north">
+                <div class="res-card-top">
+                  <span class="res-num-badge">01</span>
+                  <h4 class="res-name-title">新山水庫(基隆)</h4>
+                </div>
+                <div class="res-card-body">
+                  <div class="res-wave-circle wave-blue" data-level="91.7">
+                    <div class="water-wave"></div>
+                    <span class="wave-percent-txt">91.7%</span>
+                  </div>
+                  <div class="res-meta-info">
+                    <div class="meta-row text-danger-drop">昨日水量下降：0.78%</div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄水量：</span><span class="meta-val">913.39 萬立方公尺</span></div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄容量：</span><span class="meta-val">995.96 萬立方公尺</span></div>
+                    <div class="meta-row meta-time"><span class="meta-lbl">更新時間：</span><span class="meta-val">2026-07-31 (07時)</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 02 翡翠水庫 (北部) -->
+              <div class="res-card-box" data-id="feicui" data-region="north">
+                <div class="res-card-top">
+                  <span class="res-num-badge">02</span>
+                  <h4 class="res-name-title">翡翠水庫(新北)</h4>
+                </div>
+                <div class="res-card-body">
+                  <div class="res-wave-circle wave-blue" data-level="73.5">
+                    <div class="water-wave" style="top: 26.5%;"></div>
+                    <span class="wave-percent-txt">73.5%</span>
+                  </div>
+                  <div class="res-meta-info">
+                    <div class="meta-row text-danger-drop">昨日水量下降：0.72%</div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄水量：</span><span class="meta-val">27189.76 萬立方公尺</span></div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄容量：</span><span class="meta-val">36997.60 萬立方公尺</span></div>
+                    <div class="meta-row meta-time"><span class="meta-lbl">更新時間：</span><span class="meta-val">2026-07-31 (14時)</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 03 石門水庫 (北部) -->
+              <div class="res-card-box" data-id="shimen" data-region="north">
+                <div class="res-card-top">
+                  <span class="res-num-badge">03</span>
+                  <h4 class="res-name-title">石門水庫(新北/桃園)</h4>
+                </div>
+                <div class="res-card-body">
+                  <div class="res-wave-circle wave-blue" data-level="99.9">
+                    <div class="water-wave" style="top: 0.1%;"></div>
+                    <span class="wave-percent-txt">99.9%</span>
+                  </div>
+                  <div class="res-meta-info">
+                    <div class="meta-row text-danger-drop">昨日水量下降：0.35%</div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄水量：</span><span class="meta-val">20500.39 萬立方公尺</span></div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄容量：</span><span class="meta-val">20526.00 萬立方公尺</span></div>
+                    <div class="meta-row meta-time"><span class="meta-lbl">更新時間：</span><span class="meta-val">2026-07-31 (12時)</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 04 明德水庫 (中部) -->
+              <div class="res-card-box" data-id="mingde" data-region="central">
+                <div class="res-card-top">
+                  <span class="res-num-badge">04</span>
+                  <h4 class="res-name-title">明德水庫(苗栗)</h4>
+                </div>
+                <div class="res-card-body">
+                  <div class="res-wave-circle wave-blue" data-level="85.5">
+                    <div class="water-wave" style="top: 14.5%;"></div>
+                    <span class="wave-percent-txt">85.5%</span>
+                  </div>
+                  <div class="res-meta-info">
+                    <div class="meta-row text-danger-drop">昨日水量下降：0.69%</div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄水量：</span><span class="meta-val">1062.21 萬立方公尺</span></div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄容量：</span><span class="meta-val">1242.28 萬立方公尺</span></div>
+                    <div class="meta-row meta-time"><span class="meta-lbl">更新時間：</span><span class="meta-val">2026-07-31 (12時)</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 05 鯉魚潭水庫 (中部 - 低水位紅色警示卡片) -->
+              <div class="res-card-box card-danger" data-id="liyutan" data-region="central">
+                <div class="res-card-top">
+                  <span class="res-num-badge">05</span>
+                  <h4 class="res-name-title">鯉魚潭水庫(台中)</h4>
+                </div>
+                <div class="res-card-body">
+                  <div class="res-wave-circle wave-red" data-level="46">
+                    <div class="water-wave" style="top: 54%;"></div>
+                    <span class="wave-percent-txt">46%</span>
+                  </div>
+                  <div class="res-meta-info">
+                    <div class="meta-row text-danger-drop">昨日水量下降：0.04%</div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄水量：</span><span class="meta-val">11566.26 萬立方公尺</span></div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄容量：</span><span class="meta-val">11548.60 萬立方公尺</span></div>
+                    <div class="meta-row meta-time"><span class="meta-lbl">更新時間：</span><span class="meta-val">2026-07-31 (12時)</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 06 德基水庫 (中部) -->
+              <div class="res-card-box" data-id="deji" data-region="central">
+                <div class="res-card-top">
+                  <span class="res-num-badge">06</span>
+                  <h4 class="res-name-title">德基水庫(台中)</h4>
+                </div>
+                <div class="res-card-body">
+                  <div class="res-wave-circle wave-blue" data-level="92.7">
+                    <div class="water-wave" style="top: 7.3%;"></div>
+                    <span class="wave-percent-txt">92.7%</span>
+                  </div>
+                  <div class="res-meta-info">
+                    <div class="meta-row text-danger-drop">昨日水量下降：0.45%</div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄水量：</span><span class="meta-val">16822.91 萬立方公尺</span></div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄容量：</span><span class="meta-val">18154.94 萬立方公尺</span></div>
+                    <div class="meta-row meta-time"><span class="meta-lbl">更新時間：</span><span class="meta-val">2026-07-31 (12時)</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 07 日月潭水庫 (中部) -->
+              <div class="res-card-box" data-id="sunmoon" data-region="central">
+                <div class="res-card-top">
+                  <span class="res-num-badge">07</span>
+                  <h4 class="res-name-title">日月潭水庫(南投)</h4>
+                </div>
+                <div class="res-card-body">
+                  <div class="res-wave-circle wave-blue" data-level="92.3">
+                    <div class="water-wave" style="top: 7.7%;"></div>
+                    <span class="wave-percent-txt">92.3%</span>
+                  </div>
+                  <div class="res-meta-info">
+                    <div class="meta-row text-danger-drop">昨日水量下降：0.12%</div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄水量：</span><span class="meta-val">10885.30 萬立方公尺</span></div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄容量：</span><span class="meta-val">11774.00 萬立方公尺</span></div>
+                    <div class="meta-row meta-time"><span class="meta-lbl">更新時間：</span><span class="meta-val">2026-07-31 (12時)</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 08 曾文水庫 (南部) -->
+              <div class="res-card-box" data-id="zengwen" data-region="south">
+                <div class="res-card-top">
+                  <span class="res-num-badge">08</span>
+                  <h4 class="res-name-title">曾文水庫(嘉義/台南)</h4>
+                </div>
+                <div class="res-card-body">
+                  <div class="res-wave-circle wave-blue" data-level="68.6">
+                    <div class="water-wave" style="top: 31.4%;"></div>
+                    <span class="wave-percent-txt">68.6%</span>
+                  </div>
+                  <div class="res-meta-info">
+                    <div class="meta-row text-danger-drop">昨日水量下降：1.05%</div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄水量：</span><span class="meta-val">39334.24 萬立方公尺</span></div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄容量：</span><span class="meta-val">57300.00 萬立方公尺</span></div>
+                    <div class="meta-row meta-time"><span class="meta-lbl">更新時間：</span><span class="meta-val">2026-07-31 (12時)</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 09 烏山頭水庫 (南部) -->
+              <div class="res-card-box" data-id="wushantou" data-region="south">
+                <div class="res-card-top">
+                  <span class="res-num-badge">09</span>
+                  <h4 class="res-name-title">烏山頭水庫(台南)</h4>
+                </div>
+                <div class="res-card-body">
+                  <div class="res-wave-circle wave-blue" data-level="95.9">
+                    <div class="water-wave" style="top: 4.1%;"></div>
+                    <span class="wave-percent-txt">95.9%</span>
+                  </div>
+                  <div class="res-meta-info">
+                    <div class="meta-row text-danger-drop">昨日水量下降：0.50%</div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄水量：</span><span class="meta-val">7561.00 萬立方公尺</span></div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄容量：</span><span class="meta-val">7885.19 萬立方公尺</span></div>
+                    <div class="meta-row meta-time"><span class="meta-lbl">更新時間：</span><span class="meta-val">2026-07-31 (12時)</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 10 南化水庫 (南部) -->
+              <div class="res-card-box" data-id="nanhua" data-region="south">
+                <div class="res-card-top">
+                  <span class="res-num-badge">10</span>
+                  <h4 class="res-name-title">南化水庫(台南/高雄)</h4>
+                </div>
+                <div class="res-card-body">
+                  <div class="res-wave-circle wave-blue" data-level="100">
+                    <div class="water-wave" style="top: 0%;"></div>
+                    <span class="wave-percent-txt">100%</span>
+                  </div>
+                  <div class="res-meta-info">
+                    <div class="meta-row text-danger-drop">昨日水量下降：0.00%</div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄水量：</span><span class="meta-val">8185.75 萬立方公尺</span></div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄容量：</span><span class="meta-val">8180.90 萬立方公尺</span></div>
+                    <div class="meta-row meta-time"><span class="meta-lbl">更新時間：</span><span class="meta-val">2026-07-31 (12時)</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 11 牡丹水庫 (南部) -->
+              <div class="res-card-box" data-id="mudan" data-region="south">
+                <div class="res-card-top">
+                  <span class="res-num-badge">11</span>
+                  <h4 class="res-name-title">牡丹水庫(屏東)</h4>
+                </div>
+                <div class="res-card-body">
+                  <div class="res-wave-circle wave-blue" data-level="84.4">
+                    <div class="water-wave" style="top: 15.6%;"></div>
+                    <span class="wave-percent-txt">84.4%</span>
+                  </div>
+                  <div class="res-meta-info">
+                    <div class="meta-row text-danger-drop">昨日水量下降：0.28%</div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄水量：</span><span class="meta-val">2198.00 萬立方公尺</span></div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄容量：</span><span class="meta-val">2603.66 萬立方公尺</span></div>
+                    <div class="meta-row meta-time"><span class="meta-lbl">更新時間：</span><span class="meta-val">2026-07-31 (12時)</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 12 白河水庫 (南部) -->
+              <div class="res-card-box" data-id="baihe" data-region="south">
+                <div class="res-card-top">
+                  <span class="res-num-badge">12</span>
+                  <h4 class="res-name-title">白河水庫(台南)</h4>
+                </div>
+                <div class="res-card-body">
+                  <div class="res-wave-circle wave-blue" data-level="68.4">
+                    <div class="water-wave" style="top: 31.6%;"></div>
+                    <span class="wave-percent-txt">68.4%</span>
+                  </div>
+                  <div class="res-meta-info">
+                    <div class="meta-row text-danger-drop">昨日水量下降：0.15%</div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄水量：</span><span class="meta-val">982.00 萬立方公尺</span></div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄容量：</span><span class="meta-val">1436.28 萬立方公尺</span></div>
+                    <div class="meta-row meta-time"><span class="meta-lbl">更新時間：</span><span class="meta-val">2026-07-31 (12時)</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 13 湖山水庫 (中部/南部) -->
+              <div class="res-card-box" data-id="hushan" data-region="south">
+                <div class="res-card-top">
+                  <span class="res-num-badge">13</span>
+                  <h4 class="res-name-title">湖山水庫(雲林/嘉義)</h4>
+                </div>
+                <div class="res-card-body">
+                  <div class="res-wave-circle wave-blue" data-level="99.6">
+                    <div class="water-wave" style="top: 0.4%;"></div>
+                    <span class="wave-percent-txt">99.6%</span>
+                  </div>
+                  <div class="res-meta-info">
+                    <div class="meta-row text-danger-drop">昨日水量下降：0.08%</div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄水量：</span><span class="meta-val">5022.40 萬立方公尺</span></div>
+                    <div class="meta-row"><span class="meta-lbl">有效蓄容量：</span><span class="meta-val">5041.00 萬立方公尺</span></div>
+                    <div class="meta-row meta-time"><span class="meta-lbl">更新時間：</span><span class="meta-val">2026-07-31 (12時)</span></div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 垂直可拖曳調整寬度分割條 (含收合把手) -->
+      <div id="panelResizer" class="panel-resizer-bar" title="左右拖曳調整寬度">
+        <div class="resizer-line"></div>
+        <button id="toggleCollapseBtn" class="collapse-toggle-bar" title="收合/展開左側表格">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+      </div>
+
+      <!-- 右側 GIS 衛星地圖工作區 -->
+      <section class="right-map-panel">
+        
+        <!-- 視圖 1：全台供水狀態總覽 Google Map GIS 衛星地圖底圖容器 -->
+        <div class="satellite-map-container" id="satelliteMapContainer">
+          
+          <!-- Google Map 實體圖台容器 -->
+          <div id="gisGoogleMap" class="gis-google-map"></div>
+
+          <!-- 右上角：供水區域狀態圖例卡片 (Legend Card - 支援一鍵收合與展開) -->
+          <div class="map-floating-card map-legend-card" id="overviewLegendCard">
+            <div class="legend-card-header" id="toggleOverviewLegendBtn">
+              <div class="legend-card-title"><i class="fa-solid fa-layer-group"></i> 供水區域狀態圖例</div>
+              <button type="button" class="btn-legend-collapse" title="收合/展開圖例">
+                <i class="fa-solid fa-chevron-up" id="overviewLegendArrow"></i>
+              </button>
+            </div>
+            <div class="legend-card-list" id="overviewLegendContent">
+              <div class="legend-card-item">
+                <span class="legend-box box-warning"></span>
+                <span>警戒供水區域</span>
+              </div>
+              <div class="legend-card-item">
+                <span class="legend-box box-danger"></span>
+                <span>異常供水區域</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 中右側：全台總計 KPI 卡片 (Summary Card) -->
+          <div class="map-floating-card map-kpi-card">
+            <div class="kpi-card-header">全台總計</div>
+            <div class="kpi-card-content">
+              <div class="kpi-title-line">
+                <i class="fa-solid fa-droplet text-primary"></i>
+                <span>總供水量</span>
+              </div>
+              <div class="kpi-main-number">
+                <span class="num">944.6</span>
+                <span class="unit">萬噸 / 日</span>
+              </div>
+              <div class="kpi-card-trend">
+                <span class="trend-lbl">較前一日</span>
+                <span class="trend-delta text-success">
+                  <i class="fa-solid fa-arrow-down"></i> -0.83%
+                </span>
+                <span class="trend-sub">(-7.9 萬噸 / 日)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 右下角浮動工具按鈕群 (FAB) -->
+          <div class="map-fab-group">
+            <button class="fab-btn" id="fabLayerBtn" title="圖層切換">
+              <i class="fa-solid fa-layer-group"></i>
+            </button>
+            <button class="fab-btn fab-robot" id="fabAiBtn" title="智慧管網 AI 助理">
+              <i class="fa-solid fa-robot"></i>
+            </button>
+          </div>
+
+          <!-- 區處懸浮數值浮動窗 (Tooltip) -->
+          <div id="districtTooltip" class="district-tooltip hide">
+            <div class="tooltip-title" id="ttTitle">區處名稱</div>
+            <div class="tooltip-row">狀態：<span id="ttStatus" class="font-bold">正常</span></div>
+            <div class="tooltip-row">今日供水量：<span id="ttSupply" class="font-bold">0 CMD</span></div>
+            <div class="tooltip-row">去年同日：<span id="ttLastYear">0 CMD</span></div>
+          </div>
+        </div>
+
+        <!-- 視圖 2：全臺各縣市供水支援與受支援量 Google Map 衛星底圖套疊拓撲圖 -->
+        <div class="dispatch-static-map-view hide" id="dispatchStaticMapView">
+          
+          <!-- 底層 Google Map 台灣衛星地圖 -->
+          <div id="dispatchGoogleMap" class="dispatch-google-map-bg"></div>
+          <div class="dispatch-map-overlay-mask"></div>
+          
+          <!-- 左上角：支援水量統計模式選擇器 (日結量 / 瞬間量) -->
+          <div class="dispatch-mode-dropdown-box">
+            <button type="button" class="btn-dispatch-mode" id="dispatchModeBtn">
+              <i class="fa-solid fa-droplet text-cyan"></i>
+              <span class="mode-title-txt">支援水量統計</span>
+              <span class="mode-current-badge" id="currentDispatchModeText">日結量</span>
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+
+            <div class="dispatch-mode-menu hide" id="dispatchModeMenu">
+              <div class="mode-menu-item active" data-mode="daily">
+                <span>日結量</span>
+                <i class="fa-solid fa-circle-check mode-check-icon"></i>
+              </div>
+              <div class="mode-menu-item" data-mode="instant">
+                <span>瞬間量</span>
+                <i class="fa-regular fa-circle mode-check-icon"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- 左側：支援水源圖例面板 (支援一鍵收合與展開) -->
+          <div class="dispatch-legend-panel" id="dispatchLegendPanel">
+            <div class="legend-panel-header" id="toggleDispatchLegendBtn">
+              <span class="legend-panel-title"><i class="fa-solid fa-layer-group"></i> 支援水源圖例</span>
+              <button type="button" class="btn-legend-collapse" title="收合/展開圖例">
+                <i class="fa-solid fa-chevron-up" id="dispatchLegendArrow"></i>
+              </button>
+            </div>
+            <div class="legend-items-list" id="dispatchLegendContent">
+              <div class="dispatch-legend-row">
+                <span class="legend-color-block color-orange"></span>
+                <span>橙色 = 支援</span>
+              </div>
+              <div class="dispatch-legend-row">
+                <span class="legend-color-block color-blue"></span>
+                <span>藍色 = 受支援</span>
+              </div>
+              <div class="dispatch-legend-row">
+                <span class="legend-color-block color-red"></span>
+                <span>紅色 = 雙向</span>
+              </div>
+              <div class="dispatch-legend-row">
+                <span class="legend-color-block color-green"></span>
+                <span>綠色 = 無需跨區支援</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 中央靜態台灣全島地圖與各縣市發光資訊卡片拓撲圖 -->
+          <div class="dispatch-map-canvas-wrap">
+            
+            <!-- SVG 地圖本體與連線 -->
+            <svg class="dispatch-taiwan-svg" viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <filter id="card-glow-red" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#ef4444" flood-opacity="0.6"/>
+                </filter>
+                <filter id="card-glow-orange" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#f97316" flood-opacity="0.6"/>
+                </filter>
+                <filter id="card-glow-blue" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#3b82f6" flood-opacity="0.6"/>
+                </filter>
+                <filter id="card-glow-green" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#22c55e" flood-opacity="0.6"/>
+                </filter>
+              </defs>
+
+              <!-- 台灣各縣市分區上色 Path (橙/藍/紅/綠) -->
+              <!-- 基隆 (藍色) -->
+              <path class="county-shape shape-blue" id="shape-keelung" d="M635,120 L660,135 L645,155 L625,140 Z" />
+              <!-- 台北市 (橙色) -->
+              <path class="county-shape shape-orange" id="shape-taipei" d="M605,135 L630,130 L635,160 L610,165 Z" />
+              <!-- 新北市 (紅色) -->
+              <path class="county-shape shape-red" id="shape-newtaipei" d="M575,130 L645,115 L665,155 L635,185 L585,165 Z" />
+              <!-- 桃園市 (紅色) -->
+              <path class="county-shape shape-red" id="shape-taoyuan" d="M545,165 L585,160 L575,205 L530,195 Z" />
+              <!-- 新竹縣市 (藍色) -->
+              <path class="county-shape shape-blue" id="shape-hsinchu" d="M525,198 L570,208 L555,255 L510,235 Z" />
+              <!-- 苗栗縣 (紅色) -->
+              <path class="county-shape shape-red" id="shape-miaoli" d="M500,240 L550,258 L530,305 L485,280 Z" />
+              <!-- 台中市 (橙色) -->
+              <path class="county-shape shape-orange" id="shape-taichung" d="M475,285 L530,305 L515,365 L460,340 Z" />
+              <!-- 彰化縣 (藍色) -->
+              <path class="county-shape shape-blue" id="shape-changhua" d="M450,345 L500,365 L490,410 L440,390 Z" />
+              <!-- 南投縣 (綠色) -->
+              <path class="county-shape shape-green" id="shape-nantou" d="M510,360 L565,375 L545,475 L490,450 Z" />
+              <!-- 雲林縣 (橙色) -->
+              <path class="county-shape shape-orange" id="shape-yunlin" d="M430,395 L485,415 L475,465 L420,445 Z" />
+              <!-- 嘉義縣市 (藍色) -->
+              <path class="county-shape shape-blue" id="shape-chiayi" d="M420,450 L475,470 L460,520 L405,500 Z" />
+              <!-- 台南市 (紅色) -->
+              <path class="county-shape shape-red" id="shape-tainan" d="M405,505 L460,525 L445,580 L390,560 Z" />
+              <!-- 高雄市 (紅色) -->
+              <path class="county-shape shape-red" id="shape-kaohsiung" d="M410,570 L465,585 L440,660 L395,635 Z" />
+              <!-- 屏東縣 (綠色) -->
+              <path class="county-shape shape-green" id="shape-pingtung" d="M425,640 L465,655 L445,750 L405,730 Z" />
+              <!-- 宜蘭縣 (綠色) -->
+              <path class="county-shape shape-green" id="shape-yilan" d="M605,185 L655,200 L630,285 L580,265 Z" />
+              <!-- 花蓮縣 (綠色) -->
+              <path class="county-shape shape-green" id="shape-hualien" d="M555,285 L625,305 L585,505 L525,475 Z" />
+              <!-- 台東縣 (綠色) -->
+              <path class="county-shape shape-green" id="shape-taitung" d="M485,505 L555,525 L510,695 L450,670 Z" />
+
+              <!-- 連線指示箭頭 (Leader Lines) -->
+              <!-- 基隆 -->
+              <polyline class="leader-line" points="720,85 640,85 640,120" />
+              <!-- 台北 -->
+              <polyline class="leader-line" points="720,165 625,165 625,145" />
+              <!-- 新北 -->
+              <polyline class="leader-line" points="720,270 610,270 610,165" />
+              <!-- 宜蘭 -->
+              <polyline class="leader-line" points="720,365 615,365 615,230" />
+              <!-- 南投 -->
+              <polyline class="leader-line" points="720,460 540,460 540,410" />
+              <!-- 花蓮 -->
+              <polyline class="leader-line" points="720,555 570,555 570,390" />
+              <!-- 台東 -->
+              <polyline class="leader-line" points="720,650 510,650 510,580" />
+              <!-- 屏東 -->
+              <polyline class="leader-line" points="620,740 440,740 440,680" />
+
+              <!-- 桃園 -->
+              <polyline class="leader-line" points="350,85 540,85 555,165" />
+              <!-- 新竹 -->
+              <polyline class="leader-line" points="350,175 490,175 530,210" />
+              <!-- 苗栗 -->
+              <polyline class="leader-line" points="350,265 480,265 510,265" />
+              <!-- 台中 -->
+              <polyline class="leader-line" points="330,355 460,355 490,320" />
+              <!-- 彰化 -->
+              <polyline class="leader-line" points="310,445 435,445 460,375" />
+              <!-- 雲林 -->
+              <polyline class="leader-line" points="300,535 410,535 445,430" />
+              <!-- 嘉義 -->
+              <polyline class="leader-line" points="290,625 400,625 430,485" />
+              <!-- 台南 -->
+              <polyline class="leader-line" points="400,740 400,680 420,550" />
+              <!-- 高雄 -->
+              <polyline class="leader-line" points="460,780 440,780 440,630" />
+            </svg>
+
+            <!-- 17 個立體發光各縣市資訊卡片 (依據截圖精密排列) -->
+            <div class="county-cards-overlay">
+              
+              <!-- === 右側縱列卡片 === -->
+              <!-- 基隆市 (藍色) -->
+              <div class="county-stat-card card-border-blue pos-keelung">
+                <div class="card-header-tag tag-blue">基隆市</div>
+                <div class="card-data-grid">
+                  <div class="grid-row"><span class="lbl">支援量</span><span class="val" data-city="keelung" data-field="support">-</span></div>
+                  <div class="grid-row"><span class="lbl">受支援量</span><span class="val" data-city="keelung" data-field="received">18,145</span></div>
+                </div>
+              </div>
+
+              <!-- 臺北市 (橙色) -->
+              <div class="county-stat-card card-border-orange pos-taipei">
+                <div class="card-header-tag tag-orange">臺北市</div>
+                <div class="card-data-grid">
+                  <div class="grid-row"><span class="lbl">支援量</span><span class="val" data-city="taipei" data-field="support">386,757</span></div>
+                  <div class="grid-row"><span class="lbl">受支援量</span><span class="val" data-city="taipei" data-field="received">-</span></div>
+                </div>
+              </div>
+
+              <!-- 新北市 (紅色) -->
+              <div class="county-stat-card card-border-red pos-newtaipei">
+                <div class="card-header-tag tag-red">新北市</div>
+                <div class="card-data-grid">
+                  <div class="grid-row"><span class="lbl">支援量</span><span class="val" data-city="newtaipei" data-field="support">281,035</span></div>
+                  <div class="grid-row"><span class="lbl">受支援量</span><span class="val" data-city="newtaipei" data-field="received">368,612</span></div>
+                </div>
+              </div>
+
+              <!-- 宜蘭縣 (綠色) -->
+              <div class="county-stat-card card-border-green pos-yilan">
+                <div class="card-header-tag tag-green">宜蘭縣</div>
+                <div class="card-data-grid">
+                  <div class="grid-row"><span class="lbl">支援量</span><span class="val" data-city="yilan" data-field="support">-</span></div>
+                  <div class="grid-row"><span class="lbl">受支援量</span><span class="val" data-city="yilan" data-field="received">-</span></div>
+                </div>
+              </div>
+
+              <!-- 南投縣 (綠色) -->
+              <div class="county-stat-card card-border-green pos-nantou">
+                <div class="card-header-tag tag-green">南投縣</div>
+                <div class="card-data-grid">
+                  <div class="grid-row"><span class="lbl">支援量</span><span class="val" data-city="nantou" data-field="support">-</span></div>
+                  <div class="grid-row"><span class="lbl">受支援量</span><span class="val" data-city="nantou" data-field="received">-</span></div>
+                </div>
+              </div>
+
+              <!-- 花蓮縣 (綠色) -->
+              <div class="county-stat-card card-border-green pos-hualien">
+                <div class="card-header-tag tag-green">花蓮縣</div>
+                <div class="card-data-grid">
+                  <div class="grid-row"><span class="lbl">支援量</span><span class="val" data-city="hualien" data-field="support">-</span></div>
+                  <div class="grid-row"><span class="lbl">受支援量</span><span class="val" data-city="hualien" data-field="received">-</span></div>
+                </div>
+              </div>
+
+              <!-- 臺東縣 (綠色) -->
+              <div class="county-stat-card card-border-green pos-taitung">
+                <div class="card-header-tag tag-green">臺東縣</div>
+                <div class="card-data-grid">
+                  <div class="grid-row"><span class="lbl">支援量</span><span class="val" data-city="taitung" data-field="support">-</span></div>
+                  <div class="grid-row"><span class="lbl">受支援量</span><span class="val" data-city="taitung" data-field="received">-</span></div>
+                </div>
+              </div>
+
+              <!-- 屏東縣 (綠色) -->
+              <div class="county-stat-card card-border-green pos-pingtung">
+                <div class="card-header-tag tag-green">屏東縣</div>
+                <div class="card-data-grid">
+                  <div class="grid-row"><span class="lbl">支援量</span><span class="val" data-city="pingtung" data-field="support">-</span></div>
+                  <div class="grid-row"><span class="lbl">受支援量</span><span class="val" data-city="pingtung" data-field="received">-</span></div>
+                </div>
+              </div>
+
+              <!-- === 左側縱列卡片 === -->
+              <!-- 桃園市 (紅色) -->
+              <div class="county-stat-card card-border-red pos-taoyuan">
+                <div class="card-header-tag tag-red">桃園市</div>
+                <div class="card-data-grid">
+                  <div class="grid-row"><span class="lbl">支援量</span><span class="val" data-city="taoyuan" data-field="support">87,577</span></div>
+                  <div class="grid-row"><span class="lbl">受支援量</span><span class="val" data-city="taoyuan" data-field="received">281,035</span></div>
+                </div>
+              </div>
+
+              <!-- 新竹縣市 (藍色) -->
+              <div class="county-stat-card card-border-blue pos-hsinchu">
+                <div class="card-header-tag tag-blue">新竹縣市</div>
+                <div class="card-data-grid">
+                  <div class="grid-row"><span class="lbl">支援量</span><span class="val" data-city="hsinchu" data-field="support">-</span></div>
+                  <div class="grid-row"><span class="lbl">受支援量</span><span class="val" data-city="hsinchu" data-field="received">159,150</span></div>
+                </div>
+              </div>
+
+              <!-- 苗栗縣 (紅色) -->
+              <div class="county-stat-card card-border-red pos-miaoli">
+                <div class="card-header-tag tag-red">苗栗縣</div>
+                <div class="card-data-grid">
+                  <div class="grid-row"><span class="lbl">支援量</span><span class="val" data-city="miaoli" data-field="support">71,573</span></div>
+                  <div class="grid-row"><span class="lbl">受支援量</span><span class="val" data-city="miaoli" data-field="received">75,628</span></div>
+                </div>
+              </div>
+
+              <!-- 臺中市 (橙色) -->
+              <div class="county-stat-card card-border-orange pos-taichung">
+                <div class="card-header-tag tag-orange">臺中市</div>
+                <div class="card-data-grid">
+                  <div class="grid-row"><span class="lbl">支援量</span><span class="val" data-city="taichung" data-field="support">87,495</span></div>
+                  <div class="grid-row"><span class="lbl">受支援量</span><span class="val" data-city="taichung" data-field="received">-</span></div>
+                </div>
+              </div>
+
+              <!-- 彰化縣 (藍色) -->
+              <div class="county-stat-card card-border-blue pos-changhua">
+                <div class="card-header-tag tag-blue">彰化縣</div>
+                <div class="card-data-grid">
+                  <div class="grid-row"><span class="lbl">支援量</span><span class="val" data-city="changhua" data-field="support">-</span></div>
+                  <div class="grid-row"><span class="lbl">受支援量</span><span class="val" data-city="changhua" data-field="received">74,077</span></div>
+                </div>
+              </div>
+
+              <!-- 雲林縣 (橙色) -->
+              <div class="county-stat-card card-border-orange pos-yunlin">
+                <div class="card-header-tag tag-orange">雲林縣</div>
+                <div class="card-data-grid">
+                  <div class="grid-row"><span class="lbl">支援量</span><span class="val" data-city="yunlin" data-field="support">69,320</span></div>
+                  <div class="grid-row"><span class="lbl">受支援量</span><span class="val" data-city="yunlin" data-field="received">-</span></div>
+                </div>
+              </div>
+
+              <!-- 嘉義縣 (藍色) -->
+              <div class="county-stat-card card-border-blue pos-chiayi">
+                <div class="card-header-tag tag-blue">嘉義縣</div>
+                <div class="card-data-grid">
+                  <div class="grid-row"><span class="lbl">支援量</span><span class="val" data-city="chiayi" data-field="support">-</span></div>
+                  <div class="grid-row"><span class="lbl">受支援量</span><span class="val" data-city="chiayi" data-field="received">7,110</span></div>
+                </div>
+              </div>
+
+              <!-- 臺南市 (紅色) -->
+              <div class="county-stat-card card-border-red pos-tainan">
+                <div class="card-header-tag tag-red">臺南市</div>
+                <div class="card-data-grid">
+                  <div class="grid-row"><span class="lbl">支援量</span><span class="val" data-city="tainan" data-field="support">7,524</span></div>
+                  <div class="grid-row"><span class="lbl">受支援量</span><span class="val" data-city="tainan" data-field="received">1,802</span></div>
+                </div>
+              </div>
+
+              <!-- 高雄市 (紅色) -->
+              <div class="county-stat-card card-border-red pos-kaohsiung">
+                <div class="card-header-tag tag-red">高雄市</div>
+                <div class="card-data-grid">
+                  <div class="grid-row"><span class="lbl">支援量</span><span class="val" data-city="kaohsiung" data-field="support">1,802</span></div>
+                  <div class="grid-row"><span class="lbl">受支援量</span><span class="val" data-city="kaohsiung" data-field="received">7,524</span></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- 右下角浮動工具按鈕群 (FAB) -->
+          <div class="map-fab-group">
+            <button class="fab-btn" title="圖層切換">
+              <i class="fa-solid fa-layer-group"></i>
+            </button>
+            <button class="fab-btn fab-robot" title="智慧管網 AI 助理">
+              <i class="fa-solid fa-robot"></i>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- 視圖 3：SVG 格式供水高程水位關係圖 (依據截圖實作) -->
+        <div class="water-level-svg-view hide" id="waterLevelSvgView">
+          <!-- 頂部系統標籤 -->
+          <div class="water-level-header-bar">
+            <div class="water-level-title-group">
+              <span class="water-level-badge"><i class="fa-solid fa-chart-area"></i> 水位關係拓撲圖</span>
+              <h3 class="water-level-sys-name" id="currentLevelSystemName">北埔供水系統 - 供水水位高程關係圖</h3>
+            </div>
+            <div class="water-level-actions">
+              <button type="button" class="btn-level-toggle-view" id="btnSwitchToTelemetry">
+                <i class="fa-solid fa-map-location-dot"></i> 切換至傳訊點分布圖台
+              </button>
+            </div>
+          </div>
+
+          <!-- SVG 高程拓撲畫布 (精密復刻截圖中之管線、高程、池槽、站體、流量計與水流箭頭) -->
+          <div class="water-level-canvas-wrap">
+            <svg class="water-level-svg" viewBox="0 0 1080 720" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#60a5fa" />
+                </marker>
+                <marker id="arrow-white" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#ffffff" />
+                </marker>
+              </defs>
+
+              <!-- 深色網格底紋 -->
+              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+              </pattern>
+              <rect width="100%" height="100%" fill="url(#grid)" />
+
+              <!-- === 1. 北埔淨水場 外框虛線盒 === -->
+              <rect x="690" y="80" width="340" height="190" fill="rgba(15, 30, 54, 0.4)" stroke="#60a5fa" stroke-width="1.8" stroke-dasharray="6 4" rx="6" />
+              <text x="860" y="258" fill="#e2e8f0" font-size="14.5" font-weight="bold" text-anchor="middle">北埔淨水場</text>
+
+              <!-- 清水池 (矩形盒) -->
+              <rect x="740" y="105" width="80" height="55" fill="#0f2942" stroke="#38bdf8" stroke-width="1.5" rx="3" />
+              <text x="780" y="125" fill="#ffffff" font-size="11.5" font-weight="bold" text-anchor="middle">清水池</text>
+              <text x="780" y="139" fill="#94a3b8" font-size="8.5" text-anchor="middle">HWL: 219M</text>
+              <text x="780" y="149" fill="#94a3b8" font-size="8.5" text-anchor="middle">LWL: 214M</text>
+              <text x="780" y="157" fill="#38bdf8" font-size="8" text-anchor="middle">30000M³</text>
+
+              <!-- 淨水設備 (矩形盒) -->
+              <rect x="850" y="120" width="75" height="35" fill="#0f2942" stroke="#38bdf8" stroke-width="1.5" rx="3" />
+              <text x="887" y="136" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">淨水設備</text>
+              <text x="887" y="148" fill="#94a3b8" font-size="8.5" text-anchor="middle">HWL: 240M</text>
+
+              <!-- 5400M³ 蓄水式設計 橢圓 -->
+              <ellipse cx="755" cy="205" rx="50" ry="18" fill="#0a192f" stroke="#38bdf8" stroke-width="1.2" />
+              <text x="755" y="202" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="middle">5400M³</text>
+              <text x="755" y="213" fill="#94a3b8" font-size="7.5" text-anchor="middle">(蓄水式設計)</text>
+
+              <!-- === 2. 左上：大坪林高地 === -->
+              <ellipse cx="380" cy="55" rx="60" ry="20" fill="#0a192f" stroke="#38bdf8" stroke-width="1.5" />
+              <text x="380" y="52" fill="#ffffff" font-size="10.5" font-weight="bold" text-anchor="middle">大坪林高地</text>
+              <text x="380" y="64" fill="#94a3b8" font-size="8.5" text-anchor="middle">EL : 173-214M</text>
+
+              <!-- === 3. 右上：頭前溪 取水口 === -->
+              <ellipse cx="940" cy="45" rx="55" ry="18" fill="#0a192f" stroke="#38bdf8" stroke-width="1.5" />
+              <text x="940" y="42" fill="#ffffff" font-size="9.5" font-weight="bold" text-anchor="middle">頭前溪(支流・乾流)</text>
+              <text x="940" y="53" fill="#94a3b8" font-size="8" text-anchor="middle">取水口(EL : 55M)</text>
+
+              <!-- 右上：大坪林溪原水前 矩形 -->
+              <rect x="915" y="85" width="70" height="42" fill="#0f2942" stroke="#38bdf8" stroke-width="1.2" rx="3" />
+              <text x="950" y="100" fill="#ffffff" font-size="8.5" font-weight="bold" text-anchor="middle">大坪林溪原水前</text>
+              <text x="950" y="110" fill="#94a3b8" font-size="7.5" text-anchor="middle">HWL: 268M</text>
+              <text x="950" y="119" fill="#94a3b8" font-size="7.5" text-anchor="middle">LWL: 217M</text>
+
+              <!-- 右側：原水調整池 矩形 -->
+              <rect x="915" y="210" width="70" height="55" fill="#0f2942" stroke="#38bdf8" stroke-width="1.2" rx="3" />
+              <text x="950" y="226" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="middle">原水調整池</text>
+              <text x="950" y="238" fill="#94a3b8" font-size="7.5" text-anchor="middle">HWL: 165M</text>
+              <text x="950" y="248" fill="#94a3b8" font-size="7.5" text-anchor="middle">LWL: 160M</text>
+              <text x="950" y="258" fill="#38bdf8" font-size="7.5" text-anchor="middle">2000M³</text>
+
+              <!-- === 4. 中間水平主管與站體 === -->
+              <!-- 隆恩堰引水 -->
+              <ellipse cx="445" cy="275" rx="45" ry="18" fill="#0a192f" stroke="#38bdf8" stroke-width="1.2" />
+              <text x="445" y="272" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="middle">頭前溪引水</text>
+              <text x="445" y="283" fill="#94a3b8" font-size="7.5" text-anchor="middle">EL: 137-177M</text>
+
+              <!-- 隆恩堰引水 (上方) -->
+              <ellipse cx="535" cy="260" rx="45" ry="18" fill="#0a192f" stroke="#38bdf8" stroke-width="1.2" />
+              <text x="535" y="257" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="middle">隆恩堰引水</text>
+              <text x="535" y="268" fill="#94a3b8" font-size="7.5" text-anchor="middle">EL: 137-177M</text>
+
+              <!-- 北埔原水站 -->
+              <ellipse cx="615" cy="265" rx="45" ry="18" fill="#0a192f" stroke="#38bdf8" stroke-width="1.2" />
+              <text x="615" y="262" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="middle">北埔原水站</text>
+              <text x="615" y="273" fill="#94a3b8" font-size="7.5" text-anchor="middle">EL: 137-177M</text>
+
+              <!-- 第二原水調整池 -->
+              <ellipse cx="735" cy="265" rx="55" ry="18" fill="#0a192f" stroke="#38bdf8" stroke-width="1.2" />
+              <text x="735" y="262" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="middle">第二原水調整池</text>
+              <text x="735" y="273" fill="#94a3b8" font-size="7.5" text-anchor="middle">EL: 151.3M</text>
+
+              <!-- 大湖科取水井 -->
+              <ellipse cx="850" cy="285" rx="50" ry="18" fill="#0a192f" stroke="#38bdf8" stroke-width="1.2" />
+              <text x="850" y="282" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="middle">大湖科取水井</text>
+              <text x="850" y="293" fill="#94a3b8" font-size="7.5" text-anchor="middle">EL: 140-163M</text>
+
+              <!-- === 5. 中下部站體 === -->
+              <!-- 隆恩堰閥 (圓圈 R 標誌) -->
+              <circle cx="560" cy="340" r="16" fill="#0f2942" stroke="#38bdf8" stroke-width="1.8" />
+              <text x="560" y="345" fill="#38bdf8" font-size="13" font-weight="bold" text-anchor="middle">R</text>
+              <text x="590" y="344" fill="#ffffff" font-size="11" font-weight="bold">隆恩堰閥</text>
+
+              <!-- 員興取水口 -->
+              <circle cx="500" cy="425" r="16" fill="#0f2942" stroke="#38bdf8" stroke-width="1.8" />
+              <text x="500" y="430" fill="#38bdf8" font-size="13" font-weight="bold" text-anchor="middle">R</text>
+              <text x="525" y="429" fill="#ffffff" font-size="11" font-weight="bold">員興取水口 (自來水行控室)</text>
+
+              <!-- 右側：七星取水站 矩形盒 -->
+              <rect x="765" y="375" width="80" height="60" fill="#0f2942" stroke="#38bdf8" stroke-width="1.5" rx="3" />
+              <text x="805" y="392" fill="#ffffff" font-size="10.5" font-weight="bold" text-anchor="middle">七星取水站</text>
+              <text x="805" y="404" fill="#94a3b8" font-size="8" text-anchor="middle">HWL: 170.3M</text>
+              <text x="805" y="414" fill="#94a3b8" font-size="8" text-anchor="middle">LWL: 145.3M</text>
+              <text x="805" y="424" fill="#38bdf8" font-size="8" text-anchor="middle">100M³</text>
+
+              <!-- 七星井 橢圓 -->
+              <ellipse cx="715" cy="465" rx="45" ry="18" fill="#0a192f" stroke="#38bdf8" stroke-width="1.2" />
+              <text x="715" y="462" fill="#ffffff" font-size="9.5" font-weight="bold" text-anchor="middle">七星井</text>
+              <text x="715" y="473" fill="#94a3b8" font-size="8" text-anchor="middle">EL : 150-155M</text>
+
+              <!-- === 6. 底部水路站體 === -->
+              <!-- 天花湖 -->
+              <ellipse cx="420" cy="580" rx="45" ry="18" fill="#0a192f" stroke="#38bdf8" stroke-width="1.2" />
+              <text x="420" y="577" fill="#ffffff" font-size="9.5" font-weight="bold" text-anchor="middle">天花湖</text>
+              <text x="420" y="588" fill="#94a3b8" font-size="8" text-anchor="middle">EL : 129M</text>
+
+              <!-- 客雅屯原水站 -->
+              <ellipse cx="505" cy="620" rx="45" ry="18" fill="#0a192f" stroke="#38bdf8" stroke-width="1.2" />
+              <text x="505" y="617" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="middle">客雅屯原水站</text>
+              <text x="505" y="628" fill="#94a3b8" font-size="8" text-anchor="middle">EL: 100M</text>
+
+              <!-- 石壁堰閥 -->
+              <circle cx="585" cy="600" r="14" fill="#0f2942" stroke="#38bdf8" stroke-width="1.6" />
+              <text x="585" y="605" fill="#38bdf8" font-size="11" font-weight="bold" text-anchor="middle">R</text>
+              <text x="585" y="625" fill="#ffffff" font-size="9" text-anchor="middle">石壁堰閥</text>
+
+              <!-- 芎林排水道 -->
+              <ellipse cx="680" cy="595" rx="45" ry="18" fill="#0a192f" stroke="#38bdf8" stroke-width="1.2" />
+              <text x="680" y="592" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="middle">芎林排水道</text>
+              <text x="680" y="603" fill="#94a3b8" font-size="8" text-anchor="middle">EL : 92-130M</text>
+
+              <!-- 大坪水庫・十二寮等 -->
+              <ellipse cx="800" cy="600" rx="60" ry="18" fill="#0a192f" stroke="#38bdf8" stroke-width="1.2" />
+              <text x="800" y="597" fill="#ffffff" font-size="8.5" font-weight="bold" text-anchor="middle">大坪水庫・十二寮等</text>
+              <text x="800" y="608" fill="#94a3b8" font-size="7.5" text-anchor="middle">EL: 107-135M</text>
+
+              <!-- === 7. 骨幹管線連接繪製 (Main Pipes with Flow Arrows) === -->
+              <!-- 大坪林高地至隆恩堰幹管 (斜粗管) -->
+              <path d="M430,70 L630,210 L565,330" fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
+              <text x="670" y="195" fill="#94a3b8" font-size="8" transform="rotate(35 670,195)">1000-1500HP</text>
+
+              <!-- 清水池與淨水設備聯管 -->
+              <line x1="820" y1="135" x2="850" y2="135" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)"/>
+              <!-- 淨水設備至出水管 -->
+              <line x1="925" y1="135" x2="975" y2="135" stroke="#38bdf8" stroke-width="2"/>
+              <line x1="975" y1="135" x2="975" y2="210" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)"/>
+
+              <!-- 原水管至第二調整池至大湖科 -->
+              <line x1="660" y1="265" x2="680" y2="265" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow)"/>
+              <line x1="790" y1="265" x2="800" y2="265" stroke="#60a5fa" stroke-width="2"/>
+              <line x1="800" y1="265" x2="800" y2="285" stroke="#60a5fa" stroke-width="2"/>
+              <line x1="800" y1="285" x2="850" y2="285" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow)"/>
+
+              <!-- 隆恩堰至員興取水口 (縱向主幹管) -->
+              <line x1="560" y1="360" x2="500" y2="410" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arrow)"/>
+              <text x="550" y="385" fill="#94a3b8" font-size="8.5">電磁流量計 2.16cms/日</text>
+
+              <!-- 員興取水口至石壁堰 (向下主幹管) -->
+              <line x1="500" y1="445" x2="420" y2="560" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arrow)"/>
+              <text x="440" y="490" fill="#94a3b8" font-size="8.5" transform="rotate(-55 440,490)">3700-2900HP</text>
+
+              <!-- 底部聯通水路管線 -->
+              <line x1="465" y1="580" x2="570" y2="600" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow)"/>
+              <line x1="600" y1="600" x2="635" y2="595" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow)"/>
+              <line x1="725" y1="595" x2="740" y2="600" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow)"/>
+
+              <!-- 右側大湖科至七星取水站管線 -->
+              <line x1="850" y1="305" x2="805" y2="375" stroke="#60a5fa" stroke-width="2" stroke-dasharray="3 2" marker-end="url(#arrow)"/>
+              <line x1="805" y1="435" x2="740" y2="455" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow)"/>
+
+              <!-- 水流與狀態說明備註方塊 -->
+              <rect x="650" y="315" width="90" height="35" fill="rgba(8, 25, 45, 0.85)" stroke="#38bdf8" stroke-width="1" rx="4" />
+              <text x="695" y="330" fill="#38bdf8" font-size="8" font-weight="bold" text-anchor="middle">本日標出水系統</text>
+              <text x="695" y="342" fill="#ffffff" font-size="8" text-anchor="middle">各口供水系統使用</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- 視圖 4：全台水庫蓄水量 Google Map 衛星底圖套疊視圖 (依據截圖 2 實作) -->
+        <div class="reservoir-map-view hide" id="reservoirMapView">
+          
+          <!-- 底層 Google Map 台灣衛星混合地圖 -->
+          <div id="reservoirGoogleMap" class="dispatch-google-map-bg"></div>
+          <div class="dispatch-map-overlay-mask"></div>
+
+          <!-- 左下角：蓄水量百分比圖例 (支援一鍵收合與展開) -->
+          <div class="reservoir-legend-card" id="reservoirLegendCard">
+            <div class="legend-card-header" id="toggleReservoirLegendBtn">
+              <span class="legend-card-title"><i class="fa-solid fa-water"></i> 蓄水量百分比圖例</span>
+              <button type="button" class="btn-legend-collapse" title="收合/展開圖例">
+                <i class="fa-solid fa-chevron-up" id="reservoirLegendArrow"></i>
+              </button>
+            </div>
+            <div class="legend-card-list" id="reservoirLegendContent">
+              <div class="legend-item"><span class="legend-dot dot-red"></span><span>0 - 30%</span></div>
+              <div class="legend-item"><span class="legend-dot dot-orange"></span><span>30 - 60%</span></div>
+              <div class="legend-item"><span class="legend-dot dot-yellow"></span><span>60 - 80%</span></div>
+              <div class="legend-item"><span class="legend-dot dot-blue"></span><span>80 - 100%</span></div>
+            </div>
+          </div>
+
+          <!-- 中央拓撲畫布與兩側水庫卡片疊加層 -->
+          <div class="reservoir-canvas-overlay">
+            
+            <!-- 中央 SVG 連線 -->
+            <svg class="reservoir-taiwan-svg" viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg">
+              <!-- 左側連線 -->
+              <polyline class="res-leader-line" points="300,55 490,55 530,95" />
+              <polyline class="res-leader-line" points="300,125 480,125 515,135" />
+              <polyline class="res-leader-line" points="300,195 470,195 510,150" />
+              <polyline class="res-leader-line" points="300,265 460,265 495,180" />
+              <polyline class="res-leader-line" points="300,335 450,335 480,210" />
+              <polyline class="res-leader-line" points="300,405 440,405 470,250" />
+              <polyline class="res-leader-line" points="300,475 450,475 510,270" />
+              <polyline class="res-leader-line" points="300,545 460,545 520,330" />
+              <polyline class="res-leader-line" points="300,615 430,615 460,420" />
+              <polyline class="res-leader-line" points="300,685 420,685 450,470" />
+
+              <!-- 右側連線 -->
+              <polyline class="res-leader-line" points="700,65 590,65 580,75" />
+              <polyline class="res-leader-line" points="700,145 580,145 565,95" />
+              <polyline class="res-leader-line" points="700,225 540,225 440,490" />
+              <polyline class="res-leader-line" points="700,305 560,305 500,320" />
+              <polyline class="res-leader-line" points="700,385 530,385 450,450" />
+              <polyline class="res-leader-line" points="700,465 520,465 470,370" />
+              <polyline class="res-leader-line" points="700,545 510,545 450,530" />
+              <polyline class="res-leader-line" points="700,625 480,625 460,670" />
+            </svg>
+
+            <!-- 水庫左右側浮動卡片清單 -->
+            <div class="reservoir-floating-cards">
+              
+              <!-- === 左側 10 座水庫卡片 === -->
+              <div class="res-float-card res-left pos-shimen">
+                <div class="res-gauge-badge badge-blue"><span>99.9%</span></div>
+                <div class="res-float-info">
+                  <div class="float-name">石門水庫 (新北、桃園、新竹)</div>
+                  <div class="float-val">20,500.39 萬立方公尺</div>
+                  <div class="float-cap">有效庫容量：20,526.00 萬立方公尺</div>
+                </div>
+              </div>
+
+              <div class="res-float-card res-left pos-baoshan">
+                <div class="res-gauge-badge badge-blue"><span>100%</span></div>
+                <div class="res-float-info">
+                  <div class="float-name">寶山水庫 (新竹)</div>
+                  <div class="float-val">511.56 萬立方公尺</div>
+                  <div class="float-cap">有效庫容量：500.83 萬立方公尺</div>
+                </div>
+              </div>
+
+              <div class="res-float-card res-left pos-baoshan2">
+                <div class="res-gauge-badge badge-blue"><span>100%</span></div>
+                <div class="res-float-info">
+                  <div class="float-name">寶山第二水庫 (新竹)</div>
+                  <div class="float-val">3,391.18 萬立方公尺</div>
+                  <div class="float-cap">有效庫容量：3,383.71 萬立方公尺</div>
+                </div>
+              </div>
+
+              <div class="res-float-card res-left pos-yonghe">
+                <div class="res-gauge-badge badge-blue"><span>99.5%</span></div>
+                <div class="res-float-info">
+                  <div class="float-name">永和山水庫 (新竹、苗栗)</div>
+                  <div class="float-val">2,977.80 萬立方公尺</div>
+                  <div class="float-cap">有效庫容量：2,993.43 萬立方公尺</div>
+                </div>
+              </div>
+
+              <div class="res-float-card res-left pos-mingde-map">
+                <div class="res-gauge-badge badge-blue"><span>90.5%</span></div>
+                <div class="res-float-info">
+                  <div class="float-name">明德水庫 (苗栗)</div>
+                  <div class="float-val">1,124.50 萬立方公尺</div>
+                  <div class="float-cap">有效庫容量：1,242.28 萬立方公尺</div>
+                </div>
+              </div>
+
+              <div class="res-float-card res-left pos-liyutan-map">
+                <div class="res-gauge-badge badge-blue"><span>100%</span></div>
+                <div class="res-float-info">
+                  <div class="float-name">鯉魚潭水庫 (苗栗、台中)</div>
+                  <div class="float-val">11,592.73 萬立方公尺</div>
+                  <div class="float-cap">有效庫容量：11,548.60 萬立方公尺</div>
+                </div>
+              </div>
+
+              <div class="res-float-card res-left pos-deji-map">
+                <div class="res-gauge-badge badge-blue"><span>92.7%</span></div>
+                <div class="res-float-info">
+                  <div class="float-name">德基水庫 (台中)</div>
+                  <div class="float-val">16,822.91 萬立方公尺</div>
+                  <div class="float-cap">有效庫容量：18,154.94 萬立方公尺</div>
+                </div>
+              </div>
+
+              <div class="res-float-card res-left pos-wushe">
+                <div class="res-gauge-badge badge-blue"><span>80.3%</span></div>
+                <div class="res-float-info">
+                  <div class="float-name">霧社水庫 (南投)</div>
+                  <div class="float-val">1,952.77 萬立方公尺</div>
+                  <div class="float-cap">有效庫容量：2,433.42 萬立方公尺</div>
+                </div>
+              </div>
+
+              <div class="res-float-card res-left pos-renyitan">
+                <div class="res-gauge-badge badge-blue"><span>99%</span></div>
+                <div class="res-float-info">
+                  <div class="float-name">仁義潭水庫 (嘉義)</div>
+                  <div class="float-val">2,434.12 萬立方公尺</div>
+                  <div class="float-cap">有效庫容量：2,459.19 萬立方公尺</div>
+                </div>
+              </div>
+
+              <div class="res-float-card res-left pos-zengwen-map">
+                <div class="res-gauge-badge badge-blue"><span>86%</span></div>
+                <div class="res-float-info">
+                  <div class="float-name">曾文水庫 (嘉義、台南)</div>
+                  <div class="float-val">38,707.00 萬立方公尺</div>
+                  <div class="float-cap">有效庫容量：45,004.00 萬立方公尺</div>
+                </div>
+              </div>
+
+              <!-- === 右側 8 座水庫卡片 === -->
+              <div class="res-float-card res-right pos-xinshan-map">
+                <div class="res-gauge-badge badge-blue"><span>88%</span></div>
+                <div class="res-float-info">
+                  <div class="float-name">新山水庫 (基隆)</div>
+                  <div class="float-val">876.06 萬立方公尺</div>
+                  <div class="float-cap">有效庫容量：995.96 萬立方公尺</div>
+                </div>
+              </div>
+
+              <div class="res-float-card res-right pos-feicui-map">
+                <div class="res-gauge-badge badge-blue"><span>76.8%</span></div>
+                <div class="res-float-info">
+                  <div class="float-name">翡翠水庫 (台北、新北)</div>
+                  <div class="float-val">28,408.03 萬立方公尺</div>
+                  <div class="float-cap">有效庫容量：36,997.60 萬立方公尺</div>
+                </div>
+              </div>
+
+              <div class="res-float-card res-right pos-wushantou-map">
+                <div class="res-gauge-badge badge-blue"><span>95.9%</span></div>
+                <div class="res-float-info">
+                  <div class="float-name">烏山頭水庫 (台南)</div>
+                  <div class="float-val">7,561.00 萬立方公尺</div>
+                  <div class="float-cap">有效庫容量：7,885.19 萬立方公尺</div>
+                </div>
+              </div>
+
+              <div class="res-float-card res-right pos-sunmoon-map">
+                <div class="res-gauge-badge badge-blue"><span>94.7%</span></div>
+                <div class="res-float-info">
+                  <div class="float-name">日月潭水庫 (南投)</div>
+                  <div class="float-val">12,158.89 萬立方公尺</div>
+                  <div class="float-cap">有效庫容量：12,846.14 萬立方公尺</div>
+                </div>
+              </div>
+
+              <div class="res-float-card res-right pos-baihe">
+                <div class="res-gauge-badge badge-yellow"><span>68.4%</span></div>
+                <div class="res-float-info">
+                  <div class="float-name">白河水庫 (台南)</div>
+                  <div class="float-val">982.00 萬立方公尺</div>
+                  <div class="float-cap">有效庫容量：1,436.28 萬立方公尺</div>
+                </div>
+              </div>
+
+              <div class="res-float-card res-right pos-hushan">
+                <div class="res-gauge-badge badge-blue"><span>99.6%</span></div>
+                <div class="res-float-info">
+                  <div class="float-name">湖山水庫 (雲林、彰化、嘉義)</div>
+                  <div class="float-val">5,022.40 萬立方公尺</div>
+                  <div class="float-cap">有效庫容量：5,041.00 萬立方公尺</div>
+                </div>
+              </div>
+
+              <div class="res-float-card res-right pos-nanhua-map">
+                <div class="res-gauge-badge badge-blue"><span>100%</span></div>
+                <div class="res-float-info">
+                  <div class="float-name">南化水庫 (台南、高雄)</div>
+                  <div class="float-val">8,185.75 萬立方公尺</div>
+                  <div class="float-cap">有效庫容量：8,180.90 萬立方公尺</div>
+                </div>
+              </div>
+
+              <div class="res-float-card res-right pos-mudan-map">
+                <div class="res-gauge-badge badge-blue"><span>84.4%</span></div>
+                <div class="res-float-info">
+                  <div class="float-name">牡丹水庫 (屏東)</div>
+                  <div class="float-val">2,198.00 萬立方公尺</div>
+                  <div class="float-cap">有效庫容量：2,603.66 萬立方公尺</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <!-- 緊急應變戰情儀表板 登入浮動視窗 (淺藍風格) -->
+  <div id="loginModal" class="modal-overlay login-modal-overlay" aria-hidden="true">
+    <div class="login-modal-box" role="dialog" aria-modal="true" aria-labelledby="loginSystemTitle">
+      <!-- 頂部標頭 -->
+      <div class="login-modal-header">
+        <div class="login-brand-group">
+          <img src="logo/Taiwan_Water_Corporation_Seal.svg.webp" alt="台灣自來水公司標誌" class="login-logo-img">
+          <div class="login-brand-text">
+            <span class="company-zh">台灣自來水公司</span>
+            <span class="company-en">TAIWAN WATER CORPORATION</span>
+          </div>
+        </div>
+        <h2 class="login-system-title" id="loginSystemTitle">緊急應變戰情儀表板</h2>
+        <button id="closeLoginModalBtn" class="login-close-btn" type="button" title="關閉視窗">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="login-modal-divider"></div>
+
+      <!-- 單位切換頁籤 -->
+      <div class="login-tabs">
+        <button type="button" class="login-tab-btn active" data-unit="hq">總管理處</button>
+        <button type="button" class="login-tab-btn" data-unit="branch">區管理處</button>
+      </div>
+
+      <!-- 登入表單 -->
+      <form class="login-form" id="loginForm" onsubmit="event.preventDefault();">
+        <!-- 登入方式 -->
+        <div class="login-form-group">
+          <label class="login-form-label" for="loginMethodSelect">登入方式</label>
+          <div class="login-select-wrapper">
+            <select id="loginMethodSelect" class="login-form-select">
+              <option value="local">本機登入</option>
+              <option value="sso">公務 SSO 單一簽入</option>
+              <option value="ad">AD 網域驗證</option>
+            </select>
+            <i class="fa-solid fa-chevron-down select-arrow-icon"></i>
+          </div>
+        </div>
+
+        <!-- 管理單位 (區管理處專屬欄位) -->
+        <div class="login-form-group branch-only-field" id="branchUnitGroup" style="display: none;">
+          <label class="login-form-label" for="loginBranchUnitSelect">管理單位</label>
+          <div class="login-select-wrapper">
+            <select id="loginBranchUnitSelect" class="login-form-select">
+              <option value="">請選擇管理單位</option>
+              <option value="1">第一區管理處 (基隆、新北)</option>
+              <option value="2">第二區管理處 (桃園、新北)</option>
+              <option value="3">第三區管理處 (新竹、苗栗)</option>
+              <option value="4">第四區管理處 (台中、南投)</option>
+              <option value="5">第五區管理處 (嘉義、雲林)</option>
+              <option value="6">第六區管理處 (台南)</option>
+              <option value="7">第七區管理處 (高雄、澎湖)</option>
+              <option value="8">第八區管理處 (宜蘭)</option>
+              <option value="9">第九區管理處 (花蓮)</option>
+              <option value="10">第十區管理處 (台東)</option>
+              <option value="11">第十一區管理處 (彰化)</option>
+              <option value="12">第十二區管理處 (新北)</option>
+            </select>
+            <i class="fa-solid fa-chevron-down select-arrow-icon"></i>
+          </div>
+        </div>
+
+        <!-- 地區 (區管理處專屬欄位) -->
+        <div class="login-form-group branch-only-field" id="branchRegionGroup" style="display: none;">
+          <label class="login-form-label" for="loginBranchRegionSelect">地區</label>
+          <div class="login-select-wrapper">
+            <select id="loginBranchRegionSelect" class="login-form-select">
+              <option value="">請選擇地區</option>
+              <option value="reg-all">全部轄區</option>
+              <option value="reg-1">基隆服務所 / 汐止營運所</option>
+              <option value="reg-2">桃園服務所 / 中壢服務所</option>
+              <option value="reg-3">新竹服務所 / 竹東營運所</option>
+              <option value="reg-4">台中服務所 / 豐原給水廠</option>
+              <option value="reg-5">嘉義服務所 / 斗六營運所</option>
+              <option value="reg-6">台南服務所 / 新營營運所</option>
+              <option value="reg-7">高雄給水廠 / 楠梓服務所</option>
+            </select>
+            <i class="fa-solid fa-chevron-down select-arrow-icon"></i>
+          </div>
+        </div>
+
+        <!-- 帳號 -->
+        <div class="login-form-group">
+          <label class="login-form-label" for="loginUsername">帳號</label>
+          <input type="text" id="loginUsername" class="login-form-input" placeholder="請輸入帳號" autocomplete="username">
+        </div>
+
+        <!-- 密碼 -->
+        <div class="login-form-group">
+          <label class="login-form-label" for="loginPassword">密碼</label>
+          <input type="password" id="loginPassword" class="login-form-input" placeholder="請輸入密碼" autocomplete="current-password">
+        </div>
+
+        <!-- 驗證碼 -->
+        <div class="login-form-group">
+          <label class="login-form-label" for="loginCaptcha">驗證碼</label>
+          <div class="captcha-input-row">
+            <input type="text" id="loginCaptcha" class="login-form-input captcha-input-field" placeholder="驗證碼" maxlength="5">
+            <div class="captcha-display-box" id="captchaDisplayBox" title="點擊刷新驗證碼">
+              <span class="captcha-code-text" id="captchaCodeText">95172</span>
+            </div>
+            <button type="button" id="refreshCaptchaBtn" class="captcha-refresh-btn" title="重新產生驗證碼">
+              <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 登入按鈕 -->
+        <div class="login-action-group">
+          <button type="submit" id="submitLoginBtn" class="btn-login-submit">登入</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 選擇應變事件 浮動視窗 (淺藍科技風格，參照登入視窗設計) -->
+  <div id="eventSelectModal" class="modal-overlay event-modal-overlay" aria-hidden="true">
+    <div class="event-modal-box" role="dialog" aria-modal="true" aria-labelledby="eventModalTitle">
+      <!-- 頂部標頭 -->
+      <div class="event-modal-header">
+        <div class="event-brand-group">
+          <img src="logo/Taiwan_Water_Corporation_Seal.svg.webp" alt="台灣自來水公司標誌" class="event-logo-img">
+          <div class="event-brand-text">
+            <span class="company-zh">台灣自來水公司</span>
+            <span class="company-en">TAIWAN WATER CORPORATION</span>
+          </div>
+        </div>
+        <h2 class="event-system-title" id="eventModalTitle">請選擇應變事件</h2>
+        <button id="closeEventModalBtn" class="event-close-btn" type="button" title="關閉視窗">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="event-modal-divider"></div>
+
+      <!-- 開設狀態切換頁籤 (開設中 / 已撤除) -->
+      <div class="event-tabs">
+        <button type="button" class="event-tab-btn active" data-status="active">開設中事件</button>
+        <button type="button" class="event-tab-btn" data-status="closed">已撤除事件</button>
+      </div>
+
+      <!-- 事件選擇表單區 -->
+      <div class="event-form-group">
+        <div class="event-label-row">
+          <label class="event-form-label" for="incidentSelectDropdown">應變事件清單</label>
+          <button type="button" id="refreshEventListBtn" class="btn-event-refresh" title="重新整理事件清單">
+            <i class="fa-solid fa-arrows-rotate"></i> 更新
+          </button>
+        </div>
+        <div class="event-select-wrapper">
+          <select id="incidentSelectDropdown" class="event-form-select">
+            <option value="農業部萬里溪堰塞湖-災害緊急應變小組">農業部萬里溪堰塞湖-災害緊急應變小組</option>
+            <option value="0831豪雨">0831豪雨</option>
+            <option value="山陀兒颱風應變專案">山陀兒颱風應變專案</option>
+            <option value="南部地區水情乾旱專案應變小組">南部地區水情乾旱專案應變小組</option>
+          </select>
+          <i class="fa-solid fa-chevron-down select-arrow-icon"></i>
+        </div>
+      </div>
+
+      <!-- 確定切換按鈕 (居中水藍按鈕) -->
+      <div class="event-action-group">
+        <button type="button" id="confirmEventSwitchBtn" class="btn-event-submit">確定切換</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 腳本載入 -->
+  <script src="js/main.js"></script>
+  <script src="js/supply-overview.js"></script>
+</body>
+</html>

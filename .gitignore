@@ -1,0 +1,10 @@
+# 排除大型備份檔與原始壓縮包 (超過 GitHub 100MB 限制)
+*.zip
+智慧水網原始嗎/
+bk/
+
+# 系統與暫存檔
+.DS_Store
+Thumbs.db
+*.tmp
+*.log

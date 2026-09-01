@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>綜合案件分析 - 智慧水網戰情平台</title>
+  
+  <!-- Google Fonts: Noto Sans TC, Roboto, Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;600;700;900&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome 6 CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Chart.js 圖表庫 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  
+  <!-- 核心全域樣式表 -->
+  <link rel="stylesheet" href="css/style.css">
+  <!-- 綜合案件分析專屬樣式表 -->
+  <link rel="stylesheet" href="css/case-analysis.css">
+</head>
+<body class="font-md">
+  
+  <!-- 側邊欄抽屜 (Sidebar Drawer) -->
+  <aside id="sidebarDrawer" class="sidebar-drawer" aria-label="系統導航">
+    <div class="sidebar-header">
+      <div class="logo-box">
+        <img src="logo/Taiwan_Water_Corporation_Seal.svg.webp" alt="台水標誌" class="sidebar-logo-img">
+        <span>應變事件情資</span>
+      </div>
+      <button id="closeSidebarBtn" class="btn-icon" title="關閉選單">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <nav class="sidebar-menu">
+      <a href="index.html" class="menu-item">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>災情事件彙總</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-solid fa-hurricane"></i>
+        <span>颱風路徑動態圖</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-solid fa-cloud-showers-heavy"></i>
+        <span>雨量資訊</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-solid fa-house-flood-water"></i>
+        <span>海水警戒</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-solid fa-cloud-bolt"></i>
+        <span>降雨預報</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-solid fa-hill-rockslide"></i>
+        <span>土石流警戒</span>
+      </a>
+      
+      <!-- 外部情資下拉 -->
+      <div class="sidebar-dropdown">
+        <button type="button" class="menu-item dropdown-toggle" id="sidebarExternalToggle" aria-expanded="false">
+          <i class="fa-solid fa-globe"></i>
+          <span>外部情資</span>
+          <i class="fa-solid fa-caret-down dropdown-arrow"></i>
+        </button>
+        <div class="sidebar-submenu" id="sidebarExternalSubmenu">
+          <a href="#" class="submenu-item"><i class="fa-solid fa-cloud-sun"></i> <span>氣象署氣象情資</span></a>
+          <a href="#" class="submenu-item"><i class="fa-solid fa-bell"></i> <span>NCDR 災防情資</span></a>
+          <a href="#" class="submenu-item"><i class="fa-solid fa-water"></i> <span>水利署水情資訊</span></a>
+          <a href="#" class="submenu-item"><i class="fa-solid fa-bolt"></i> <span>台電電力狀況</span></a>
+          <a href="#" class="submenu-item"><i class="fa-solid fa-road"></i> <span>公路局災阻情資</span></a>
+        </div>
+      </div>
+    </nav>
+  </aside>
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <!-- 主版面容器 (App Layout) -->
+  <div class="app-layout">
+    
+    <!-- 頂部導航列 (Header - 與全站規範 100% 統一) -->
+    <header class="main-header">
+      <div class="header-left">
+        <!-- 側邊欄展開切換鈕 -->
+        <button id="openSidebarBtn" class="btn-icon header-toggle-btn" title="展開選單">
+          <i class="fa-solid fa-angles-left"></i>
+        </button>
+        <!-- 機關單位 Logo 與標題 -->
+        <div class="brand-title">
+          <div class="brand-logo">
+            <img src="logo/Taiwan_Water_Corporation_Seal.svg.webp" alt="台灣自來水公司標誌" class="brand-logo-img">
+          </div>
+          <span class="title-text" id="headerTitleText">總管理處-平時</span>
+          <button id="globalSearchBtn" class="btn-icon search-trigger-btn" title="選擇應變事件">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </div>
+
+        <!-- 頂部主模組切換下拉選單 (綜合案件分析 active) -->
+        <div class="dropdown-wrapper">
+          <button id="viewDropdownBtn" class="dropdown-btn primary-dropdown">
+            <span id="currentViewText">綜合案件分析</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          
+          <!-- 選單容器 -->
+          <div id="viewDropdownMenu" class="cascading-menu-wrapper">
+            <ul class="cascading-menu-level1">
+              <!-- 1. 今日營運概況 (首頁入口) -->
+              <li class="menu-direct-item" data-title="今日營運概況" onclick="location.href='index.html'">
+                <span>今日營運概況</span>
+              </li>
+
+              <!-- 2. 供水營運概況 (保留子選單) -->
+              <li class="menu-parent-item" data-parent="water-supply" onclick="if(!event.target.closest('.cascading-menu-level2')) location.href='supply-overview.html'">
+                <span>供水營運概況</span>
+                <i class="fa-solid fa-caret-right"></i>
+                
+                <!-- 第二層：供水營運概況 子項目 -->
+                <ul class="cascading-menu-level2">
+                  <li class="menu-sub-item" onclick="location.href='supply-overview.html'">
+                    <span class="sub-text">全台供水狀況總覽</span>
+                    <i class="fa-regular fa-circle radio-icon"></i>
+                  </li>
+                  <li class="menu-sub-item" onclick="location.href='supply-overview.html#tab-dispatch'">
+                    <span class="sub-text">跨區水源調度</span>
+                    <i class="fa-regular fa-circle radio-icon"></i>
+                  </li>
+                  <li class="menu-sub-item" onclick="location.href='supply-overview.html#tab-reservoir'">
+                    <span class="sub-text">水庫蓄水量</span>
+                    <i class="fa-regular fa-circle radio-icon"></i>
+                  </li>
+                </ul>
+              </li>
+
+              <!-- 3. 客服進線狀況 -->
+              <li class="menu-direct-item" data-title="客服進線狀況" onclick="location.href='customer-service.html'">
+                <span>客服進線狀況</span>
+              </li>
+
+              <!-- 4. 事件應變情資 (單一功能，無子選單) -->
+              <li class="menu-direct-item" data-title="事件應變情資">
+                <span>事件應變情資</span>
+              </li>
+
+              <!-- 5. 綜合案件分析 (當前啟用) -->
+              <li class="menu-direct-item active" data-title="綜合案件分析" onclick="location.href='case-analysis.html'">
+                <span>綜合案件分析</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 中央公告跑馬燈 -->
+      <div class="header-center">
+        <div class="alert-badge">
+          <span class="pulse-dot"></span>
+        </div>
+        <div class="announcement-content">
+          <span class="announcement-text" id="announcementTicker">全臺供水狀態整體正常。</span>
+        </div>
+      </div>
+
+      <!-- 右側使用者與工具欄 (含字級調整功能) -->
+      <div class="header-right">
+        <!-- 字級調整控制器 -->
+        <div class="font-size-controller" title="調整全站字級大小">
+          <span class="fs-label">字級</span>
+          <div class="fs-options">
+            <button type="button" class="fs-btn" data-size="sm">小</button>
+            <button type="button" class="fs-btn active" data-size="md">中</button>
+            <button type="button" class="fs-btn" data-size="lg">大</button>
+          </div>
+          <div class="fs-select-wrap">
+            <select id="fontSizeSelect" class="fs-select" aria-label="選擇字級大小">
+              <option value="sm">小</option>
+              <option value="md" selected>中</option>
+              <option value="lg">大</option>
+            </select>
+            <i class="fa-solid fa-chevron-down fs-select-arrow"></i>
+          </div>
+        </div>
+
+        <!-- 視圖切換快捷按鈕 -->
+        <div class="view-switch-group">
+          <button id="toggleDashboardView" class="btn-toggle" title="切換至儀表板視圖" onclick="location.href='index.html'">
+            <i class="fa-solid fa-table-cells-large"></i>
+          </button>
+          <button id="toggleMapView" class="btn-toggle" title="切換至 GIS 空間圖台" onclick="location.href='supply-overview.html'">
+            <i class="fa-solid fa-map"></i>
+          </button>
+        </div>
+
+        <!-- 使用者資訊 (點擊展開登入浮動視窗) -->
+        <div class="user-profile" id="userProfileBtn" title="點擊登入緊急應變戰情儀表板" role="button" tabindex="0">
+          <div class="user-meta">
+            <span class="user-role" id="headerUserRole">一般使用者</span>
+            <span class="system-time" id="systemClock">2026/09/01 10:02</span>
+          </div>
+          <div class="avatar-box" id="userAvatarBtn">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="使用者頭像">
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ======================================================================= -->
+    <!-- 綜合案件分析 主工作區 (左側篩選面板 + 右側大盤分析儀表板) -->
+    <!-- ======================================================================= -->
+    <main class="analysis-main-container">
+      
+      <!-- 左側查詢與篩選面板 -->
+      <aside class="filter-sidebar" id="filterSidebar">
+        
+        <!-- 1. 查詢模式切換 (事件查詢 / 時間區間查詢) -->
+        <div class="filter-mode-tabs">
+          <button type="button" class="mode-tab-btn active" id="btnModeEvent" data-mode="event">事件查詢</button>
+          <button type="button" class="mode-tab-btn" id="btnModeRange" data-mode="range">時間區間查詢</button>
+        </div>
+
+        <!-- 2. 事件下拉選擇器 -->
+        <div class="filter-field-group" id="eventSelectGroup">
+          <div class="custom-select-wrap">
+            <select class="form-select-ctrl" id="eventSelect">
+              <option value="bawi" selected>颱風巴威</option>
+              <option value="chanthu">颱風璨樹</option>
+              <option value="doksuri">颱風杜蘇芮</option>
+              <option value="hualien_eq">0403 花蓮強震應變</option>
+              <option value="normal">平時應變情資</option>
+            </select>
+            <i class="fa-solid fa-chevron-down select-arrow"></i>
+          </div>
+        </div>
+
+        <!-- 3. 時間區間自訂選擇器 (隱藏/條件切換) -->
+        <div class="filter-field-group hide" id="timeRangeGroup">
+          <div class="date-range-row">
+            <input type="datetime-local" class="form-date-input" id="startDateInput" value="2026-06-11T00:00">
+            <span class="range-sep">至</span>
+            <input type="datetime-local" class="form-date-input" id="endDateInput" value="2026-06-12T12:00">
+          </div>
+        </div>
+
+        <!-- 4. 行政維度切換 (縣市 / 區處) -->
+        <div class="filter-dim-tabs">
+          <button type="button" class="dim-tab-btn active" id="btnDimCity" data-dim="city">縣市</button>
+          <button type="button" class="dim-tab-btn" id="btnDimDistrict" data-dim="district">區處</button>
+        </div>
+
+        <!-- 5. 區域二級聯動篩選 (縣市 / 鄉鎮市區) -->
+        <div class="filter-dual-row" id="cityRowSelectGroup">
+          <div class="field-item">
+            <label class="field-lbl">縣市</label>
+            <div class="custom-select-wrap">
+              <select class="form-select-ctrl" id="citySelect">
+                <option value="all" selected>請選擇</option>
+                <option value="taipei">臺北市</option>
+                <option value="newtaipei">新北市</option>
+                <option value="keelung">基隆市</option>
+                <option value="taoyuan">桃園市</option>
+                <option value="hsinchu_county">新竹縣</option>
+                <option value="hsinchu_city">新竹市</option>
+                <option value="miaoli">苗栗縣</option>
+                <option value="taichung">臺中市</option>
+                <option value="changhua">彰化縣</option>
+                <option value="nantou">南投縣</option>
+                <option value="yunlin">雲林縣</option>
+                <option value="chiayi_county">嘉義縣</option>
+                <option value="chiayi_city">嘉義市</option>
+                <option value="tainan">臺南市</option>
+                <option value="kaohsiung">高雄市</option>
+                <option value="pingtung">屏東縣</option>
+                <option value="yilan">宜蘭縣</option>
+                <option value="hualien">花蓮縣</option>
+                <option value="taitung">臺東縣</option>
+                <option value="penghu">澎湖縣</option>
+              </select>
+              <i class="fa-solid fa-chevron-down select-arrow"></i>
+            </div>
+          </div>
+          <div class="field-item">
+            <label class="field-lbl">鄉鎮市區</label>
+            <div class="custom-select-wrap">
+              <select class="form-select-ctrl" id="townSelect">
+                <option value="all" selected>請先選擇縣市</option>
+              </select>
+              <i class="fa-solid fa-chevron-down select-arrow"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. 服務類別下拉 -->
+        <div class="filter-field-group">
+          <label class="field-lbl">服務類別</label>
+          <div class="custom-select-wrap">
+            <select class="form-select-ctrl" id="serviceCategorySelect">
+              <option value="all" selected>請選擇</option>
+              <option value="water_quality">水質問題</option>
+              <option value="water_pressure">水壓不足</option>
+              <option value="pipe_leak">管線漏水</option>
+              <option value="billing">水費帳單</option>
+              <option value="outage_query">停水復水查詢</option>
+              <option value="other">其他服務</option>
+            </select>
+            <i class="fa-solid fa-chevron-down select-arrow"></i>
+          </div>
+        </div>
+
+        <!-- 7. 服務類別細項下拉 -->
+        <div class="filter-field-group">
+          <label class="field-lbl">服務類別細項</label>
+          <div class="custom-select-wrap">
+            <select class="form-select-ctrl" id="serviceSubCategorySelect">
+              <option value="all" selected>請選擇服務類別細項</option>
+            </select>
+            <i class="fa-solid fa-chevron-down select-arrow"></i>
+          </div>
+        </div>
+
+        <!-- 8. 操作按鈕群 (查詢 / 檢視案件明細 / 報表匯出) -->
+        <div class="filter-actions-group">
+          <button type="button" class="btn-action-primary" id="btnQuerySubmit">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span>查詢</span>
+          </button>
+          <button type="button" class="btn-action-outline" id="btnViewCaseDetail">
+            <span>檢視案件明細</span>
+          </button>
+          <button type="button" class="btn-action-outline" id="btnExportReport">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span>報表匯出</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- 垂直分割條 (含收合把手，與 supply-overview.html 100% 一致) -->
+      <div id="panelResizer" class="panel-resizer-bar" title="收合/展開左側查詢面板">
+        <div class="resizer-line"></div>
+        <button id="toggleFilterSidebarBtn" class="collapse-toggle-bar" title="收合/展開左側查詢面板">
+          <i class="fa-solid fa-chevron-left" id="filterSidebarArrow"></i>
+        </button>
+      </div>
+
+      <!-- 右側大盤分析儀表板工作區 -->
+      <section class="analysis-workspace">
+        
+        <!-- === 1. 頂部 4 大 KPI 統計指標卡片列 === -->
+        <div class="kpi-metrics-row">
+          <!-- KPI 1: 案件總數 -->
+          <div class="kpi-stat-card">
+            <div class="kpi-lbl">案件總數</div>
+            <div class="kpi-val val-blue" id="kpiTotalCases">3460</div>
+          </div>
+          <!-- KPI 2: 建立中/待送件 -->
+          <div class="kpi-stat-card">
+            <div class="kpi-lbl">建立中/待送件</div>
+            <div class="kpi-val val-orange" id="kpiDraftCases">2</div>
+          </div>
+          <!-- KPI 3: 待確認/待處理 -->
+          <div class="kpi-stat-card">
+            <div class="kpi-lbl">待確認/待處理</div>
+            <div class="kpi-val val-yellow" id="kpiPendingCases">344</div>
+          </div>
+          <!-- KPI 4: 處理完成 -->
+          <div class="kpi-stat-card">
+            <div class="kpi-lbl">處理完成</div>
+            <div class="kpi-val val-green" id="kpiDoneCases">602</div>
+          </div>
+        </div>
+
+        <!-- === 2. 中段統計分析區 (3 欄佈局：服務類別圓餅 + 案件分布多色圓餅 + 案件熱點 GIS 地圖) === -->
+        <div class="middle-charts-grid">
+          
+          <!-- 卡片 1: 服務類別統計 (圓餅圖) -->
+          <div class="analysis-card card-service-category">
+            <div class="card-header-bar">
+              <h3 class="card-title-txt">服務類別統計</h3>
+            </div>
+            <div class="card-body-content flex-center">
+              <div class="pie-chart-wrap">
+                <canvas id="serviceCategoryPieChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- 卡片 2: 案件分布統計 (多色圓餅圖 + 分頁圖例) -->
+          <div class="analysis-card card-case-distribution">
+            <div class="card-header-bar">
+              <h3 class="card-title-txt">案件分布統計</h3>
+              <div class="header-ctrl-group">
+                <button type="button" class="btn-ctrl-pill active" id="btnTotalCasesMode">總案件</button>
+                <div class="custom-select-wrap mini-select">
+                  <select class="form-select-ctrl" id="caseDistSelect">
+                    <option value="case">依案件</option>
+                    <option value="region">依區域</option>
+                  </select>
+                  <i class="fa-solid fa-caret-down select-arrow"></i>
+                </div>
+              </div>
+            </div>
+            <div class="card-body-content flex-column">
+              <div class="pie-dist-chart-wrap">
+                <canvas id="caseDistributionPieChart"></canvas>
+              </div>
+              <!-- 分頁圖例導航 -->
+              <div class="chart-pagination-legend" id="distChartLegend">
+                <div class="legend-items-wrap" id="distLegendItems">
+                  <!-- 動態注入圖例標籤 -->
+                  <span class="legend-badge-item"><span class="badge-dot" style="background:#00bcd4;"></span> 高雄市</span>
+                  <span class="legend-badge-item"><span class="badge-dot" style="background:#3b82f6;"></span> 台中市</span>
+                  <span class="legend-badge-item"><span class="badge-dot" style="background:#8b5cf6;"></span> 新北市</span>
+                  <span class="legend-badge-item"><span class="badge-dot" style="background:#10b981;"></span> 桃園市</span>
+                  <span class="legend-badge-item"><span class="badge-dot" style="background:#f59e0b;"></span> 台南市</span>
+                </div>
+                <div class="legend-page-nav">
+                  <button type="button" class="btn-legend-nav" id="btnDistPrevPage" title="上一頁"><i class="fa-solid fa-caret-left"></i></button>
+                  <span class="legend-page-txt" id="distPageIndicator">1/4</span>
+                  <button type="button" class="btn-legend-nav" id="btnDistNextPage" title="下一頁"><i class="fa-solid fa-caret-right"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 卡片 3: 案件熱點分布 (台灣 GIS 熱度圖) -->
+          <div class="analysis-card card-hotspot-map">
+            <div class="card-header-bar">
+              <h3 class="card-title-txt">案件熱點分布</h3>
+            </div>
+            <div class="card-body-content map-heat-container">
+              <!-- 熱點 GIS 畫布 -->
+              <div class="heat-map-canvas-wrap" id="heatMapCanvasWrap">
+                <!-- 台灣熱度圖高保真向量套疊底圖 -->
+                <svg class="taiwan-heat-svg" viewBox="0 0 450 550" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <!-- 高斯發光熱區濾鏡 -->
+                    <filter id="heat-glow-high" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="14" result="blur1" />
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="24" result="blur2" />
+                      <feMerge>
+                        <feMergeNode in="blur2" />
+                        <feMergeNode in="blur1" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+                    <filter id="heat-glow-mid" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="12" />
+                    </filter>
+                    <!-- 漸層填色 -->
+                    <radialGradient id="heat-core-red" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#ef4444" stop-opacity="0.95" />
+                      <stop offset="45%" stop-color="#f97316" stop-opacity="0.85" />
+                      <stop offset="75%" stop-color="#eab308" stop-opacity="0.6" />
+                      <stop offset="100%" stop-color="#22c55e" stop-opacity="0" />
+                    </radialGradient>
+                    <radialGradient id="heat-core-orange" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#f97316" stop-opacity="0.9" />
+                      <stop offset="50%" stop-color="#eab308" stop-opacity="0.7" />
+                      <stop offset="85%" stop-color="#38bdf8" stop-opacity="0.4" />
+                      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0" />
+                    </radialGradient>
+                    <radialGradient id="heat-core-green" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#10b981" stop-opacity="0.85" />
+                      <stop offset="60%" stop-color="#38bdf8" stop-opacity="0.5" />
+                      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0" />
+                    </radialGradient>
+                  </defs>
+
+                  <!-- 淺色台灣海陸輪廓線 -->
+                  <g class="map-boundaries" stroke="#60a5fa" stroke-width="0.8" fill="rgba(186, 230, 253, 0.15)">
+                    <!-- 領海界線 -->
+                    <path d="M 120,40 C 260,30 380,80 410,220 C 430,350 370,480 300,520 C 200,540 100,480 80,350 Z" fill="none" stroke="#bae6fd" stroke-dasharray="4 3" stroke-width="0.8"/>
+                    <!-- 台灣主島輪廓 -->
+                    <path d="M 285,125 C 310,130 335,160 325,220 C 315,260 295,330 270,390 C 250,440 235,465 220,460 C 205,430 200,370 205,310 C 210,250 230,170 265,135 Z" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.2"/>
+                  </g>
+
+                  <!-- 地名標籤文字 -->
+                  <text x="75" y="105" class="map-place-lbl">福州市</text>
+                  <text x="50" y="185" class="map-place-lbl">莆田市</text>
+                  <text x="245" y="325" class="map-center-lbl">中華民國</text>
+
+                  <!-- 案件熱點高斯光暈圖層 (依據截圖西部密集熱區排列) -->
+                  <!-- 北部熱區 (大台北 / 桃園) -->
+                  <circle cx="295" cy="155" r="32" fill="url(#heat-core-red)" filter="url(#heat-glow-high)"/>
+                  <circle cx="280" cy="180" r="26" fill="url(#heat-core-red)" filter="url(#heat-glow-high)"/>
+                  
+                  <!-- 中部熱區 (台中 / 彰化 / 苗栗) -->
+                  <circle cx="245" cy="240" r="34" fill="url(#heat-core-red)" filter="url(#heat-glow-high)"/>
+                  <circle cx="235" cy="275" r="28" fill="url(#heat-core-red)" filter="url(#heat-glow-high)"/>
+                  
+                  <!-- 南部熱區 (台南 / 高雄) -->
+                  <circle cx="218" cy="335" r="36" fill="url(#heat-core-red)" filter="url(#heat-glow-high)"/>
+                  <circle cx="210" cy="385" r="34" fill="url(#heat-core-red)" filter="url(#heat-glow-high)"/>
+                  <circle cx="225" cy="435" r="22" fill="url(#heat-core-orange)" filter="url(#heat-glow-mid)"/>
+
+                  <!-- 東部與外島次熱區 (宜蘭/花蓮/台東/澎湖) -->
+                  <circle cx="315" cy="195" r="14" fill="url(#heat-core-green)"/>
+                  <circle cx="295" cy="285" r="14" fill="url(#heat-core-green)"/>
+                  <circle cx="265" cy="380" r="12" fill="url(#heat-core-green)"/>
+                  <circle cx="155" cy="330" r="16" fill="url(#heat-core-green)"/>
+                </svg>
+
+                <!-- 地圖左下角比例尺 -->
+                <div class="map-scale-badge">
+                  <span class="scale-bar-line"></span>
+                  <span class="scale-text">50 公里</span>
+                </div>
+
+                <!-- 地圖右下角經緯度座標 -->
+                <div class="map-coord-badge">
+                  經緯度: <span id="mapCoordTxt">119.586805 23.118909</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- === 3. 下段趨勢分析區 (2 欄佈局：連線趨勢分析 + 案件趨勢圖-依縣市鄉鎮) === -->
+        <div class="bottom-charts-grid">
+          
+          <!-- 卡片 1: 連線趨勢分析 (單折線波動圖) -->
+          <div class="analysis-card card-connection-trend">
+            <div class="card-header-bar">
+              <h3 class="card-title-txt">連線趨勢分析</h3>
+              <div class="header-ctrl-group">
+                <div class="btn-pill-group" id="connScalePills">
+                  <button type="button" class="btn-ctrl-pill" data-scale="min">分</button>
+                  <button type="button" class="btn-ctrl-pill active" data-scale="hour">時</button>
+                  <button type="button" class="btn-ctrl-pill" data-scale="day">日</button>
+                </div>
+                <button type="button" class="btn-mini-dropdown" id="btnConnMoreOpt" title="更多刻度選項">
+                  <i class="fa-solid fa-caret-down"></i>
+                </button>
+              </div>
+            </div>
+            <div class="card-body-content flex-column">
+              <div class="line-chart-wrap">
+                <canvas id="connectionTrendLineChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- 卡片 2: 案件趨勢圖-依縣市鄉鎮 (多折線走勢圖) -->
+          <div class="analysis-card card-town-trend">
+            <div class="card-header-bar">
+              <h3 class="card-title-txt">案件趨勢圖-依縣市鄉鎮</h3>
+              <div class="header-ctrl-group">
+                <button type="button" class="btn-ctrl-pill active" id="btnRegionAdmin">行政區</button>
+                <div class="custom-select-wrap mini-select">
+                  <select class="form-select-ctrl" id="regionCtrlSelect">
+                    <option value="jurisdiction">管轄區</option>
+                    <option value="supply_zone">供水區</option>
+                  </select>
+                  <i class="fa-solid fa-caret-down select-arrow"></i>
+                </div>
+              </div>
+            </div>
+            <div class="card-body-content flex-column">
+              <div class="line-chart-wrap">
+                <canvas id="townTrendMultiLineChart"></canvas>
+              </div>
+              <!-- 下方分頁圖例 -->
+              <div class="chart-pagination-legend" id="townTrendLegend">
+                <div class="legend-items-wrap" id="townLegendItems">
+                  <span class="legend-badge-item"><span class="badge-dot-circle" style="background:#ef4444;"></span> 高雄市</span>
+                  <span class="legend-badge-item"><span class="badge-dot-circle" style="background:#22c55e;"></span> 台中市</span>
+                  <span class="legend-badge-item"><span class="badge-dot-circle" style="background:#eab308;"></span> 新北市</span>
+                  <span class="legend-badge-item"><span class="badge-dot-circle" style="background:#8b5cf6;"></span> 桃園市</span>
+                  <span class="legend-badge-item"><span class="badge-dot-circle" style="background:#a16207;"></span> 台南市</span>
+                </div>
+                <div class="legend-page-nav">
+                  <button type="button" class="btn-legend-nav" id="btnTownPrevPage" title="上一頁"><i class="fa-solid fa-caret-left"></i></button>
+                  <span class="legend-page-txt" id="townPageIndicator">1/4</span>
+                  <button type="button" class="btn-legend-nav" id="btnTownNextPage" title="下一頁"><i class="fa-solid fa-caret-right"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+    </main>
+
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 彈窗 1：檢視案件明細 Modal (Case Detail Modal) -->
+  <!-- ========================================================================= -->
+  <div class="case-modal-overlay" id="caseDetailModal">
+    <div class="case-modal-box">
+      <div class="case-modal-header">
+        <div class="modal-title-wrap">
+          <i class="fa-solid fa-list-check"></i>
+          <h3>綜合案件明細清單</h3>
+          <span class="badge-total-count">共 3,460 筆</span>
+        </div>
+        <button type="button" class="btn-modal-close" id="closeCaseDetailBtn" title="關閉視窗">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="case-modal-body">
+        <!-- 彈窗頂部過濾列 -->
+        <div class="modal-filter-row">
+          <div class="search-input-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="modalCaseSearchInput" placeholder="搜尋案件編號、縣市鄉鎮或關鍵字...">
+          </div>
+          <div class="modal-filter-selects">
+            <select class="form-select-sm" id="modalStatusFilter">
+              <option value="all">全部狀態</option>
+              <option value="draft">建立中/待送件</option>
+              <option value="pending">待確認/待處理</option>
+              <option value="done">處理完成</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 案件表格 -->
+        <div class="modal-table-wrap">
+          <table class="case-detail-table">
+            <thead>
+              <tr>
+                <th>案件編號</th>
+                <th>進線時間</th>
+                <th>縣市鄉鎮</th>
+                <th>服務類別</th>
+                <th>服務細項</th>
+                <th>處理狀態</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="caseDetailTableBody">
+              <!-- Mock Data 自動填入 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="case-modal-footer">
+        <div class="footer-page-info">顯示 1 到 10 筆，共 3,460 筆</div>
+        <div class="modal-pagination">
+          <button type="button" class="btn-pg-nav" disabled><i class="fa-solid fa-chevron-left"></i></button>
+          <button type="button" class="btn-pg-num active">1</button>
+          <button type="button" class="btn-pg-num">2</button>
+          <button type="button" class="btn-pg-num">3</button>
+          <span class="pg-dots">...</span>
+          <button type="button" class="btn-pg-num">346</button>
+          <button type="button" class="btn-pg-nav"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 彈窗 2：報表匯出 Modal (Export Modal) -->
+  <!-- ========================================================================= -->
+  <div class="case-modal-overlay" id="exportReportModal">
+    <div class="case-modal-box modal-box-sm">
+      <div class="case-modal-header">
+        <div class="modal-title-wrap">
+          <i class="fa-solid fa-file-export"></i>
+          <h3>匯出綜合案件分析報表</h3>
+        </div>
+        <button type="button" class="btn-modal-close" id="closeExportModalBtn" title="關閉視窗">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="case-modal-body">
+        <div class="export-form-group">
+          <label class="export-form-label">選擇匯出格式：</label>
+          <div class="export-radio-options">
+            <label class="radio-box">
+              <input type="radio" name="exportFormat" value="excel" checked>
+              <span class="radio-card"><i class="fa-solid fa-file-excel text-success"></i> Excel 活頁簿 (.xlsx)</span>
+            </label>
+            <label class="radio-box">
+              <input type="radio" name="exportFormat" value="csv">
+              <span class="radio-card"><i class="fa-solid fa-file-csv text-primary"></i> CSV 逗號分隔檔 (.csv)</span>
+            </label>
+            <label class="radio-box">
+              <input type="radio" name="exportFormat" value="pdf">
+              <span class="radio-card"><i class="fa-solid fa-file-pdf text-danger"></i> PDF 分析報告 (.pdf)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="case-modal-footer">
+        <button type="button" class="btn-cancel-modal" id="btnCancelExport">取消</button>
+        <button type="button" class="btn-action-primary" id="btnConfirmExport">立即下載匯出</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 彈窗 3：使用者登入視窗 (User Login Modal) -->
+  <!-- ========================================================================= -->
+  <div id="userLoginModal" class="modal-overlay login-modal-overlay" aria-hidden="true">
+    <div class="login-modal-box" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle">
+      <div class="login-modal-header">
+        <div class="login-brand-group">
+          <img src="logo/Taiwan_Water_Corporation_Seal.svg.webp" alt="台灣自來水公司標誌" class="login-logo-img">
+          <div class="login-brand-text">
+            <span class="company-zh">台灣自來水公司</span>
+            <span class="company-en">TAIWAN WATER CORPORATION</span>
+          </div>
+        </div>
+        <h2 class="login-system-title" id="loginModalTitle">緊急應變戰情儀表板</h2>
+        <button id="closeLoginModalBtn" class="login-close-btn" type="button" title="關閉視窗">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="login-modal-divider"></div>
+
+      <form id="emergencyLoginForm" class="login-form">
+        <div class="login-form-group">
+          <label class="login-form-label" for="loginUnitSelect">單位</label>
+          <div class="login-select-wrapper">
+            <select id="loginUnitSelect" class="login-form-select">
+              <option value="hq" selected>總管理處</option>
+              <option value="branch">區管理處</option>
+            </select>
+            <i class="fa-solid fa-chevron-down select-arrow-icon"></i>
+          </div>
+        </div>
+
+        <div class="login-form-group branch-only-field" id="branchManageGroup" style="display: none;">
+          <label class="login-form-label" for="loginBranchSelect">管理處</label>
+          <div class="login-select-wrapper">
+            <select id="loginBranchSelect" class="login-form-select">
+              <option value="">請選擇管理單位</option>
+              <option value="1">第一區管理處 (基隆、新北)</option>
+              <option value="2">第二區管理處 (桃園、新北)</option>
+              <option value="3">第三區管理處 (新竹、苗栗)</option>
+              <option value="4">第四區管理處 (台中、南投)</option>
+              <option value="5">第五區管理處 (嘉義、雲林)</option>
+              <option value="6">第六區管理處 (台南)</option>
+              <option value="7">第七區管理處 (高雄、澎湖)</option>
+              <option value="8">第八區管理處 (宜蘭)</option>
+              <option value="9">第九區管理處 (花蓮)</option>
+              <option value="10">第十區管理處 (台東)</option>
+              <option value="11">第十一區管理處 (彰化)</option>
+              <option value="12">第十二區管理處 (新北)</option>
+            </select>
+            <i class="fa-solid fa-chevron-down select-arrow-icon"></i>
+          </div>
+        </div>
+
+        <div class="login-form-group">
+          <label class="login-form-label" for="loginUsername">帳號</label>
+          <input type="text" id="loginUsername" class="login-form-input" placeholder="請輸入帳號" autocomplete="username">
+        </div>
+
+        <div class="login-form-group">
+          <label class="login-form-label" for="loginPassword">密碼</label>
+          <input type="password" id="loginPassword" class="login-form-input" placeholder="請輸入密碼" autocomplete="current-password">
+        </div>
+
+        <div class="login-form-group">
+          <label class="login-form-label" for="loginCaptcha">驗證碼</label>
+          <div class="captcha-input-row">
+            <input type="text" id="loginCaptcha" class="login-form-input captcha-input-field" placeholder="驗證碼" maxlength="5">
+            <div class="captcha-display-box" id="captchaDisplayBox" title="點擊刷新驗證碼">
+              <span class="captcha-code-text" id="captchaCodeText">95172</span>
+            </div>
+            <button type="button" id="refreshCaptchaBtn" class="captcha-refresh-btn" title="重新產生驗證碼">
+              <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="login-action-group">
+          <button type="submit" id="submitLoginBtn" class="btn-login-submit">登入</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 彈窗 4：選擇應變事件 浮動視窗 (Event Select Modal) -->
+  <!-- ========================================================================= -->
+  <div id="eventSelectModal" class="modal-overlay event-modal-overlay" aria-hidden="true">
+    <div class="event-modal-box" role="dialog" aria-modal="true" aria-labelledby="eventModalTitle">
+      <div class="event-modal-header">
+        <div class="event-brand-group">
+          <img src="logo/Taiwan_Water_Corporation_Seal.svg.webp" alt="台灣自來水公司標誌" class="event-logo-img">
+          <div class="event-brand-text">
+            <span class="company-zh">台灣自來水公司</span>
+            <span class="company-en">TAIWAN WATER CORPORATION</span>
+          </div>
+        </div>
+        <h2 class="event-system-title" id="eventModalTitle">請選擇應變事件</h2>
+        <button id="closeEventModalBtn" class="event-close-btn" type="button" title="關閉視窗">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="event-modal-divider"></div>
+
+      <div class="event-tabs">
+        <button type="button" class="event-tab-btn active" data-status="active">開設中事件</button>
+        <button type="button" class="event-tab-btn" data-status="closed">已撤除事件</button>
+      </div>
+
+      <div class="event-form-group">
+        <div class="event-label-row">
+          <label class="event-form-label" for="incidentSelectDropdown">應變事件清單</label>
+          <button type="button" id="refreshEventListBtn" class="btn-event-refresh" title="重新整理事件清單">
+            <i class="fa-solid fa-arrows-rotate"></i> 更新
+          </button>
+        </div>
+        <div class="event-select-wrapper">
+          <select id="incidentSelectDropdown" class="event-form-select">
+            <option value="農業部萬里溪堰塞湖-災害緊急應變小組">農業部萬里溪堰塞湖-災害緊急應變小組</option>
+            <option value="0831豪雨">0831豪雨</option>
+            <option value="山陀兒颱風應變專案">山陀兒颱風應變專案</option>
+            <option value="南部地區水情乾旱專案應變小組">南部地區水情乾旱專案應變小組</option>
+          </select>
+          <i class="fa-solid fa-chevron-down select-arrow-icon"></i>
+        </div>
+      </div>
+
+      <div class="event-action-group">
+        <button type="button" id="confirmEventSwitchBtn" class="btn-event-submit">確定切換</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 全域與專屬行為腳本 -->
+  <script src="js/main.js"></script>
+  <script src="js/case-analysis.js"></script>
+</body>
+</html>

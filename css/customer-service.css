@@ -1,0 +1,847 @@
+/* ==========================================================================
+   客服進線狀況 (客服進線分析) - 專屬樣式表 (css/customer-service.css)
+   ========================================================================== */
+
+/* 1. 主工作區佈局 (支援大螢幕自適應與平板/手機滑鼠順暢垂直滾動) */
+.cs-main-layout {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 64px);
+  min-height: 680px;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: #f1f5f9;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 2. 上半部版塊 (地圖 72% + 右側案件清單 28%) */
+.cs-top-section {
+  display: flex;
+  flex: 1;
+  min-height: 460px;
+  position: relative;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+/* 2.1 左側 Google Map GIS 容器 */
+.cs-map-wrapper {
+  flex: 1;
+  position: relative;
+  height: 100%;
+  min-height: 460px;
+  min-width: 0;
+  background: #0b1726;
+  overflow: hidden;
+}
+
+.cs-google-map {
+  width: 100%;
+  height: 100%;
+  min-height: 460px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+/* 2.2 地圖浮動圖例卡片 (透明深色科技感) */
+.cs-floating-legend {
+  position: absolute;
+  background: rgba(11, 23, 38, 0.88);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 8px;
+  padding: 10px 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+  z-index: 10;
+  color: #ffffff;
+}
+
+.legend-cases {
+  top: 16px;
+  left: 16px;
+  min-width: 130px;
+}
+
+.legend-sentiment {
+  top: 135px;
+  left: 16px;
+  min-width: 130px;
+}
+
+.legend-hdr {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #cbd5e1;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding-bottom: 4px;
+}
+
+.case-legend-body {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  justify-content: space-around;
+}
+
+.case-badge-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.case-pin {
+  width: 24px;
+  height: 32px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 900;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  position: relative;
+}
+
+.case-pin::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px 4px 0 4px;
+  border-style: solid;
+}
+
+.pin-emergency {
+  background: #ef4444;
+}
+.pin-emergency::after {
+  border-color: #ef4444 transparent transparent transparent;
+}
+
+.pin-normal {
+  background: #f97316;
+}
+.pin-normal::after {
+  border-color: #f97316 transparent transparent transparent;
+}
+
+.pin-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.sentiment-legend-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sentiment-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.sentiment-rect {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.rect-red    { background: #ef4444; }
+.rect-yellow { background: #eab308; }
+.rect-blue   { background: #0284c7; }
+
+/* 2.3 地圖左下角行政區彈窗 */
+.cs-district-popup {
+  position: absolute;
+  bottom: 24px;
+  left: 16px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  z-index: 10;
+  min-width: 200px;
+  overflow: hidden;
+}
+
+.popup-hdr {
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 6px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.popup-title-select {
+  font-size: 11px;
+  font-weight: 700;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.popup-close-btn {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.popup-table-wrap {
+  padding: 6px 8px;
+}
+
+.popup-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.popup-table th {
+  background: #f1f5f9;
+  color: #64748b;
+  font-weight: 600;
+  padding: 3px 6px;
+  border: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.popup-table td {
+  padding: 4px 6px;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
+}
+
+/* 2.4 地圖右下角 FAB 按鈕 */
+.cs-map-fab-group {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 10;
+}
+
+.fab-map-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #0284c7;
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  transition: var(--transition-fast);
+}
+
+.fab-map-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 16px rgba(2, 132, 199, 0.5);
+}
+
+.btn-ai-robot {
+  background: #0f172a;
+  border-color: #38bdf8;
+  color: #38bdf8;
+  font-size: 20px;
+}
+
+/* 2.5 右側進線案件清單面板 */
+.cs-cases-sidebar {
+  width: 28%;
+  min-width: 320px;
+  max-width: 420px;
+  background: #ffffff;
+  border-left: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -2px 0 12px rgba(0, 0, 0, 0.04);
+}
+
+.sidebar-header {
+  padding: 10px 14px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sidebar-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0284c7;
+}
+
+.sidebar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-cs-action {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.btn-cs-action:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.btn-cs-primary {
+  background: #0284c7;
+  border-color: #0284c7;
+  color: #ffffff;
+}
+
+.btn-cs-primary:hover {
+  background: #0369a1;
+}
+
+/* 案件清單表格 */
+.sidebar-table-scroll {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.cs-cases-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11.5px;
+}
+
+.cs-cases-table thead {
+  position: sticky;
+  top: 0;
+  background: #f1f5f9;
+  z-index: 5;
+}
+
+.cs-cases-table th {
+  padding: 8px 6px;
+  color: #475569;
+  font-weight: 700;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.cs-cases-table td {
+  padding: 7px 6px;
+  border-bottom: 1px solid #f1f5f9;
+  text-align: center;
+  color: #334155;
+  vertical-align: middle;
+}
+
+.case-row {
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.case-row:hover {
+  background-color: #f0fdfa;
+}
+
+.td-town {
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.td-time {
+  font-size: 10.5px;
+  line-height: 1.2;
+  color: #64748b;
+}
+
+.td-code {
+  font-family: 'Roboto', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* 案件狀態標籤 */
+.status-badge {
+  display: inline-block;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-size: 10.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.st-unforward {
+  color: #ef4444;
+}
+
+.st-done {
+  color: #16a34a;
+  line-height: 1.1;
+}
+
+.st-processing {
+  color: #f59e0b;
+}
+
+/* ==========================================================================
+   3. 下半部版塊 (底部趨勢圖 + 輿情新聞)
+   ========================================================================== */
+.cs-bottom-section {
+  height: 200px;
+  display: flex;
+  background: #ffffff;
+  flex-shrink: 0;
+}
+
+/* 3.1 底部左側：客服進線趨勢圖 */
+.cs-trend-card {
+  width: 40%;
+  border-right: 1px solid #e2e8f0;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.card-heading {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.scale-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.scale-lbl {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.scale-select {
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #cbd5e1;
+  font-size: 11px;
+  color: #334155;
+  background: #ffffff;
+  outline: none;
+}
+
+.trend-chart-container {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+  width: 100%;
+}
+
+/* 3.2 底部右側：白海豚颱風輿情新聞 */
+.cs-news-card {
+  flex: 1;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.news-top-bar {
+  margin-bottom: 6px;
+}
+
+.news-title-group {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.news-update-time {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.news-table-wrap {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.cs-news-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11.5px;
+}
+
+.cs-news-table th {
+  background: #f8fafc;
+  padding: 4px 8px;
+  color: #64748b;
+  font-weight: 600;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.th-news-time {
+  width: 90px;
+}
+
+.cs-news-table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.td-news-time {
+  color: #64748b;
+  font-family: 'Roboto', sans-serif;
+  font-size: 11px;
+}
+
+.news-link {
+  color: #1e293b;
+  text-decoration: none;
+  display: inline-block;
+  max-width: 580px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: var(--transition-fast);
+}
+
+.news-link:hover {
+  color: #0284c7;
+  text-decoration: underline;
+}
+
+/* 4. 成立案件 Modal 彈窗樣式 */
+.cs-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.cs-modal-overlay.show {
+  display: flex;
+}
+
+.cs-modal-box {
+  background: #ffffff;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 480px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  animation: modalFadeIn 0.25s ease-out;
+}
+
+.cs-modal-header {
+  padding: 12px 16px;
+  background: #f0f9ff;
+  border-bottom: 1px solid #bae6fd;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cs-modal-header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0369a1;
+}
+
+.cs-modal-close {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.cs-modal-form {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-row label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.cs-input,
+.cs-select,
+.cs-textarea {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  font-size: 12.5px;
+  outline: none;
+  background: #ffffff;
+}
+
+.cs-input:focus,
+.cs-select:focus,
+.cs-textarea:focus {
+  border-color: #0284c7;
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15);
+}
+
+.cs-radio-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.radio-lbl {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+}
+
+.cs-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.btn-cancel {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-submit {
+  background: #0284c7;
+  border: 1px solid #0284c7;
+  color: #ffffff;
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   5. RWD 響應式自適應優化 (手機 / 平板多層級適配)
+   ========================================================================== */
+
+/* 5.1 平板 / 筆電 (<= 1200px) */
+@media (max-width: 1200px) {
+  .cs-main-layout {
+    height: auto !important;
+    min-height: calc(100vh - 64px);
+    overflow-y: visible !important;
+    overflow-x: hidden;
+  }
+
+  .cs-top-section {
+    flex-direction: column;
+    flex: none;
+    height: auto;
+  }
+
+  /* 圖台版面上下深度加長，確保地圖視野清楚 */
+  .cs-map-wrapper {
+    width: 100%;
+    height: 56vh !important;
+    min-height: 420px !important;
+    flex: none;
+  }
+
+  .cs-cases-sidebar {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 350px !important;
+    flex: none;
+    border-left: none;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .cs-bottom-section {
+    flex-direction: column;
+    height: auto !important;
+    flex: none;
+  }
+
+  .cs-trend-card {
+    width: 100% !important;
+    height: 250px !important;
+    border-right: none;
+    border-bottom: 1px solid #e2e8f0;
+    flex: none;
+  }
+
+  .cs-news-card {
+    width: 100% !important;
+    height: 240px !important;
+    flex: none;
+  }
+}
+
+/* 5.2 手機版極限適配 (<= 768px) */
+@media (max-width: 768px) {
+  .cs-map-wrapper {
+    height: 60vh !important;
+    min-height: 450px !important; /* 手機版上下深度加大，視圖清晰度極佳 */
+  }
+
+  /* 手機版圖例微調，避免遮蔽過大地圖範圍 */
+  .cs-floating-legend {
+    padding: 8px 10px;
+    border-radius: 6px;
+  }
+
+  .legend-cases {
+    top: 10px;
+    left: 10px;
+    min-width: 110px;
+  }
+
+  .legend-sentiment {
+    top: 105px;
+    left: 10px;
+    min-width: 110px;
+  }
+
+  .legend-hdr {
+    font-size: 11.5px;
+    margin-bottom: 6px;
+  }
+
+  .case-pin {
+    width: 20px;
+    height: 26px;
+    font-size: 11px;
+  }
+
+  .sentiment-item {
+    font-size: 10.5px;
+    gap: 6px;
+  }
+
+  .sentiment-rect {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* 行政區彈窗在手機上縮小並防止溢出 */
+  .cs-district-popup {
+    bottom: 12px;
+    left: 10px;
+    min-width: 150px;
+    max-width: calc(100% - 90px);
+  }
+
+  .popup-hdr {
+    padding: 4px 6px;
+  }
+
+  .popup-title-select {
+    font-size: 10.5px;
+  }
+
+  .popup-table {
+    font-size: 10px;
+  }
+
+  .popup-table th,
+  .popup-table td {
+    padding: 2px 4px;
+  }
+
+  /* FAB 工具按鈕微調 */
+  .cs-map-fab-group {
+    bottom: 12px;
+    right: 12px;
+    gap: 8px;
+  }
+
+  .fab-map-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 14px;
+  }
+
+  .cs-cases-sidebar {
+    height: 320px !important;
+  }
+
+  .cs-trend-card {
+    height: 230px !important;
+    padding: 8px 10px;
+  }
+
+  .cs-news-card {
+    height: 220px !important;
+    padding: 8px 10px;
+  }
+
+  .news-link {
+    max-width: 260px;
+  }
+}
+

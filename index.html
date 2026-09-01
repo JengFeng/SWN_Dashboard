@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>智慧水網 - 總管理處營運資訊儀表板</title>
+  <!-- Google Fonts & Font Awesome CDN -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- 客製化樣式表 -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="font-md">
+
+  <!-- ========================================================================= -->
+  <!-- 側邊欄抽屜 (Sidebar Drawer) -->
+  <!-- ========================================================================= -->
+  <aside id="sidebarDrawer" class="sidebar-drawer" aria-label="系統導航">
+    <div class="sidebar-header">
+      <div class="logo-box">
+        <img src="logo/Taiwan_Water_Corporation_Seal.svg.webp" alt="台水標誌" class="sidebar-logo-img">
+        <span>應變事件情資</span>
+      </div>
+      <button id="closeSidebarBtn" class="btn-icon" title="關閉選單">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <nav class="sidebar-menu">
+      <a href="index.html" class="menu-item active">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>災情事件彙總</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-solid fa-hurricane"></i>
+        <span>颱風路徑動態圖</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-solid fa-cloud-showers-heavy"></i>
+        <span>雨量資訊</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-solid fa-house-flood-water"></i>
+        <span>海水警戒</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-solid fa-cloud-bolt"></i>
+        <span>降雨預報</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-solid fa-hill-rockslide"></i>
+        <span>土石流警戒</span>
+      </a>
+      
+      <!-- 外部情資 (點擊展開下拉子選單) -->
+      <div class="sidebar-dropdown">
+        <button type="button" class="menu-item dropdown-toggle" id="sidebarExternalToggle" aria-expanded="false">
+          <i class="fa-solid fa-globe"></i>
+          <span>外部情資</span>
+          <i class="fa-solid fa-caret-down dropdown-arrow"></i>
+        </button>
+        <div class="sidebar-submenu" id="sidebarExternalSubmenu">
+          <a href="#" class="submenu-item"><i class="fa-solid fa-cloud-sun"></i> <span>氣象署氣象情資</span></a>
+          <a href="#" class="submenu-item"><i class="fa-solid fa-bell"></i> <span>NCDR 災防情資</span></a>
+          <a href="#" class="submenu-item"><i class="fa-solid fa-water"></i> <span>水利署水情資訊</span></a>
+          <a href="#" class="submenu-item"><i class="fa-solid fa-bolt"></i> <span>台電電力狀況</span></a>
+          <a href="#" class="submenu-item"><i class="fa-solid fa-road"></i> <span>公路局災阻情資</span></a>
+        </div>
+      </div>
+    </nav>
+  </aside>
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <!-- ========================================================================= -->
+  <!-- 主版面容器 (App Layout) -->
+  <!-- ========================================================================= -->
+  <div class="app-layout">
+    
+    <!-- 頂部導航列 (Header) -->
+    <header class="main-header">
+      <div class="header-left">
+        <!-- 側邊欄展開切換鈕 -->
+        <button id="openSidebarBtn" class="btn-icon header-toggle-btn" title="展開選單">
+          <i class="fa-solid fa-angles-left"></i>
+        </button>
+        <!-- 機關單位 Logo 與標題 -->
+        <div class="brand-title">
+          <div class="brand-logo">
+            <img src="logo/Taiwan_Water_Corporation_Seal.svg.webp" alt="台灣自來水公司標誌" class="brand-logo-img">
+          </div>
+          <span class="title-text" id="headerTitleText">總管理處-平時</span>
+          <button id="globalSearchBtn" class="btn-icon search-trigger-btn" title="選擇應變事件">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </div>
+
+        <!-- 頂部主模組切換下拉選單 -->
+        <div class="dropdown-wrapper">
+          <button id="viewDropdownBtn" class="dropdown-btn primary-dropdown">
+            <span id="currentViewText">今日營運概況</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          
+          <!-- 選單容器 -->
+          <div id="viewDropdownMenu" class="cascading-menu-wrapper">
+            <ul class="cascading-menu-level1">
+              <!-- 1. 今日營運概況 (首頁入口，當前啟用) -->
+              <li class="menu-direct-item active" data-title="今日營運概況" onclick="location.href='index.html'">
+                <span>今日營運概況</span>
+              </li>
+
+              <!-- 2. 供水營運概況 (保留子選單) -->
+              <li class="menu-parent-item" data-parent="water-supply">
+                <span>供水營運概況</span>
+                <i class="fa-solid fa-caret-right"></i>
+                
+                <!-- 第二層：供水營運概況 子項目 -->
+                <ul class="cascading-menu-level2">
+                  <li class="menu-sub-item" onclick="location.href='supply-overview.html'">
+                    <span class="sub-text">全台供水狀況總覽</span>
+                    <i class="fa-regular fa-circle radio-icon"></i>
+                  </li>
+                  <li class="menu-sub-item" onclick="location.href='supply-overview.html#tab-dispatch'">
+                    <span class="sub-text">跨區水源調度</span>
+                    <i class="fa-regular fa-circle radio-icon"></i>
+                  </li>
+                  <li class="menu-sub-item" onclick="location.href='supply-overview.html#tab-reservoir'">
+                    <span class="sub-text">水庫蓄水量</span>
+                    <i class="fa-regular fa-circle radio-icon"></i>
+                  </li>
+                </ul>
+              </li>
+
+              <!-- 3. 客服進線狀況 (單一功能，點擊跳轉至客服進線分析) -->
+              <li class="menu-direct-item" data-title="客服進線狀況" onclick="location.href='customer-service.html'">
+                <span>客服進線狀況</span>
+              </li>
+
+              <!-- 4. 事件應變情資 (單一功能，無子選單) -->
+              <li class="menu-direct-item" data-title="事件應變情資">
+                <span>事件應變情資</span>
+              </li>
+
+              <!-- 5. 綜合案件分析 (單一功能，點擊跳轉至綜合案件分析) -->
+              <li class="menu-direct-item" data-title="綜合案件分析" onclick="location.href='case-analysis.html'">
+                <span>綜合案件分析</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 中央公告跑馬燈 -->
+      <div class="header-center">
+        <div class="alert-badge">
+          <span class="pulse-dot"></span>
+        </div>
+        <div class="announcement-content">
+          <span class="announcement-label">今日重要公告：</span>
+          <span class="announcement-text" id="announcementTicker">全台供水情形整體正常，請持續留意最新供水與氣象資訊。</span>
+        </div>
+      </div>
+
+      <!-- 右側使用者與工具欄 (含字級調整功能) -->
+      <div class="header-right">
+        
+        <!-- 字級調整控制器 (預設為中字級，支援寬版按鈕與 RWD 下拉式選取) -->
+        <div class="font-size-controller" title="調整全站字級大小">
+          <span class="fs-label">字級</span>
+          <div class="fs-options">
+            <button type="button" class="fs-btn" data-size="sm">小</button>
+            <button type="button" class="fs-btn active" data-size="md">中</button>
+            <button type="button" class="fs-btn" data-size="lg">大</button>
+          </div>
+          <div class="fs-select-wrap">
+            <select id="fontSizeSelect" class="fs-select" aria-label="選擇字級大小">
+              <option value="sm">小</option>
+              <option value="md" selected>中</option>
+              <option value="lg">大</option>
+            </select>
+            <i class="fa-solid fa-chevron-down fs-select-arrow"></i>
+          </div>
+        </div>
+
+        <!-- 視圖切換快捷按鈕 -->
+        <div class="view-switch-group">
+          <button id="toggleDashboardView" class="btn-toggle active" title="切換至儀表板視圖">
+            <i class="fa-solid fa-table-cells-large"></i>
+          </button>
+          <button id="toggleMapView" class="btn-toggle" title="切換至 GIS 空間圖台" onclick="location.href='supply-overview.html'">
+            <i class="fa-solid fa-map"></i>
+          </button>
+        </div>
+
+        <!-- 使用者資訊 (點擊展開登入浮動視窗) -->
+        <div class="user-profile" id="userProfileBtn" title="點擊登入緊急應變戰情儀表板" role="button" tabindex="0">
+          <div class="user-meta">
+            <span class="user-role" id="headerUserRole">一般使用者</span>
+            <span class="system-time" id="systemClock">2025/05/23 14:48</span>
+          </div>
+          <div class="avatar-box" id="userAvatarBtn">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="使用者頭像">
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ========================================================================= -->
+    <!-- 主要內容區 (Dashboard View) -->
+    <!-- ========================================================================= -->
+    <main id="mainDashboardView" class="dashboard-container">
+      
+      <!-- 上半部：左欄 (供水 KPI + 停水表格) / 右欄 (水壓、水質、客服、輿情) 各佔 50% 對稱 -->
+      <div class="dashboard-top-grid">
+        
+        <!-- 左側主監控區 (50%) -->
+        <section class="left-main-column">
+          
+          <!-- 1. 供水資訊卡片 (KPI Block) -->
+          <div class="card kpi-card">
+            <div class="card-header-clean">
+              <h2 class="card-title">供水資訊</h2>
+            </div>
+            <div class="kpi-grid">
+              <!-- KPI 1: 全台總計 -->
+              <div class="kpi-item">
+                <div class="kpi-icon-wrap water-blue">
+                  <i class="fa-solid fa-droplet"></i>
+                </div>
+                <div class="kpi-body">
+                  <div class="kpi-label">全台總計</div>
+                  <div class="kpi-sublabel">總供水量</div>
+                  <div class="kpi-value-row">
+                    <span class="kpi-number text-primary">944.6</span>
+                    <span class="kpi-unit">萬噸/日</span>
+                  </div>
+                  <div class="kpi-trend trend-down">
+                    <span>較前一日</span>
+                    <i class="fa-solid fa-arrow-down"></i>
+                    <strong>-0.83%</strong>
+                    <span class="trend-delta">(-7.9 萬噸/日)</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- KPI 2: 北水支援量 -->
+              <div class="kpi-item">
+                <div class="kpi-icon-wrap water-teal">
+                  <i class="fa-solid fa-water"></i>
+                </div>
+                <div class="kpi-body">
+                  <div class="kpi-label">北水支援量</div>
+                  <div class="kpi-sublabel">(北部區域供水)</div>
+                  <div class="kpi-value-row">
+                    <span class="kpi-number text-teal">386,757</span>
+                    <span class="kpi-unit">CMD</span>
+                  </div>
+                  <div class="kpi-trend trend-up">
+                    <span>較昨日</span>
+                    <i class="fa-solid fa-arrow-up"></i>
+                    <strong>+12.56%</strong>
+                    <span class="trend-delta">(+6,800 CMD)</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- KPI 3: 南化供水量 -->
+              <div class="kpi-item">
+                <div class="kpi-icon-wrap water-gray">
+                  <i class="fa-solid fa-faucet"></i>
+                </div>
+                <div class="kpi-body">
+                  <div class="kpi-label">南化供水量</div>
+                  <div class="kpi-sublabel">(南化給水調度管線量)</div>
+                  <div class="kpi-value-row">
+                    <span class="kpi-number text-dark">38</span>
+                    <span class="kpi-unit">CMD</span>
+                  </div>
+                  <div class="kpi-trend trend-up-red">
+                    <span>較昨日</span>
+                    <i class="fa-solid fa-arrow-up"></i>
+                    <strong>+0.63%</strong>
+                    <span class="trend-delta">(+1 CMD)</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- KPI 4: 水庫蓄水量平均 (半環錶 Gauge) -->
+              <div class="kpi-item gauge-item">
+                <div class="gauge-chart-container">
+                  <canvas id="reservoirGaugeChart" width="100" height="55"></canvas>
+                  <div class="gauge-center-val">
+                    <span class="gauge-num">58.3</span>
+                    <span class="gauge-pct">%</span>
+                  </div>
+                </div>
+                <div class="kpi-body text-center">
+                  <div class="kpi-label">水庫蓄水量平均</div>
+                  <div class="kpi-trend trend-down">
+                    <span>較昨日</span>
+                    <i class="fa-solid fa-arrow-down"></i>
+                    <strong>-1.45%</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. 重要停水地區表格卡片 (Table Block) -->
+          <div class="card table-card">
+            <div class="card-header-bar">
+              <h2 class="card-title">重要停水地區</h2>
+              <button id="viewMoreOutageBtn" class="link-btn">
+                查看更多 <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="custom-table" id="outageTable">
+                <thead>
+                  <tr>
+                    <th>縣市</th>
+                    <th>行政區</th>
+                    <th>停水原因</th>
+                    <th>開始時間</th>
+                    <th>預計結束時間</th>
+                    <th>影響戶數</th>
+                    <th>狀態</th>
+                  </tr>
+                </thead>
+                <tbody id="outageTableBody">
+                  <tr>
+                    <td>台南市</td>
+                    <td>北區、中西區</td>
+                    <td>管線維修</td>
+                    <td>05/23 09:30</td>
+                    <td>05/23 17:00</td>
+                    <td>12,568</td>
+                    <td><span class="status-badge badge-danger">進行中</span></td>
+                  </tr>
+                  <tr>
+                    <td>高雄市</td>
+                    <td>左營區</td>
+                    <td>管線汰換</td>
+                    <td>05/23 08:00</td>
+                    <td>05/23 18:00</td>
+                    <td>8,452</td>
+                    <td><span class="status-badge badge-danger">進行中</span></td>
+                  </tr>
+                  <tr>
+                    <td>新竹縣</td>
+                    <td>竹北市</td>
+                    <td>漏水搶修</td>
+                    <td>05/23 11:20</td>
+                    <td>05/23 16:00</td>
+                    <td>3,245</td>
+                    <td><span class="status-badge badge-danger">進行中</span></td>
+                  </tr>
+                  <tr>
+                    <td>花蓮縣</td>
+                    <td>花蓮市</td>
+                    <td>原水濁度過高</td>
+                    <td>05/23 07:40</td>
+                    <td>05/23 15:30</td>
+                    <td>2,156</td>
+                    <td><span class="status-badge badge-danger">進行中</span></td>
+                  </tr>
+                  <tr>
+                    <td>宜蘭縣</td>
+                    <td>羅東鎮</td>
+                    <td>設備檢修</td>
+                    <td>05/23 10:00</td>
+                    <td>05/23 14:30</td>
+                    <td>1,245</td>
+                    <td><span class="status-badge badge-success">已完成</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 右側 2x2 統計監控區 (50%) -->
+        <section class="right-stats-column">
+          
+          <!-- 統計 1: 水壓點位統計 -->
+          <div class="card stat-card">
+            <div class="card-header-bar">
+              <h3 class="stat-card-title">水壓點位統計 <span class="sub-date">(今日)</span></h3>
+              <div class="spot-filter-wrapper">
+                <div class="select-box-styled">
+                  <select class="mini-select" id="pressureFilterSelect">
+                    <option value="all">全部</option>
+                    <option value="key-spots">重要供水點位</option>
+                    <option value="north">北部區</option>
+                    <option value="central">中部區</option>
+                    <option value="south">南部區</option>
+                    <option value="east">東部區</option>
+                  </select>
+                  <i class="fa-solid fa-chevron-down select-arrow"></i>
+                </div>
+                <div class="quick-chip-label" id="pressureChipLabel">重要供水點位</div>
+              </div>
+            </div>
+            <div class="donut-stat-row">
+              <div class="donut-chart-box">
+                <canvas id="pressureDonutChart"></canvas>
+                <div class="donut-center-text">
+                  <div class="donut-title">總計</div>
+                  <div class="donut-total" id="pressureTotalVal">23895</div>
+                  <div class="donut-unit">處</div>
+                </div>
+              </div>
+              <div class="donut-legend-box">
+                <div class="legend-row">
+                  <span class="legend-dot dot-blue"></span>
+                  <span class="legend-name">正常</span>
+                  <span class="legend-val">19428處</span>
+                </div>
+                <div class="legend-row">
+                  <span class="legend-dot dot-orange"></span>
+                  <span class="legend-name">警戒</span>
+                  <span class="legend-val">2449處</span>
+                </div>
+                <div class="legend-row">
+                  <span class="legend-dot dot-red"></span>
+                  <span class="legend-name">異常</span>
+                  <span class="legend-val">2018處</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 統計 2: 水質點位統計 -->
+          <div class="card stat-card">
+            <div class="card-header-bar">
+              <h3 class="stat-card-title">水質點位統計 <span class="sub-date">(今日)</span></h3>
+              <div class="spot-filter-wrapper">
+                <div class="select-box-styled">
+                  <select class="mini-select" id="waterQualityFilterSelect">
+                    <option value="all">全部</option>
+                    <option value="key-spots">重要供水點位</option>
+                    <option value="north">北部區</option>
+                    <option value="central">中部區</option>
+                    <option value="south">南部區</option>
+                    <option value="east">東部區</option>
+                  </select>
+                  <i class="fa-solid fa-chevron-down select-arrow"></i>
+                </div>
+                <div class="quick-chip-label" id="qualityChipLabel">重要供水點位</div>
+              </div>
+            </div>
+            <div class="donut-stat-row">
+              <div class="donut-chart-box">
+                <canvas id="waterQualityDonutChart"></canvas>
+                <div class="donut-center-text">
+                  <div class="donut-title">總計</div>
+                  <div class="donut-total" id="qualityTotalVal">4823</div>
+                  <div class="donut-unit">處</div>
+                </div>
+              </div>
+              <div class="donut-legend-box">
+                <div class="legend-row">
+                  <span class="legend-dot dot-blue"></span>
+                  <span class="legend-name">正常</span>
+                  <span class="legend-val">3708處</span>
+                </div>
+                <div class="legend-row">
+                  <span class="legend-dot dot-orange"></span>
+                  <span class="legend-name">警戒</span>
+                  <span class="legend-val">530處</span>
+                </div>
+                <div class="legend-row">
+                  <span class="legend-dot dot-red"></span>
+                  <span class="legend-name">異常</span>
+                  <span class="legend-val">585處</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 統計 3: 客服案件統計 -->
+          <div class="card stat-card customer-card">
+            <div class="card-header-bar">
+              <h3 class="stat-card-title">客服案件統計 <span class="sub-date">(今日)</span></h3>
+            </div>
+            <div class="customer-top-row">
+              <div class="customer-stat-left">
+                <div class="icon-label-row">
+                  <i class="fa-solid fa-user-gear text-primary"></i>
+                  <span>總案件數</span>
+                </div>
+                <div class="big-stat-val">
+                  <span class="num">588</span>
+                  <span class="unit">件</span>
+                </div>
+                <div class="kpi-trend trend-up-red">
+                  <span>較昨日</span>
+                  <i class="fa-solid fa-arrow-up"></i>
+                  <strong>+6.7%</strong>
+                  <span>(+36件)</span>
+                </div>
+              </div>
+
+              <div class="customer-donut-box">
+                <canvas id="customerCaseDonutChart"></canvas>
+              </div>
+
+              <div class="customer-case-legend">
+                <div class="case-legend-item">
+                  <span class="legend-dot dot-red"></span>
+                  <span>未處理 228件 (38.8%)</span>
+                </div>
+                <div class="case-legend-item">
+                  <span class="legend-dot dot-orange"></span>
+                  <span>處理中 208件 (35.4%)</span>
+                </div>
+                <div class="case-legend-item">
+                  <span class="legend-dot dot-blue"></span>
+                  <span>已結案 258件 (25.8%)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 案件類別 TOP 5 -->
+            <div class="sub-section-divider"></div>
+            <div class="top-list-block">
+              <div class="list-block-title">案件類別 TOP 5</div>
+              <div class="bar-progress-list">
+                <div class="bar-item">
+                  <span class="bar-rank rank-1">1</span>
+                  <span class="bar-name">水壓問題</span>
+                  <div class="progress-track">
+                    <div class="progress-fill fill-blue" style="width: 37.8%;"></div>
+                  </div>
+                  <span class="bar-value">210 件 (37.8%)</span>
+                </div>
+                <div class="bar-item">
+                  <span class="bar-rank rank-2">2</span>
+                  <span class="bar-name">水質異常</span>
+                  <div class="progress-track">
+                    <div class="progress-fill fill-orange" style="width: 22.4%;"></div>
+                  </div>
+                  <span class="bar-value">132 件 (22.4%)</span>
+                </div>
+                <div class="bar-item">
+                  <span class="bar-rank rank-3">3</span>
+                  <span class="bar-name">漏水問題</span>
+                  <div class="progress-track">
+                    <div class="progress-fill fill-blue-light" style="width: 16.7%;"></div>
+                  </div>
+                  <span class="bar-value">98 件 (16.7%)</span>
+                </div>
+                <div class="bar-item">
+                  <span class="bar-rank">4</span>
+                  <span class="bar-name">管線維修</span>
+                  <div class="progress-track">
+                    <div class="progress-fill fill-blue-soft" style="width: 13.3%;"></div>
+                  </div>
+                  <span class="bar-value">78 件 (13.3%)</span>
+                </div>
+                <div class="bar-item">
+                  <span class="bar-rank">5</span>
+                  <span class="bar-name">其他問題</span>
+                  <div class="progress-track">
+                    <div class="progress-fill fill-green" style="width: 10.8%;"></div>
+                  </div>
+                  <span class="bar-value">60 件 (10.8%)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 統計 4: 輿情分析 -->
+          <div class="card stat-card sentiment-card">
+            <div class="card-header-bar">
+              <h3 class="stat-card-title">輿情分析 <span class="sub-date">(今日)</span></h3>
+            </div>
+            <div class="customer-top-row">
+              <div class="customer-stat-left">
+                <div class="icon-label-row">
+                  <i class="fa-solid fa-comments text-primary"></i>
+                  <span>總輿情件數</span>
+                </div>
+                <div class="big-stat-val">
+                  <span class="num">86</span>
+                  <span class="unit">件</span>
+                </div>
+                <div class="kpi-trend trend-up-red">
+                  <span>較昨日</span>
+                  <i class="fa-solid fa-arrow-up"></i>
+                  <strong>+8.7%</strong>
+                  <span>(+7件)</span>
+                </div>
+              </div>
+
+              <div class="customer-donut-box">
+                <canvas id="sentimentDonutChart"></canvas>
+              </div>
+
+              <div class="customer-case-legend">
+                <div class="case-legend-item">
+                  <span class="legend-dot dot-green"></span>
+                  <span>正面 18件 (20.9%)</span>
+                </div>
+                <div class="case-legend-item">
+                  <span class="legend-dot dot-blue"></span>
+                  <span>中立 52件 (60.5%)</span>
+                </div>
+                <div class="case-legend-item">
+                  <span class="legend-dot dot-red"></span>
+                  <span>負面 16件 (18.6%)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 熱門話題 TOP 3 -->
+            <div class="sub-section-divider"></div>
+            <div class="top-list-block">
+              <div class="topic-header-row">
+                <div class="list-block-title">熱門話題 TOP 3</div>
+                <div class="topic-heat-head">熱度</div>
+              </div>
+              <div class="topic-list">
+                <div class="topic-item">
+                  <div class="topic-rank-title">
+                    <span class="topic-rank rank-gold">1</span>
+                    <span class="topic-text" title="自來水壓太低影響使用">自來水壓太低影響使用</span>
+                  </div>
+                  <div class="topic-meta">
+                    <span class="heat-time">熱度 24 時</span>
+                    <span class="trend-indicator trend-up"><i class="fa-solid fa-arrow-up"></i> +6</span>
+                  </div>
+                </div>
+                <div class="topic-item">
+                  <div class="topic-rank-title">
+                    <span class="topic-rank rank-gold">2</span>
+                    <span class="topic-text" title="花蓮地區原水濁度影響供水">花蓮地區原水濁度影響供水</span>
+                  </div>
+                  <div class="topic-meta">
+                    <span class="heat-time">熱度 18 時</span>
+                    <span class="trend-indicator trend-up"><i class="fa-solid fa-arrow-up"></i> +4</span>
+                  </div>
+                </div>
+                <div class="topic-item">
+                  <div class="topic-rank-title">
+                    <span class="topic-rank rank-gold">3</span>
+                    <span class="topic-text" title="夏季用水措施與提醒">夏季用水措施與提醒</span>
+                  </div>
+                  <div class="topic-meta">
+                    <span class="heat-time">熱度 12 時</span>
+                    <span class="trend-indicator trend-down-green"><i class="fa-solid fa-arrow-down"></i> -2</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- 底部全幅：主要水庫蓄水情況 -->
+      <!-- ========================================================================= -->
+      <div class="dashboard-bottom-row">
+        <div class="card reservoir-card">
+          <div class="card-header-clean">
+            <h2 class="card-title">主要水庫蓄水情況</h2>
+          </div>
+          <div class="reservoir-grid">
+            <!-- 水庫 1: 石門水庫 -->
+            <div class="reservoir-item">
+              <div class="circle-progress-box">
+                <svg class="progress-ring" width="58" height="58">
+                  <circle class="ring-bg" cx="29" cy="29" r="23"></circle>
+                  <circle class="ring-fill ring-blue" cx="29" cy="29" r="23" stroke-dasharray="144.51" stroke-dashoffset="1.45"></circle>
+                </svg>
+                <div class="ring-center-val">99%</div>
+              </div>
+              <div class="reservoir-info">
+                <div class="reservoir-name">石門水庫</div>
+                <div class="reservoir-stat-row">
+                  <span class="stat-label">有效蓄水量</span>
+                  <span class="stat-num">20,500.39 <span class="unit">萬立方公尺</span></span>
+                </div>
+                <div class="reservoir-stat-row sub-row">
+                  <span class="stat-label">有效庫容量</span>
+                  <span class="stat-num">20,526.00 <span class="unit">萬立方公尺</span></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 水庫 2: 曾文水庫 -->
+            <div class="reservoir-item">
+              <div class="circle-progress-box">
+                <svg class="progress-ring" width="58" height="58">
+                  <circle class="ring-bg" cx="29" cy="29" r="23"></circle>
+                  <circle class="ring-fill ring-green" cx="29" cy="29" r="23" stroke-dasharray="144.51" stroke-dashoffset="20.23"></circle>
+                </svg>
+                <div class="ring-center-val">86%</div>
+              </div>
+              <div class="reservoir-info">
+                <div class="reservoir-name">曾文水庫</div>
+                <div class="reservoir-stat-row">
+                  <span class="stat-label">有效蓄水量</span>
+                  <span class="stat-num">38,707.00 <span class="unit">萬立方公尺</span></span>
+                </div>
+                <div class="reservoir-stat-row sub-row">
+                  <span class="stat-label">有效庫容量</span>
+                  <span class="stat-num">45,004.00 <span class="unit">萬立方公尺</span></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 水庫 3: 烏山頭水庫 -->
+            <div class="reservoir-item">
+              <div class="circle-progress-box">
+                <svg class="progress-ring" width="58" height="58">
+                  <circle class="ring-bg" cx="29" cy="29" r="23"></circle>
+                  <circle class="ring-fill ring-green" cx="29" cy="29" r="23" stroke-dasharray="144.51" stroke-dashoffset="5.92"></circle>
+                </svg>
+                <div class="ring-center-val">95.9%</div>
+              </div>
+              <div class="reservoir-info">
+                <div class="reservoir-name">烏山頭水庫</div>
+                <div class="reservoir-stat-row">
+                  <span class="stat-label">有效蓄水量</span>
+                  <span class="stat-num">7,561.00 <span class="unit">萬立方公尺</span></span>
+                </div>
+                <div class="reservoir-stat-row sub-row">
+                  <span class="stat-label">有效庫容量</span>
+                  <span class="stat-num">7,885.19 <span class="unit">萬立方公尺</span></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 水庫 4: 南化水庫 -->
+            <div class="reservoir-item">
+              <div class="circle-progress-box">
+                <svg class="progress-ring" width="58" height="58">
+                  <circle class="ring-bg" cx="29" cy="29" r="23"></circle>
+                  <circle class="ring-fill ring-green" cx="29" cy="29" r="23" stroke-dasharray="144.51" stroke-dashoffset="0"></circle>
+                </svg>
+                <div class="ring-center-val">100%</div>
+              </div>
+              <div class="reservoir-info">
+                <div class="reservoir-name">南化水庫</div>
+                <div class="reservoir-stat-row">
+                  <span class="stat-label">有效蓄水量</span>
+                  <span class="stat-num">8,185.75 <span class="unit">萬立方公尺</span></span>
+                </div>
+                <div class="reservoir-stat-row sub-row">
+                  <span class="stat-label">有效庫容量</span>
+                  <span class="stat-num">8,180.90 <span class="unit">萬立方公尺</span></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 水庫 5: 鯉魚潭水庫 -->
+            <div class="reservoir-item">
+              <div class="circle-progress-box">
+                <svg class="progress-ring" width="58" height="58">
+                  <circle class="ring-bg" cx="29" cy="29" r="23"></circle>
+                  <circle class="ring-fill ring-green" cx="29" cy="29" r="23" stroke-dasharray="144.51" stroke-dashoffset="0"></circle>
+                </svg>
+                <div class="ring-center-val">100%</div>
+              </div>
+              <div class="reservoir-info">
+                <div class="reservoir-name">鯉魚潭水庫</div>
+                <div class="reservoir-stat-row">
+                  <span class="stat-label">有效蓄水量</span>
+                  <span class="stat-num">11,592.73 <span class="unit">萬立方公尺</span></span>
+                </div>
+                <div class="reservoir-stat-row sub-row">
+                  <span class="stat-label">有效庫容量</span>
+                  <span class="stat-num">11,548.60 <span class="unit">萬立方公尺</span></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 水庫 6: 寶山水庫 -->
+            <div class="reservoir-item">
+              <div class="circle-progress-box">
+                <svg class="progress-ring" width="58" height="58">
+                  <circle class="ring-bg" cx="29" cy="29" r="23"></circle>
+                  <circle class="ring-fill ring-green" cx="29" cy="29" r="23" stroke-dasharray="144.51" stroke-dashoffset="0"></circle>
+                </svg>
+                <div class="ring-center-val">100%</div>
+              </div>
+              <div class="reservoir-info">
+                <div class="reservoir-name">寶山水庫</div>
+                <div class="reservoir-stat-row">
+                  <span class="stat-label">有效蓄水量</span>
+                  <span class="stat-num">511.56 <span class="unit">萬立方公尺</span></span>
+                </div>
+                <div class="reservoir-stat-row sub-row">
+                  <span class="stat-label">有效庫容量</span>
+                  <span class="stat-num">500.83 <span class="unit">萬立方公尺</span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+    <!-- 緊急應變戰情儀表板 登入浮動視窗 (淺藍風格) -->
+    <div id="loginModal" class="modal-overlay login-modal-overlay" aria-hidden="true">
+      <div class="login-modal-box" role="dialog" aria-modal="true" aria-labelledby="loginSystemTitle">
+        <!-- 頂部標頭 -->
+        <div class="login-modal-header">
+          <div class="login-brand-group">
+            <img src="logo/Taiwan_Water_Corporation_Seal.svg.webp" alt="台灣自來水公司標誌" class="login-logo-img">
+            <div class="login-brand-text">
+              <span class="company-zh">台灣自來水公司</span>
+              <span class="company-en">TAIWAN WATER CORPORATION</span>
+            </div>
+          </div>
+          <h2 class="login-system-title" id="loginSystemTitle">緊急應變戰情儀表板</h2>
+          <button id="closeLoginModalBtn" class="login-close-btn" type="button" title="關閉視窗">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="login-modal-divider"></div>
+
+        <!-- 單位切換頁籤 -->
+        <div class="login-tabs">
+          <button type="button" class="login-tab-btn active" data-unit="hq">總管理處</button>
+          <button type="button" class="login-tab-btn" data-unit="branch">區管理處</button>
+        </div>
+
+        <!-- 登入表單 -->
+        <form class="login-form" id="loginForm" onsubmit="event.preventDefault();">
+          <!-- 登入方式 -->
+          <div class="login-form-group">
+            <label class="login-form-label" for="loginMethodSelect">登入方式</label>
+            <div class="login-select-wrapper">
+              <select id="loginMethodSelect" class="login-form-select">
+                <option value="local">本機登入</option>
+                <option value="sso">公務 SSO 單一簽入</option>
+                <option value="ad">AD 網域驗證</option>
+              </select>
+              <i class="fa-solid fa-chevron-down select-arrow-icon"></i>
+            </div>
+          </div>
+
+          <!-- 管理單位 (區管理處專屬欄位) -->
+          <div class="login-form-group branch-only-field" id="branchUnitGroup" style="display: none;">
+            <label class="login-form-label" for="loginBranchUnitSelect">管理單位</label>
+            <div class="login-select-wrapper">
+              <select id="loginBranchUnitSelect" class="login-form-select">
+                <option value="">請選擇管理單位</option>
+                <option value="1">第一區管理處 (基隆、新北)</option>
+                <option value="2">第二區管理處 (桃園、新北)</option>
+                <option value="3">第三區管理處 (新竹、苗栗)</option>
+                <option value="4">第四區管理處 (台中、南投)</option>
+                <option value="5">第五區管理處 (嘉義、雲林)</option>
+                <option value="6">第六區管理處 (台南)</option>
+                <option value="7">第七區管理處 (高雄、澎湖)</option>
+                <option value="8">第八區管理處 (宜蘭)</option>
+                <option value="9">第九區管理處 (花蓮)</option>
+                <option value="10">第十區管理處 (台東)</option>
+                <option value="11">第十一區管理處 (彰化)</option>
+                <option value="12">第十二區管理處 (新北)</option>
+              </select>
+              <i class="fa-solid fa-chevron-down select-arrow-icon"></i>
+            </div>
+          </div>
+
+          <!-- 地區 (區管理處專屬欄位) -->
+          <div class="login-form-group branch-only-field" id="branchRegionGroup" style="display: none;">
+            <label class="login-form-label" for="loginBranchRegionSelect">地區</label>
+            <div class="login-select-wrapper">
+              <select id="loginBranchRegionSelect" class="login-form-select">
+                <option value="">請選擇地區</option>
+                <option value="reg-all">全部轄區</option>
+                <option value="reg-1">基隆服務所 / 汐止營運所</option>
+                <option value="reg-2">桃園服務所 / 中壢服務所</option>
+                <option value="reg-3">新竹服務所 / 竹東營運所</option>
+                <option value="reg-4">台中服務所 / 豐原給水廠</option>
+                <option value="reg-5">嘉義服務所 / 斗六營運所</option>
+                <option value="reg-6">台南服務所 / 新營營運所</option>
+                <option value="reg-7">高雄給水廠 / 楠梓服務所</option>
+              </select>
+              <i class="fa-solid fa-chevron-down select-arrow-icon"></i>
+            </div>
+          </div>
+
+          <!-- 帳號 -->
+          <div class="login-form-group">
+            <label class="login-form-label" for="loginUsername">帳號</label>
+            <input type="text" id="loginUsername" class="login-form-input" placeholder="請輸入帳號" autocomplete="username">
+          </div>
+
+          <!-- 密碼 -->
+          <div class="login-form-group">
+            <label class="login-form-label" for="loginPassword">密碼</label>
+            <input type="password" id="loginPassword" class="login-form-input" placeholder="請輸入密碼" autocomplete="current-password">
+          </div>
+
+          <!-- 驗證碼 -->
+          <div class="login-form-group">
+            <label class="login-form-label" for="loginCaptcha">驗證碼</label>
+            <div class="captcha-input-row">
+              <input type="text" id="loginCaptcha" class="login-form-input captcha-input-field" placeholder="驗證碼" maxlength="5">
+              <div class="captcha-display-box" id="captchaDisplayBox" title="點擊刷新驗證碼">
+                <span class="captcha-code-text" id="captchaCodeText">95172</span>
+              </div>
+              <button type="button" id="refreshCaptchaBtn" class="captcha-refresh-btn" title="重新產生驗證碼">
+                <i class="fa-solid fa-arrows-rotate"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- 登入按鈕 -->
+          <div class="login-action-group">
+            <button type="submit" id="submitLoginBtn" class="btn-login-submit">登入</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 選擇應變事件 浮動視窗 (淺藍科技風格，參照登入視窗設計) -->
+    <div id="eventSelectModal" class="modal-overlay event-modal-overlay" aria-hidden="true">
+      <div class="event-modal-box" role="dialog" aria-modal="true" aria-labelledby="eventModalTitle">
+        <!-- 頂部標頭 -->
+        <div class="event-modal-header">
+          <div class="event-brand-group">
+            <img src="logo/Taiwan_Water_Corporation_Seal.svg.webp" alt="台灣自來水公司標誌" class="event-logo-img">
+            <div class="event-brand-text">
+              <span class="company-zh">台灣自來水公司</span>
+              <span class="company-en">TAIWAN WATER CORPORATION</span>
+            </div>
+          </div>
+          <h2 class="event-system-title" id="eventModalTitle">請選擇應變事件</h2>
+          <button id="closeEventModalBtn" class="event-close-btn" type="button" title="關閉視窗">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="event-modal-divider"></div>
+
+        <!-- 開設狀態切換頁籤 (開設中 / 已撤除) -->
+        <div class="event-tabs">
+          <button type="button" class="event-tab-btn active" data-status="active">開設中事件</button>
+          <button type="button" class="event-tab-btn" data-status="closed">已撤除事件</button>
+        </div>
+
+        <!-- 事件選擇表單區 -->
+        <div class="event-form-group">
+          <div class="event-label-row">
+            <label class="event-form-label" for="incidentSelectDropdown">應變事件清單</label>
+            <button type="button" id="refreshEventListBtn" class="btn-event-refresh" title="重新整理事件清單">
+              <i class="fa-solid fa-arrows-rotate"></i> 更新
+            </button>
+          </div>
+          <div class="event-select-wrapper">
+            <select id="incidentSelectDropdown" class="event-form-select">
+              <option value="農業部萬里溪堰塞湖-災害緊急應變小組">農業部萬里溪堰塞湖-災害緊急應變小組</option>
+              <option value="0831豪雨">0831豪雨</option>
+              <option value="山陀兒颱風應變專案">山陀兒颱風應變專案</option>
+              <option value="南部地區水情乾旱專案應變小組">南部地區水情乾旱專案應變小組</option>
+            </select>
+            <i class="fa-solid fa-chevron-down select-arrow-icon"></i>
+          </div>
+        </div>
+
+        <!-- 確定切換按鈕 (居中水藍按鈕) -->
+        <div class="event-action-group">
+          <button type="button" id="confirmEventSwitchBtn" class="btn-event-submit">確定切換</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 停水清冊 Modal -->
+    <div id="outageModal" class="modal-overlay">
+      <div class="modal-container">
+        <div class="modal-header">
+          <div class="modal-title"><i class="fa-solid fa-triangle-exclamation text-danger"></i> 重要停水地區清冊</div>
+          <button id="closeOutageModalBtn" class="btn-icon"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+          <p>停水詳細資料載入完成。</p>
+        </div>
+      </div>
+    </div>
+
+  <!-- 邏輯腳本載入 -->
+  <script src="js/main.js"></script>
+</body>
+</html>

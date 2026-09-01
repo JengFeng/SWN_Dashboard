@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>客服進線狀況 (客服進線分析) - 智慧水網戰情平台</title>
+  
+  <!-- Google Fonts: Inter, Roboto, Noto Sans TC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;600;700;900&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Leaflet GIS 地圖套件 CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  
+  <!-- 核心全域樣式表 -->
+  <link rel="stylesheet" href="css/style.css">
+  <!-- 客服進線狀況專屬樣式表 -->
+  <link rel="stylesheet" href="css/customer-service.css">
+</head>
+<body class="font-md">
+  
+  <!-- 側邊欄抽屜 (Sidebar Drawer) -->
+  <aside id="sidebarDrawer" class="sidebar-drawer" aria-label="系統導航">
+    <div class="sidebar-header">
+      <div class="logo-box">
+        <img src="logo/Taiwan_Water_Corporation_Seal.svg.webp" alt="台水標誌" class="sidebar-logo-img">
+        <span>應變事件情資</span>
+      </div>
+      <button id="closeSidebarBtn" class="btn-icon" title="關閉選單">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <nav class="sidebar-menu">
+      <a href="index.html" class="menu-item">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>災情事件彙總</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-solid fa-hurricane"></i>
+        <span>颱風路徑動態圖</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-solid fa-cloud-showers-heavy"></i>
+        <span>雨量資訊</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-solid fa-house-flood-water"></i>
+        <span>海水警戒</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-solid fa-cloud-bolt"></i>
+        <span>降雨預報</span>
+      </a>
+      <a href="#" class="menu-item">
+        <i class="fa-solid fa-hill-rockslide"></i>
+        <span>土石流警戒</span>
+      </a>
+      
+      <!-- 外部情資 (點擊展開下拉子選單) -->
+      <div class="sidebar-dropdown">
+        <button type="button" class="menu-item dropdown-toggle" id="sidebarExternalToggle" aria-expanded="false">
+          <i class="fa-solid fa-globe"></i>
+          <span>外部情資</span>
+          <i class="fa-solid fa-caret-down dropdown-arrow"></i>
+        </button>
+        <div class="sidebar-submenu" id="sidebarExternalSubmenu">
+          <a href="#" class="submenu-item"><i class="fa-solid fa-cloud-sun"></i> <span>氣象署氣象情資</span></a>
+          <a href="#" class="submenu-item"><i class="fa-solid fa-bell"></i> <span>NCDR 災防情資</span></a>
+          <a href="#" class="submenu-item"><i class="fa-solid fa-water"></i> <span>水利署水情資訊</span></a>
+          <a href="#" class="submenu-item"><i class="fa-solid fa-bolt"></i> <span>台電電力狀況</span></a>
+          <a href="#" class="submenu-item"><i class="fa-solid fa-road"></i> <span>公路局災阻情資</span></a>
+        </div>
+      </div>
+    </nav>
+  </aside>
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <div class="app-layout">
+    
+    <!-- 頂部導航列 (Header - 與 index.html / supply-overview.html 100% 統一規範) -->
+    <header class="main-header">
+      <div class="header-left">
+        <!-- 側邊欄展開切換鈕 -->
+        <button id="openSidebarBtn" class="btn-icon header-toggle-btn" title="展開選單">
+          <i class="fa-solid fa-angles-left"></i>
+        </button>
+        <!-- 機關單位 Logo 與標題 -->
+        <div class="brand-title">
+          <div class="brand-logo">
+            <img src="logo/Taiwan_Water_Corporation_Seal.svg.webp" alt="台灣自來水公司標誌" class="brand-logo-img">
+          </div>
+          <span class="title-text" id="headerTitleText">總管理處-平時</span>
+          <button id="globalSearchBtn" class="btn-icon search-trigger-btn" title="選擇應變事件">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </div>
+
+        <!-- 頂部主模組切換下拉選單 -->
+        <div class="dropdown-wrapper">
+          <button id="viewDropdownBtn" class="dropdown-btn primary-dropdown">
+            <span id="currentViewText">客服進線分析</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          
+          <!-- 選單容器 -->
+          <div id="viewDropdownMenu" class="cascading-menu-wrapper">
+            <ul class="cascading-menu-level1">
+              <!-- 1. 今日營運概況 (首頁入口) -->
+              <li class="menu-direct-item" data-title="今日營運概況" onclick="location.href='index.html'">
+                <span>今日營運概況</span>
+              </li>
+
+              <!-- 2. 供水營運概況 (保留子選單) -->
+              <li class="menu-parent-item" data-parent="water-supply">
+                <span>供水營運概況</span>
+                <i class="fa-solid fa-caret-right"></i>
+                
+                <ul class="cascading-menu-level2">
+                  <li class="menu-sub-item" onclick="location.href='supply-overview.html'">
+                    <span class="sub-text">全台供水狀況總覽</span>
+                    <i class="fa-regular fa-circle radio-icon"></i>
+                  </li>
+                  <li class="menu-sub-item" onclick="location.href='supply-overview.html#tab-dispatch'">
+                    <span class="sub-text">跨區水源調度</span>
+                    <i class="fa-regular fa-circle radio-icon"></i>
+                  </li>
+                  <li class="menu-sub-item" onclick="location.href='supply-overview.html#tab-reservoir'">
+                    <span class="sub-text">水庫蓄水量</span>
+                    <i class="fa-regular fa-circle radio-icon"></i>
+                  </li>
+                </ul>
+              </li>
+
+              <!-- 3. 客服進線狀況 (當前啟用) -->
+              <li class="menu-direct-item active" data-title="客服進線狀況" onclick="location.href='customer-service.html'">
+                <span>客服進線狀況</span>
+              </li>
+
+              <!-- 4. 事件應變情資 (單一功能，無子選單) -->
+              <li class="menu-direct-item" data-title="事件應變情資">
+                <span>事件應變情資</span>
+              </li>
+
+              <!-- 5. 綜合案件分析 (單一功能，點擊跳轉至綜合案件分析) -->
+              <li class="menu-direct-item" data-title="綜合案件分析" onclick="location.href='case-analysis.html'">
+                <span>綜合案件分析</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 中央公告跑馬燈 (紅字輿情重點警示) -->
+      <div class="header-center">
+        <div class="alert-badge">
+          <span class="pulse-dot"></span>
+        </div>
+        <div class="announcement-content">
+          <span class="announcement-text" id="announcementTicker"><strong style="color: #ef4444;">4區、11區、7區</strong>顯示相關輿情反映熱區，請留意。</span>
+        </div>
+      </div>
+
+      <!-- 右側使用者與字級調整欄 -->
+      <div class="header-right">
+        
+        <!-- 字級調整控制器 (預設為中字級，支援寬版按鈕與 RWD 下拉式選取) -->
+        <div class="font-size-controller" title="調整全站字級大小">
+          <span class="fs-label">字級</span>
+          <div class="fs-options">
+            <button type="button" class="fs-btn" data-size="sm">小</button>
+            <button type="button" class="fs-btn active" data-size="md">中</button>
+            <button type="button" class="fs-btn" data-size="lg">大</button>
+          </div>
+          <div class="fs-select-wrap">
+            <select id="fontSizeSelect" class="fs-select" aria-label="選擇字級大小">
+              <option value="sm">小</option>
+              <option value="md" selected>中</option>
+              <option value="lg">大</option>
+            </select>
+            <i class="fa-solid fa-chevron-down fs-select-arrow"></i>
+          </div>
+        </div>
+
+        <!-- 視圖切換快捷按鈕 -->
+        <div class="view-switch-group">
+          <button class="btn-icon" title="切換回儀表板總覽" onclick="location.href='index.html'"><i class="fa-solid fa-table-cells-large"></i></button>
+          <button class="btn-icon active" title="客服進線地圖圖台"><i class="fa-solid fa-map-location-dot"></i></button>
+        </div>
+
+        <!-- 登入使用者狀態 -->
+        <div class="user-status-card">
+          <div class="user-meta">
+            <span class="user-role-badge">一般使用者</span>
+            <span class="login-timestamp">2026/05/23 14:45</span>
+          </div>
+          <div class="avatar-box">
+            <img src="img/user-avatar.png" alt="使用者頭像" class="user-avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%230284c7\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>'">
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. 主工作區 (主地圖 + 右側清單 + 底部趨勢圖與輿情新聞) -->
+    <main class="cs-main-layout">
+      
+      <!-- 上半部：主工作區 (左側大地圖 + 右側進線案件清單) -->
+      <section class="cs-top-section">
+        
+        <!-- 左側 Google Map GIS 輿情地圖圖台工作區 -->
+        <div class="cs-map-wrapper" id="csMapContainer">
+          
+          <!-- Google Maps 實體圖台容器 -->
+          <div id="csGoogleMap" class="cs-google-map"></div>
+
+          <!-- 地圖左上角：客服案件圖例 -->
+          <div class="cs-floating-legend legend-cases">
+            <div class="legend-hdr">客服案件圖例</div>
+            <div class="legend-body case-legend-body">
+              <div class="case-badge-item">
+                <div class="case-pin pin-emergency"><i class="fa-solid fa-exclamation"></i></div>
+                <span class="pin-label">緊急</span>
+              </div>
+              <div class="case-badge-item">
+                <div class="case-pin pin-normal"><i class="fa-solid fa-exclamation"></i></div>
+                <span class="pin-label">一般</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 地圖左側第二層：輿情分析圖例 -->
+          <div class="cs-floating-legend legend-sentiment">
+            <div class="legend-hdr">輿情分析圖例</div>
+            <div class="legend-body sentiment-legend-body">
+              <div class="sentiment-item"><span class="sentiment-rect rect-red"></span><span>大於 20 件</span></div>
+              <div class="sentiment-item"><span class="sentiment-rect rect-yellow"></span><span>10 ~ 20 件</span></div>
+              <div class="sentiment-item"><span class="sentiment-rect rect-blue"></span><span>小於 10 件</span></div>
+            </div>
+          </div>
+
+          <!-- 地圖左下角：點擊行政區資訊浮動彈窗 (依截圖呈現) -->
+          <div class="cs-district-popup" id="districtPopup">
+            <div class="popup-hdr">
+              <div class="popup-title-select">
+                <span>4區_鄉鎮市區界(admin) (距離 : 0.00m)</span>
+                <i class="fa-solid fa-chevron-down"></i>
+              </div>
+              <button class="popup-close-btn" id="closePopupBtn" type="button" title="關閉"><i class="fa-solid fa-circle-xmark"></i></button>
+            </div>
+            <div class="popup-table-wrap">
+              <table class="popup-table">
+                <thead>
+                  <tr>
+                    <th>項目</th>
+                    <th>內容</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>縣市名</td>
+                    <td>臺中市</td>
+                  </tr>
+                  <tr>
+                    <td>鄉鎮市區名</td>
+                    <td>大肚區</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 地圖右下角浮動工具按鈕 (圖層切換 & AI 智慧助理) -->
+          <div class="cs-map-fab-group">
+            <button class="fab-map-btn btn-layer-toggle" id="fabLayerToggle" title="圖層切換 (衛星/道路)">
+              <i class="fa-solid fa-layer-group"></i>
+            </button>
+            <button class="fab-map-btn btn-ai-robot" id="fabAiRobot" title="智慧水網 AI 助理">
+              <div class="robot-avatar-wrap">
+                <i class="fa-solid fa-robot"></i>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- 右側：進線案件清單面板 -->
+        <aside class="cs-cases-sidebar" id="csCasesSidebar">
+          <div class="sidebar-header">
+            <h3 class="sidebar-title">進線案件清單</h3>
+            <div class="sidebar-actions">
+              <button class="btn-cs-action" id="btnMoreCases" type="button">更多</button>
+              <button class="btn-cs-action btn-cs-primary" id="btnCreateCase" type="button">成立案件</button>
+            </div>
+          </div>
+
+          <!-- 案件清單表格 (可垂直滾動) -->
+          <div class="sidebar-table-scroll">
+            <table class="cs-cases-table" id="csCasesTable">
+              <thead>
+                <tr>
+                  <th>鄉鎮市區</th>
+                  <th>案件時間</th>
+                  <th>案件編號</th>
+                  <th>案件狀態</th>
+                </tr>
+              </thead>
+              <tbody id="csCasesTableBody">
+                <tr class="case-row" data-id="20260259955">
+                  <td class="td-town">東區</td>
+                  <td class="td-time">12日<br>12:42</td>
+                  <td class="td-code">20260259955</td>
+                  <td class="td-status"><span class="status-badge st-unforward">未後送</span></td>
+                </tr>
+                <tr class="case-row" data-id="20260259945">
+                  <td class="td-town">未填鄉鎮市區</td>
+                  <td class="td-time">12日<br>12:37</td>
+                  <td class="td-code">20260259945</td>
+                  <td class="td-status"><span class="status-badge st-unforward">未後送</span></td>
+                </tr>
+                <tr class="case-row" data-id="20260259934">
+                  <td class="td-town">西屯區</td>
+                  <td class="td-time">12日<br>12:34</td>
+                  <td class="td-code">20260259934</td>
+                  <td class="td-status"><span class="status-badge st-done">處理完成結案</span></td>
+                </tr>
+                <tr class="case-row" data-id="20260259929">
+                  <td class="td-town">北屯區</td>
+                  <td class="td-time">12日<br>12:31</td>
+                  <td class="td-code">20260259929</td>
+                  <td class="td-status"><span class="status-badge st-unforward">未後送</span></td>
+                </tr>
+                <tr class="case-row" data-id="20260259919">
+                  <td class="td-town">北屯區</td>
+                  <td class="td-time">12日<br>12:29</td>
+                  <td class="td-code">20260259919</td>
+                  <td class="td-status"><span class="status-badge st-unforward">未後送</span></td>
+                </tr>
+                <tr class="case-row" data-id="20260259921">
+                  <td class="td-town">外埔區</td>
+                  <td class="td-time">12日<br>12:29</td>
+                  <td class="td-code">20260259921</td>
+                  <td class="td-status"><span class="status-badge st-processing">待確認處理中</span></td>
+                </tr>
+                <tr class="case-row" data-id="20260259916">
+                  <td class="td-town">南屯區</td>
+                  <td class="td-time">12日<br>12:28</td>
+                  <td class="td-code">20260259916</td>
+                  <td class="td-status"><span class="status-badge st-unforward">未後送</span></td>
+                </tr>
+                <tr class="case-row" data-id="20260259910">
+                  <td class="td-town">西區</td>
+                  <td class="td-time">12日<br>12:27</td>
+                  <td class="td-code">20260259910</td>
+                  <td class="td-status"><span class="status-badge st-unforward">未後送</span></td>
+                </tr>
+                <tr class="case-row" data-id="20260259899">
+                  <td class="td-town">北屯區</td>
+                  <td class="td-time">12日<br>12:21</td>
+                  <td class="td-code">20260259899</td>
+                  <td class="td-status"><span class="status-badge st-unforward">未後送</span></td>
+                </tr>
+                <tr class="case-row" data-id="20260259897">
+                  <td class="td-town">大里區</td>
+                  <td class="td-time">12日<br>12:21</td>
+                  <td class="td-code">20260259897</td>
+                  <td class="td-status"><span class="status-badge st-unforward">未後送</span></td>
+                </tr>
+                <tr class="case-row" data-id="20260259889">
+                  <td class="td-town">豐原區</td>
+                  <td class="td-time">12日<br>12:16</td>
+                  <td class="td-code">20260259889</td>
+                  <td class="td-status"><span class="status-badge st-processing">待確認處理中</span></td>
+                </tr>
+                <tr class="case-row" data-id="20260259878">
+                  <td class="td-town">南區</td>
+                  <td class="td-time">12日<br>12:16</td>
+                  <td class="td-code">20260259878</td>
+                  <td class="td-status"><span class="status-badge st-unforward">未後送</span></td>
+                </tr>
+                <tr class="case-row" data-id="20260259876">
+                  <td class="td-town">北屯區</td>
+                  <td class="td-time">12日<br>12:10</td>
+                  <td class="td-code">20260259876</td>
+                  <td class="td-status"><span class="status-badge st-unforward">未後送</span></td>
+                </tr>
+                <tr class="case-row" data-id="20260259874">
+                  <td class="td-town">北屯區</td>
+                  <td class="td-time">12日<br>12:09</td>
+                  <td class="td-code">20260259874</td>
+                  <td class="td-status"><span class="status-badge st-unforward">未後送</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </aside>
+      </section>
+
+      <!-- 下半部：底部面板 (左側客服進線趨勢圖 + 右側白海豚颱風輿情新聞) -->
+      <section class="cs-bottom-section">
+        
+        <!-- 底部左卡片：客服進線趨勢圖 (長條圖) -->
+        <div class="cs-trend-card">
+          <div class="card-top-bar">
+            <h4 class="card-heading">客服進線趨勢圖</h4>
+            <div class="scale-selector">
+              <span class="scale-lbl">時間刻度</span>
+              <div class="scale-dropdown-wrap">
+                <select class="scale-select" id="timeScaleSelect">
+                  <option value="10" selected>10分鐘</option>
+                  <option value="15">15分鐘</option>
+                  <option value="30">30分鐘</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 長條圖繪製容器 (Chart.js / SVG 高保真長條圖) -->
+          <div class="trend-chart-container" id="trendChartContainer">
+            <canvas id="csTrendChart"></canvas>
+          </div>
+        </div>
+
+        <!-- 底部右卡片：白海豚颱風 | 輿情新聞 -->
+        <div class="cs-news-card">
+          <div class="card-top-bar news-top-bar">
+            <div class="news-title-group">
+              <h4 class="card-heading">白海豚颱風 ｜ 輿情新聞</h4>
+              <span class="news-update-time">資料更新時間：2026年7月</span>
+            </div>
+          </div>
+
+          <!-- 輿情新聞列表表格 -->
+          <div class="news-table-wrap">
+            <table class="cs-news-table">
+              <thead>
+                <tr>
+                  <th class="th-news-time">時間</th>
+                  <th class="th-news-title">標題</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="news-row">
+                  <td class="td-news-time">2026/07/24</td>
+                  <td class="td-news-title"><a href="javascript:void(0)" class="news-link">天氣／又有新颱風！「白海豚」最快週日生成 預測路徑曝光</a></td>
+                </tr>
+                <tr class="news-row">
+                  <td class="td-news-time">2026/07/28</td>
+                  <td class="td-news-title"><a href="javascript:void(0)" class="news-link">白海豚颱風「升級中颱」！本周持續挑戰強颱 氣象署最新路徑預估</a></td>
+                </tr>
+                <tr class="news-row">
+                  <td class="td-news-time">2026/07/28</td>
+                  <td class="td-news-title"><a href="javascript:void(0)" class="news-link">4地明雨來襲！中颱白海豚最快明增強颱 下週繼續高溫36度</a></td>
+                </tr>
+                <tr class="news-row">
+                  <td class="td-news-time">2026/07/29</td>
+                  <td class="td-news-title"><a href="javascript:void(0)" class="news-link">颱風白海豚爆發性增強挑戰強颱 吳德榮：有機會超越巴威登今年風王</a></td>
+                </tr>
+                <tr class="news-row">
+                  <td class="td-news-time">2026/07/31</td>
+                  <td class="td-news-title"><a href="javascript:void(0)" class="news-link">颱風白海豚估下週後半靠近台灣 影響程度仍存在不確定性</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- 緊急應變戰情儀表板 登入浮動視窗 (淺藍風格) -->
+  <div id="loginModal" class="modal-overlay login-modal-overlay" aria-hidden="true">
+    <div class="login-modal-box" role="dialog" aria-modal="true" aria-labelledby="loginSystemTitle">
+      <!-- 頂部標頭 -->
+      <div class="login-modal-header">
+        <div class="login-brand-group">
+          <img src="logo/Taiwan_Water_Corporation_Seal.svg.webp" alt="台灣自來水公司標誌" class="login-logo-img">
+          <div class="login-brand-text">
+            <span class="company-zh">台灣自來水公司</span>
+            <span class="company-en">TAIWAN WATER CORPORATION</span>
+          </div>
+        </div>
+        <h2 class="login-system-title" id="loginSystemTitle">緊急應變戰情儀表板</h2>
+        <button id="closeLoginModalBtn" class="login-close-btn" type="button" title="關閉視窗">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="login-modal-divider"></div>
+
+      <!-- 單位切換頁籤 -->
+      <div class="login-tabs">
+        <button type="button" class="login-tab-btn active" data-unit="hq">總管理處</button>
+        <button type="button" class="login-tab-btn" data-unit="branch">區管理處</button>
+      </div>
+
+      <!-- 登入表單 -->
+      <form class="login-form" id="loginForm" onsubmit="event.preventDefault();">
+        <!-- 登入方式 -->
+        <div class="login-form-group">
+          <label class="login-form-label" for="loginMethodSelect">登入方式</label>
+          <div class="login-select-wrapper">
+            <select id="loginMethodSelect" class="login-form-select">
+              <option value="local">本機登入</option>
+              <option value="sso">公務 SSO 單一簽入</option>
+              <option value="ad">AD 網域驗證</option>
+            </select>
+            <i class="fa-solid fa-chevron-down select-arrow-icon"></i>
+          </div>
+        </div>
+
+        <!-- 管理單位 (區管理處專屬欄位) -->
+        <div class="login-form-group branch-only-field" id="branchUnitGroup" style="display: none;">
+          <label class="login-form-label" for="loginBranchUnitSelect">管理單位</label>
+          <div class="login-select-wrapper">
+            <select id="loginBranchUnitSelect" class="login-form-select">
+              <option value="">請選擇管理單位</option>
+              <option value="1">第一區管理處 (基隆、新北)</option>
+              <option value="2">第二區管理處 (桃園、新北)</option>
+              <option value="3">第三區管理處 (新竹、苗栗)</option>
+              <option value="4">第四區管理處 (台中、南投)</option>
+              <option value="5">第五區管理處 (嘉義、雲林)</option>
+              <option value="6">第六區管理處 (台南)</option>
+              <option value="7">第七區管理處 (高雄、澎湖)</option>
+              <option value="8">第八區管理處 (宜蘭)</option>
+              <option value="9">第九區管理處 (花蓮)</option>
+              <option value="10">第十區管理處 (台東)</option>
+              <option value="11">第十一區管理處 (彰化)</option>
+              <option value="12">第十二區管理處 (新北)</option>
+            </select>
+            <i class="fa-solid fa-chevron-down select-arrow-icon"></i>
+          </div>
+        </div>
+
+        <!-- 帳號 -->
+        <div class="login-form-group">
+          <label class="login-form-label" for="loginUsername">帳號</label>
+          <input type="text" id="loginUsername" class="login-form-input" placeholder="請輸入帳號" autocomplete="username">
+        </div>
+
+        <!-- 密碼 -->
+        <div class="login-form-group">
+          <label class="login-form-label" for="loginPassword">密碼</label>
+          <input type="password" id="loginPassword" class="login-form-input" placeholder="請輸入密碼" autocomplete="current-password">
+        </div>
+
+        <!-- 驗證碼 -->
+        <div class="login-form-group">
+          <label class="login-form-label" for="loginCaptcha">驗證碼</label>
+          <div class="captcha-input-row">
+            <input type="text" id="loginCaptcha" class="login-form-input captcha-input-field" placeholder="驗證碼" maxlength="5">
+            <div class="captcha-display-box" id="captchaDisplayBox" title="點擊刷新驗證碼">
+              <span class="captcha-code-text" id="captchaCodeText">95172</span>
+            </div>
+            <button type="button" id="refreshCaptchaBtn" class="captcha-refresh-btn" title="重新產生驗證碼">
+              <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 登入按鈕 -->
+        <div class="login-action-group">
+          <button type="submit" id="submitLoginBtn" class="btn-login-submit">登入</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 選擇應變事件 浮動視窗 (淺藍科技風格) -->
+  <div id="eventSelectModal" class="modal-overlay event-modal-overlay" aria-hidden="true">
+    <div class="event-modal-box" role="dialog" aria-modal="true" aria-labelledby="eventModalTitle">
+      <div class="event-modal-header">
+        <div class="event-brand-group">
+          <img src="logo/Taiwan_Water_Corporation_Seal.svg.webp" alt="台灣自來水公司標誌" class="event-logo-img">
+          <div class="event-brand-text">
+            <span class="company-zh">台灣自來水公司</span>
+            <span class="company-en">TAIWAN WATER CORPORATION</span>
+          </div>
+        </div>
+        <h2 class="event-system-title" id="eventModalTitle">請選擇應變事件</h2>
+        <button id="closeEventModalBtn" class="event-close-btn" type="button" title="關閉視窗">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="event-modal-divider"></div>
+
+      <div class="event-tabs">
+        <button type="button" class="event-tab-btn active" data-status="active">開設中事件</button>
+        <button type="button" class="event-tab-btn" data-status="closed">已撤除事件</button>
+      </div>
+
+      <div class="event-form-group">
+        <div class="event-label-row">
+          <label class="event-form-label" for="incidentSelectDropdown">應變事件清單</label>
+          <button type="button" id="refreshEventListBtn" class="btn-event-refresh" title="重新整理事件清單">
+            <i class="fa-solid fa-arrows-rotate"></i> 更新
+          </button>
+        </div>
+        <div class="event-select-wrapper">
+          <select id="incidentSelectDropdown" class="event-form-select">
+            <option value="農業部萬里溪堰塞湖-災害緊急應變小組">農業部萬里溪堰塞湖-災害緊急應變小組</option>
+            <option value="0831豪雨">0831豪雨</option>
+            <option value="山陀兒颱風應變專案">山陀兒颱風應變專案</option>
+            <option value="南部地區水情乾旱專案應變小組">南部地區水情乾旱專案應變小組</option>
+          </select>
+          <i class="fa-solid fa-chevron-down select-arrow-icon"></i>
+        </div>
+      </div>
+
+      <div class="event-action-group">
+        <button type="button" id="confirmEventSwitchBtn" class="btn-event-submit">確定切換</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 成立案件互動 Modal 彈窗 -->
+  <div id="createCaseModal" class="modal-overlay cs-modal-overlay" aria-hidden="true">
+    <div class="cs-modal-box" role="dialog" aria-modal="true" aria-labelledby="createCaseTitle">
+      <div class="cs-modal-header">
+        <h3 id="createCaseTitle"><i class="fa-solid fa-headset text-primary"></i> 成立新客服進線案件</h3>
+        <button class="cs-modal-close" id="closeCreateCaseBtn" type="button"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form class="cs-modal-form" id="createCaseForm" onsubmit="event.preventDefault();">
+        <div class="form-row">
+          <label>案件編號</label>
+          <input type="text" class="cs-input" id="newCaseCode" value="20260259999" readonly>
+        </div>
+        <div class="form-row">
+          <label>所屬鄉鎮市區</label>
+          <select class="cs-select" id="newCaseTown">
+            <option value="西屯區">西屯區</option>
+            <option value="北屯區">北屯區</option>
+            <option value="南屯區">南屯區</option>
+            <option value="大肚區">大肚區</option>
+            <option value="外埔區">外埔區</option>
+            <option value="豐原區">豐原區</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>案件層級</label>
+          <div class="cs-radio-group">
+            <label class="radio-lbl"><input type="radio" name="caseLevel" value="normal" checked> 一般案件</label>
+            <label class="radio-lbl text-danger"><input type="radio" name="caseLevel" value="emergency"> 緊急案件</label>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>進線民眾反映內容</label>
+          <textarea class="cs-textarea" id="newCaseContent" rows="3" placeholder="請輸入民眾反映之供水、水壓或水質異常狀況..."></textarea>
+        </div>
+        <div class="cs-modal-footer">
+          <button type="button" class="btn-cancel" id="cancelCaseBtn">取消</button>
+          <button type="button" class="btn-submit" id="submitCaseBtn">確認成立並後送</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Leaflet GIS JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Chart.js 圖表套件 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  
+  <!-- 全域與專屬腳本 -->
+  <script src="js/main.js"></script>
+  <script src="js/customer-service.js"></script>
+</body>
+</html>

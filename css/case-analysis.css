@@ -1,0 +1,1264 @@
+/* ==========================================================================
+   綜合案件分析 (case-analysis.html) - 專屬樣式表 (css/case-analysis.css)
+   ========================================================================== */
+
+/* 1. 主工作區總體容器 (Flex 左右佈局) */
+.analysis-main-container {
+  display: flex;
+  height: calc(100vh - 64px);
+  width: 100%;
+  overflow: hidden;
+  background-color: #f0f4f8;
+  position: relative;
+}
+
+/* ==========================================================================
+   2. 左側查詢與篩選面板 (Filter Sidebar)
+   ========================================================================== */
+.filter-sidebar {
+  width: 250px;
+  min-width: 250px;
+  max-width: 250px;
+  background: #ffffff;
+  border-right: 1.5px solid #dbeafe;
+  padding: 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 2px 0 8px rgba(15, 23, 42, 0.03);
+  z-index: 20;
+}
+
+.filter-sidebar.collapsed {
+  width: 0 !important;
+  min-width: 0 !important;
+  max-width: 0 !important;
+  padding: 12px 0 !important;
+  border-right: none !important;
+  overflow: hidden !important;
+}
+
+/* 4. 垂直分割條與收合按鈕 (與 supply-overview.css 100% 一致) */
+.panel-resizer-bar {
+  width: 12px;
+  margin: 0 -6px;
+  background: transparent;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+  transition: background-color 0.2s ease;
+}
+
+.panel-resizer-bar:hover {
+  background: rgba(2, 132, 199, 0.2);
+}
+
+.resizer-line {
+  width: 2px;
+  height: 100%;
+  background: #cbd5e1;
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.panel-resizer-bar:hover .resizer-line {
+  background: #0284c7;
+  width: 3px;
+  box-shadow: 0 0 8px rgba(2, 132, 199, 0.6);
+}
+
+/* 內嵌面板收合按鈕 (與 supply-overview.html 完全一致) */
+.collapse-toggle-bar {
+  position: absolute;
+  top: 50%;
+  left: 6px;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 48px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #475569;
+  box-shadow: 3px 0 8px rgba(0, 0, 0, 0.1);
+  z-index: 35;
+  transition: all 0.2s ease;
+}
+
+.collapse-toggle-bar:hover {
+  background: #f1f5f9;
+  color: #0284c7;
+  width: 24px;
+}
+
+.collapse-toggle-bar.collapsed i {
+  transform: rotate(180deg);
+}
+
+/* 查詢模式與維度切換按鈕群 */
+.filter-mode-tabs,
+.filter-dim-tabs {
+  display: flex;
+  border: 1.5px solid #bae6fd;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+.mode-tab-btn,
+.dim-tab-btn {
+  flex: 1;
+  padding: 6px 6px;
+  border: none;
+  background: transparent;
+  color: #0284c7;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+  text-align: center;
+}
+
+.mode-tab-btn.active,
+.dim-tab-btn.active {
+  background: #0284c7;
+  color: #ffffff;
+}
+
+.filter-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filter-field-group.hide {
+  display: none !important;
+}
+
+.field-lbl {
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+  margin-top: 1px;
+}
+
+.filter-dual-row {
+  display: flex;
+  gap: 6px;
+}
+
+.filter-dual-row .field-item {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* 下拉選單通用外框 */
+.custom-select-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.form-select-ctrl {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  right: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  font-size: 10px;
+  pointer-events: none;
+}
+
+.date-range-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-date-input {
+  width: 100%;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 11px;
+  color: #1e293b;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.range-sep {
+  text-align: center;
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 700;
+}
+
+/* 篩選面板底部操作按鈕群 */
+.filter-actions-group {
+  margin-top: auto;
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.btn-action-primary {
+  width: 100%;
+  padding: 6px 0;
+  background: #0284c7;
+  border: none;
+  border-radius: 6px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.3);
+  transition: var(--transition-fast);
+}
+
+.btn-action-primary:hover {
+  background: #0369a1;
+  transform: translateY(-1px);
+}
+
+.btn-action-outline {
+  width: 100%;
+  padding: 5px 0;
+  background: #ffffff;
+  border: 1.5px solid #0284c7;
+  border-radius: 6px;
+  color: #0284c7;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: var(--transition-fast);
+}
+
+.btn-action-outline:hover {
+  background: #f0f9ff;
+  border-color: #0369a1;
+  color: #0369a1;
+}
+
+/* ==========================================================================
+   3. 右側大盤分析儀表板工作區 (Analysis Workspace)
+  padding: 7px 0;
+  background: #ffffff;
+  border: 1.5px solid #0284c7;
+  border-radius: 6px;
+  color: #0284c7;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: var(--transition-fast);
+}
+
+.btn-action-outline:hover {
+  background: #f0f9ff;
+  border-color: #0369a1;
+  color: #0369a1;
+}
+
+/* ==========================================================================
+   3. 右側大盤分析儀表板工作區 (Analysis Workspace)
+   ========================================================================== */
+.analysis-workspace {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px 14px 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-sizing: border-box;
+}
+
+/* 3.1 頂部 4 大 KPI 統計指標卡片列 */
+.kpi-metrics-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.kpi-stat-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.kpi-lbl {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #475569;
+  margin-bottom: 2px;
+}
+
+.kpi-val {
+  font-size: 26px;
+  font-weight: 900;
+  font-family: 'Roboto', 'Noto Sans TC', sans-serif;
+  line-height: 1.1;
+  letter-spacing: 0.5px;
+}
+
+.val-blue   { color: #0284c7; }
+.val-orange { color: #f97316; }
+.val-yellow { color: #d97706; }
+.val-green  { color: #16a34a; }
+
+/* 通用分析卡片 (Analysis Card) */
+.analysis-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.card-header-bar {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: #ffffff;
+}
+
+.card-title-txt {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: 0.2px;
+}
+
+.header-ctrl-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-ctrl-pill {
+  padding: 2px 8px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.btn-ctrl-pill.active {
+  background: #0284c7;
+  border-color: #0284c7;
+  color: #ffffff;
+}
+
+.mini-select .form-select-ctrl {
+  padding: 2px 18px 2px 6px;
+  font-size: 11px;
+  border-radius: 4px;
+  height: 22px;
+}
+
+.btn-pill-group {
+  display: flex;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.btn-pill-group .btn-ctrl-pill {
+  border: none;
+  border-radius: 0;
+  padding: 2px 8px;
+}
+
+.btn-mini-dropdown {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 10px;
+  color: #64748b;
+  cursor: pointer;
+}
+
+}
+
+.btn-mini-dropdown {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 10px;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.card-body-content {
+  flex: 1;
+  padding: 8px 12px;
+  position: relative;
+  min-height: 0;
+  display: flex;
+}
+
+.flex-center {
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+/* 3.2 中段統計分析區 (3 欄佈局：服務類別圓餅 + 案件分布多色圓餅 + 案件熱點 GIS 地圖) */
+.middle-charts-grid {
+  display: grid;
+  grid-template-columns: 28% 44% 28%;
+  gap: 10px;
+  flex: 1.15;
+  min-height: 310px;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.pie-chart-wrap {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pie-dist-chart-wrap {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  height: 100%;
+  position: relative;
+}
+
+/* 圖表分頁圖例導航列 */
+.chart-pagination-legend {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.legend-items-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.legend-badge-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.badge-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.badge-dot-circle {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-page-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.btn-legend-nav {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 1px 3px;
+  transition: color 0.2s;
+}
+
+.btn-legend-nav:hover {
+  color: #0284c7;
+}
+
+.legend-page-txt {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 700;
+}
+
+/* 3.2.1 案件熱點分布 GIS 地圖 */
+.map-heat-container {
+  padding: 0 !important;
+  background: #091b2e;
+  position: relative;
+  overflow: hidden;
+}
+
+.heat-map-canvas-wrap {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, #0f2744 0%, #061220 100%);
+}
+
+.taiwan-heat-svg {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+}
+
+.map-place-lbl {
+  font-size: 10px;
+  fill: #94a3b8;
+  font-weight: 600;
+}
+
+.map-center-lbl {
+  font-size: 12px;
+  fill: #0284c7;
+  font-weight: 800;
+  text-anchor: middle;
+  opacity: 0.8;
+}
+
+.map-scale-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  padding: 2px 6px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 5;
+}
+
+.scale-bar-line {
+  width: 20px;
+  min-height: 0;
+  position: relative;
+}
+
+/* ==========================================================================
+   4. 彈窗樣式 (Case Detail Modal & Export Modal)
+   ========================================================================== */
+.case-modal-overlay {
+  position: fixed;
+  inset: 0;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.case-detail-table th {
+  background: #f8fafc;
+  padding: 8px 10px;
+  color: #475569;
+  font-weight: 700;
+  border-bottom: 1.5px solid #e2e8f0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.case-detail-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #f1f5f9;
+  text-align: center;
+  color: #334155;
+  vertical-align: middle;
+}
+
+.case-detail-table tr:hover {
+  background: #f0f9ff;
+}
+
+.badge-status {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.badge-draft   { background: #ffedd5; color: #ea580c; }
+.badge-pending { background: #fef3c7; color: #d97706; }
+.badge-done    { background: #dcfce7; color: #16a34a; }
+
+.btn-view-link {
+  color: #0284c7;
+  text-decoration: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-view-link:hover {
+  text-decoration: underline;
+}
+
+.case-modal-footer {
+  padding: 10px 18px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footer-page-info {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.modal-pagination {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-pg-nav,
+.btn-pg-num {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #475569;
+  font-size: 11.5px;
+  cursor: pointer;
+}
+
+.btn-pg-num.active {
+  background: #0284c7;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.radio-box input:checked + .radio-card {
+  border-color: #0284c7;
+  background: #f0f9ff;
+  color: #0284c7;
+}
+
+.btn-cancel-modal {
+  padding: 6px 14px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   5. 全站字級階梯縮放適配 (小 / 中[預設] / 大)
+   ========================================================================== */
+
+/* 小字級 (body.font-sm) */
+body.font-sm .kpi-lbl { font-size: 11.5px; }
+body.font-sm .kpi-val { font-size: 22px; }
+body.font-sm .card-title-txt { font-size: 12.5px; }
+body.font-sm .btn-ctrl-pill { font-size: 10px; padding: 2px 6px; }
+body.font-sm .legend-badge-item { font-size: 10px; }
+body.font-sm .field-lbl { font-size: 11px; }
+body.font-sm .form-select-ctrl { font-size: 11px; }
+body.font-sm .case-detail-table { font-size: 11px; }
+
+/* 中字級 (body / body.font-md - 預設基準) */
+body .kpi-lbl, body.font-md .kpi-lbl { font-size: 13px; }
+body .kpi-val, body.font-md .kpi-val { font-size: 26px; }
+body .card-title-txt, body.font-md .card-title-txt { font-size: 14px; }
+body .btn-ctrl-pill, body.font-md .btn-ctrl-pill { font-size: 11.5px; padding: 3px 8px; }
+body .legend-badge-item, body.font-md .legend-badge-item { font-size: 11.5px; }
+body .field-lbl, body.font-md .field-lbl { font-size: 12px; }
+body .form-select-ctrl, body.font-md .form-select-ctrl { font-size: 12.5px; }
+body .case-detail-table, body.font-md .case-detail-table { font-size: 12.5px; }
+
+/* 大字級 (body.font-lg - 明顯放大) */
+body.font-lg .kpi-lbl { font-size: 15px; }
+body.font-lg .kpi-val { font-size: 30px; }
+body.font-lg .card-title-txt { font-size: 16.5px; }
+body.font-lg .btn-ctrl-pill { font-size: 13.5px; padding: 4px 10px; }
+body.font-lg .legend-badge-item { font-size: 13px; }
+body.font-lg .field-lbl { font-size: 14px; }
+body.font-lg .form-select-ctrl { font-size: 14.5px; padding: 7px 24px 7px 10px; }
+body.font-lg .case-detail-table { font-size: 14.5px; }
+
+/* ==========================================================================
+   6. RWD 響應式斷點與排版調適
+body.font-sm .kpi-lbl { font-size: 12px !important; }
+body.font-sm .kpi-val { font-size: 23px !important; }
+body.font-sm .card-title-txt { font-size: 12.5px !important; }
+body.font-sm .btn-ctrl-pill { font-size: 10.5px !important; padding: 2px 6px !important; }
+body.font-sm .legend-badge-item { font-size: 10.5px !important; }
+body.font-sm .case-detail-table { font-size: 11px !important; }
+
+/* 中字級 (body / body.font-md - 預設基準，左右文字尺寸完全對齊一致) */
+body .field-lbl,
+body.font-md .field-lbl { font-size: 13px !important; }
+body.font-sm .btn-action-outline { font-size: 12px !important; padding: 5px 0 !important; }
+
+body.font-sm .kpi-lbl { font-size: 12px !important; }
+body.font-sm .kpi-val { font-size: 23px !important; }
+body.font-sm .card-title-txt { font-size: 12.5px !important; }
+body.font-sm .btn-ctrl-pill { font-size: 10.5px !important; padding: 2px 6px !important; }
+body.font-sm .legend-badge-item { font-size: 10.5px !important; }
+body.font-sm .case-detail-table { font-size: 11px !important; }
+
+/* 中字級 (body / body.font-md - 預設基準，左右文字尺寸完全對齊一致) */
+body .field-lbl,
+body.font-md .field-lbl { font-size: 13px !important; }
+body .mode-tab-btn,
+body.font-md .mode-tab-btn,
+body .dim-tab-btn,
+body.font-md .dim-tab-btn { font-size: 13.5px !important; padding: 6px 6px !important; }
+body .form-select-ctrl,
+body.font-md .form-select-ctrl { font-size: 13.5px !important; padding: 6px 24px 6px 10px !important; }
+body .form-date-input,
+body.font-md .form-date-input { font-size: 12.5px !important; }
+body .btn-action-primary,
+body.font-md .btn-action-primary { font-size: 14.5px !important; padding: 8px 0 !important; }
+body .btn-action-outline,
+body.font-md .btn-action-outline { font-size: 13.5px !important; padding: 7px 0 !important; }
+
+body .kpi-lbl,
+body.font-md .kpi-lbl { font-size: 13.5px !important; }
+body .kpi-val,
+body.font-md .kpi-val { font-size: 28px !important; }
+body .card-title-txt,
+body.font-md .card-title-txt { font-size: 14.5px !important; }
+body .btn-ctrl-pill,
+body.font-md .btn-ctrl-pill { font-size: 12px !important; padding: 3px 8px !important; }
+body .legend-badge-item,
+body.font-md .legend-badge-item { font-size: 12px !important; }
+body .case-detail-table,
+body.font-md .case-detail-table { font-size: 12.5px !important; }
+
+/* 大字級 (body.font-lg - 明顯清晰放大) */
+body.font-lg .field-lbl { font-size: 15.5px !important; }
+body.font-lg .mode-tab-btn,
+body.font-lg .dim-tab-btn { font-size: 15.5px !important; padding: 8px 8px !important; }
+body.font-lg .form-select-ctrl { font-size: 15.5px !important; padding: 8px 26px 8px 12px !important; }
+body.font-lg .form-date-input { font-size: 14.5px !important; }
+body.font-lg .btn-action-primary { font-size: 16.5px !important; padding: 10px 0 !important; }
+body.font-lg .btn-action-outline { font-size: 15.5px !important; padding: 9px 0 !important; }
+
+body.font-lg .kpi-lbl { font-size: 15.5px !important; }
+body.font-lg .kpi-val { font-size: 32px !important; }
+body.font-lg .card-title-txt { font-size: 17px !important; }
+body.font-lg .btn-ctrl-pill { font-size: 14px !important; padding: 4px 10px !important; }
+body.font-lg .legend-badge-item { font-size: 14px !important; }
+body.font-lg .case-detail-table { font-size: 14.5px !important; }
+
+/* ==========================================================================
+   6. RWD 響應式斷點與排版調適
+   ========================================================================== */
+/* ==========================================================================
+   6. RWD 響應式斷點與排版調適 (支援手機單一視圖完全切換)
+   ========================================================================== */
+@media (max-width: 1200px) {
+  .middle-charts-grid {
+    grid-template-columns: 1fr 1fr;
+    height: auto;
+  }
+  .card-hotspot-map {
+    grid-column: span 2;
+    height: 280px;
+  }
+  .bottom-charts-grid {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  .card-connection-trend,
+  .card-town-trend {
+    height: 260px;
+  }
+}
+
+@media (max-width: 900px) {
+  .analysis-main-container {
+    flex-direction: column;
+    overflow-y: auto;
+    height: calc(100vh - 64px);
+    position: relative;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* 模式 A：查詢條件模式 (預設) */
+  .filter-sidebar {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    border-right: none;
+    border-bottom: 1.5px solid #dbeafe;
+    padding: 14px 14px;
+    height: auto;
+    flex-shrink: 0;
+    transition: all 0.2s ease-out;
+  }
+
+  /* 查詢模式下隱藏下方圖表，專注呈現篩選設定 */
+  .analysis-main-container:not(.sidebar-collapsed) .analysis-workspace {
+    display: none !important;
+  }
+
+  /* 模式 B：統計圖表模式 (按下開闔按鈕或查詢後) */
+  .analysis-main-container.sidebar-collapsed .filter-sidebar {
+    display: none !important;
+  }
+
+  .analysis-main-container.sidebar-collapsed .analysis-workspace {
+    display: flex !important;
+    width: 100%;
+    height: auto;
+    padding: 10px 10px 180px 10px !important;
+    overflow: visible;
+  }
+
+  /* 分割條與常駐按鈕在手機 RWD 下的浮動定位 */
+  .panel-resizer-bar {
+    position: static;
+    width: 100%;
+    margin: 0;
+    background: transparent;
+  }
+
+  .resizer-line {
+    display: none;
+  }
+
+  /* 手機版開闔控制按鈕：在查詢條件模式下停靠於左側邊界 */
+  .collapse-toggle-bar {
+    position: absolute;
+    top: 500px;
+    left: 0;
+    width: 26px;
+    height: 48px;
+    background: #ffffff;
+    border: 1.5px solid #0284c7;
+    border-left: none;
+    border-radius: 0 8px 8px 0;
+    color: #0284c7;
+    box-shadow: 2px 3px 10px rgba(2, 132, 199, 0.25);
+    z-index: 100;
+  }
+
+  /* 當處於統計圖表模式時，固定懸浮在螢幕左側 (浮動常駐) */
+  .analysis-main-container.sidebar-collapsed .collapse-toggle-bar {
+    position: fixed;
+    top: 130px;
+    left: 0;
+    z-index: 1000;
+    box-shadow: 2px 4px 14px rgba(0, 0, 0, 0.25);
+  }
+
+  .kpi-metrics-row {
+    grid-template-columns: repeat(2, 1fr);
+    flex: none !important;
+  }
+  
+  .middle-charts-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    gap: 14px !important;
+    width: 100% !important;
+  }
+
+
+  .card-service-category .pie-chart-wrap {
+    height: 240px !important;
+    min-height: 240px !important;
+    width: 100% !important;
+  }
+
+  /* 案件分布統計卡片與多色圓餅圖 (防裁切並保持大尺寸) */
+  .card-case-distribution {
+    height: 360px !important;
+    min-height: 360px !important;
+  }
+
+  .card-case-distribution .card-header-bar {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .card-case-distribution .card-title-txt {
+    width: 100% !important;
+    height: 360px !important;
+    min-height: 360px !important;
+    position: relative !important;
+  }
+
+  .card-case-distribution .card-header-bar {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .card-case-distribution .card-title-txt {
+    font-size: 13px;
+  }
+
+  .card-case-distribution .header-ctrl-group {
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .card-case-distribution .btn-ctrl-pill {
+    padding: 3px 6px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .card-case-distribution .mini-select {
+    min-width: 78px;
+  }
+
+  .card-case-distribution .mini-select .form-select-ctrl {
+    padding: 3px 20px 3px 6px;
+    font-size: 11.5px;
+    height: 24px;
+  }
+
+  .card-case-distribution .pie-dist-chart-wrap {
+    height: 230px !important;
+    min-height: 230px !important;
+    width: 100% !important;
+    position: relative !important;
+  }
+
+  /* 案件熱點分布卡片 (台灣 GIS 熱度圖) */
+  .card-hotspot-map {
+    flex: none !important;
+    width: 100% !important;
+    grid-column: span 1;
+    height: 310px !important;
+    min-height: 310px !important;
+    position: relative !important;
+  }
+
+  .card-hotspot-map .map-heat-container {
+    height: 260px !important;
+    min-height: 260px !important;
+    position: relative !important;
+  }
+
+  .card-hotspot-map .heat-map-canvas-wrap {
+    height: 100% !important;
+    position: relative !important;
+  }
+
+  /* 下段趨勢分析區 */
+  .bottom-charts-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    gap: 14px !important;
+    margin-top: 14px !important;
+    width: 100% !important;
+  }
+
+  /* 連線趨勢分析卡片 */
+  .card-connection-trend {
+    flex: none !important;
+    width: 100% !important;
+    height: 300px !important;
+    min-height: 300px !important;
+    position: relative !important;
+  }
+
+  .card-connection-trend .line-chart-wrap {
+    height: 230px !important;
+    min-height: 230px !important;
+    width: 100% !important;
+    position: relative !important;
+  }
+
+  /* 案件趨勢圖-依縣市鄉鎮卡片 */
+  .card-town-trend {
+    flex: none !important;
+    width: 100% !important;
+    height: 330px !important;
+    min-height: 330px !important;
+    position: relative !important;
+  }
+
+  .card-town-trend .line-chart-wrap {
+    height: 230px !important;
+    min-height: 230px !important;
+    width: 100% !important;
+    position: relative !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .kpi-metrics-row {
+    grid-template-columns: 1fr;
+  }
+  .filter-dual-row {
+    flex-direction: column;
+  }
+  .modal-filter-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-input-box {
+    width: 100%;
+  }
+}
+
