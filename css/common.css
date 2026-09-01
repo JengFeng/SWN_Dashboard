@@ -204,9 +204,10 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
 .header-left {
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
-  white-space: nowrap;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .header-toggle-btn {
@@ -218,15 +219,18 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
 .brand-title {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: #f0fdfa;
   border: 1px solid #ccfbf1;
-  padding: 6px 12px;
+  padding: 6px 10px;
   border-radius: var(--radius-full);
-  flex-shrink: 0;
-  white-space: nowrap;
+  min-width: 0;
+  max-width: 100%;
+  flex-shrink: 1;
+  overflow: hidden;
   height: 38px;
   box-sizing: border-box;
+  cursor: pointer;
 }
 
 .brand-logo {
@@ -253,24 +257,28 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
 
 .title-text {
   font-weight: 700;
-  font-size: 16px;
+  font-size: 15px;
   color: #0f172a;
   letter-spacing: 0.3px;
   white-space: nowrap;
-  flex-shrink: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1;
 }
 
 .search-trigger-btn {
   color: #ef4444;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   flex-shrink: 0;
+  margin-left: 2px;
 }
 
 /* 多層級二級串聯選單樣式 */
 .dropdown-wrapper {
   position: relative;
-  flex-shrink: 0;
+  flex-shrink: 0 !important;
 }
 
 .primary-dropdown {
@@ -1697,7 +1705,8 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
   .header-left {
     gap: 6px;
     min-width: 0;
-    flex-shrink: 1;
+    flex: 1;
+    overflow: hidden;
   }
   .btn-sidebar-toggle {
     width: 30px;
@@ -1708,14 +1717,24 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
   .brand-title {
     padding: 3px 6px;
     gap: 4px;
-    flex-shrink: 0;
+    flex: 1;
+    min-width: 0;
+    max-width: 50%;
+    flex-shrink: 1;
+    overflow: hidden;
   }
   .brand-logo-img {
     width: 18px;
     height: 18px;
+    flex-shrink: 0;
   }
   .title-text {
-    font-size: 12.5px;
+    font-size: 12px;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
   }
   .primary-dropdown {
     padding: 4px 8px;
@@ -1802,6 +1821,7 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
   .brand-title {
     padding: 2px 4px;
     gap: 3px;
+    max-width: 46%;
   }
   .title-text {
     font-size: 11.5px;
@@ -1827,17 +1847,21 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
     display: none !important;
   }
   .main-header {
-    padding: 0 8px;
-    gap: 6px;
+    padding: 0 6px;
+    gap: 4px;
+  }
+  .brand-title {
+    max-width: 44%;
+  }
+  .primary-dropdown {
+    padding: 3px 5px;
+    font-size: 10.5px;
   }
   .header-right {
     gap: 4px;
     margin-left: auto;
   }
 }
-
-
-
 
 /* ==========================================================================
    全域 Modal 浮動視窗基礎樣式 (包含通用彈窗、登入視窗、事件切換視窗)
