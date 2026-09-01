@@ -710,13 +710,21 @@ canvas {
 /* 手機直向窄螢幕 (<= 600px) */
 @media (max-width: 600px) {
   .dashboard-container {
-    padding: 12px 10px;
+    padding: 12px 10px 60px 10px;
   }
   .kpi-grid {
     grid-template-columns: 1fr;
   }
   .reservoir-grid {
     grid-template-columns: 1fr;
+  }
+  .card-header-bar {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .customer-top-row {
+    flex-wrap: wrap;
+    gap: 8px;
   }
 }
 
