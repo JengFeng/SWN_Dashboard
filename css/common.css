@@ -1636,132 +1636,68 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
   }
 
   /* 截圖寬度斷點：字級切換為下拉式選單 */
-  .font-size-controller .fs-options {
-    display: none !important;
-  }
-
-  .font-size-controller .fs-select-wrap {
-    display: inline-flex !important;
-  }
-
+  /* 窄螢幕字級控制器：【字級】文字在上，下拉選項在下（垂直緊湊排列） */
   .font-size-controller {
-    padding: 3px 6px;
-    gap: 4px;
-    flex-shrink: 0;
-  }
-
-  /* 騰出空間：隱藏一般使用者與時間文字，完整保留並顯示登入使用者頭像/圖示 */
-  .header-right {
-    gap: 8px;
-    flex-shrink: 0;
-  }
-
-  .user-meta {
-    display: none !important;
-  }
-
-  .user-profile {
     display: flex !important;
-    padding: 2px 4px;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 2px 4px !important;
+    gap: 1px !important;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
     flex-shrink: 0;
-  }
-
-  .avatar-box {
-    display: block !important;
-    width: 36px;
-    height: 36px;
-    flex-shrink: 0;
-  }
-}
-
-@media (max-width: 1100px) {
-  .header-center {
-    display: none !important;
-  }
-  .header-left {
-    gap: 8px;
-  }
-  .brand-title {
-    padding: 4px 10px;
-  }
-  .title-text {
-    font-size: 14.5px;
-  }
-  .primary-dropdown {
-    padding: 6px 10px;
-    font-size: 13.5px;
-  }
-  .header-right {
-    gap: 8px;
-  }
-}
-
-@media (max-width: 768px) {
-  .main-header {
-    padding: 0 8px;
-    gap: 6px;
-    height: 58px;
-  }
-  .header-left {
-    gap: 6px;
-    min-width: 0;
-    flex: 1;
-    overflow: visible;
-  }
-  .btn-sidebar-toggle {
-    width: 30px;
-    height: 30px;
-    font-size: 13px;
-    flex-shrink: 0;
-  }
-  .brand-title {
-    padding: 3px 6px;
-    gap: 4px;
-    flex: 1;
-    min-width: 0;
-    max-width: 50%;
-    flex-shrink: 1;
-    overflow: hidden;
-  }
-  .brand-logo-img {
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-  }
-  .title-text {
-    font-size: 12px;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    flex: 1;
-  }
-  .primary-dropdown {
-    padding: 4px 8px;
-    font-size: 12px;
-    gap: 4px;
-    flex-shrink: 0;
-  }
-  .header-right {
-    gap: 6px;
-    flex-shrink: 0;
-    margin-left: auto;
-  }
-  .view-switch-group {
-    display: none !important;
+    min-width: 36px;
+    height: 38px;
+    box-sizing: border-box;
   }
   .font-size-controller .fs-options {
     display: none !important;
   }
+  .font-size-controller .fs-label {
+    display: block !important;
+    font-size: 9.5px !important;
+    font-weight: 800 !important;
+    color: #475569 !important;
+    line-height: 1.1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: center !important;
+    letter-spacing: 0.5px !important;
+    user-select: none;
+  }
   .font-size-controller .fs-select-wrap {
     display: inline-flex !important;
+    position: relative !important;
+    align-items: center !important;
+    width: 100% !important;
   }
-  .fs-label {
-    display: none !important;
+  .font-size-controller .fs-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    color: var(--primary-color, #0284c7);
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    padding: 1px 12px 1px 4px !important;
+    height: 18px !important;
+    line-height: 16px !important;
+    width: 100% !important;
+    cursor: pointer;
+    text-align: center;
+    box-sizing: border-box;
   }
-  .fs-select {
-    font-size: 11.5px;
-    padding: 2px 18px 2px 5px;
+  .font-size-controller .fs-select-arrow {
+    position: absolute;
+    right: 2px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 8px !important;
+    color: var(--primary-color, #0284c7);
+    pointer-events: none;
   }
   .user-meta {
     display: none !important;
@@ -1831,9 +1767,19 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
     font-size: 11px;
     gap: 3px;
   }
-  .fs-select {
-    font-size: 11px;
-    padding: 2px 14px 2px 4px;
+  .font-size-controller {
+    min-width: 34px !important;
+    padding: 1px 3px !important;
+    height: 36px !important;
+  }
+  .font-size-controller .fs-label {
+    font-size: 9px !important;
+  }
+  .font-size-controller .fs-select {
+    font-size: 10.5px !important;
+    padding: 1px 11px 1px 3px !important;
+    height: 17px !important;
+    line-height: 15px !important;
   }
   .avatar-box {
     width: 30px;
@@ -1844,7 +1790,10 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
 /* 412px 以下超極窄手機視圖：隱藏字級選擇器，釋放空間予標題與選單 */
 @media (max-width: 412px) {
   .font-size-controller {
-    display: none !important;
+    display: flex !important;
+    min-width: 34px !important;
+    padding: 1px 3px !important;
+    height: 36px !important;
   }
   .main-header {
     padding: 0 6px;
