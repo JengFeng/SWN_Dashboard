@@ -24,7 +24,7 @@
   background: #0b1726;
 }
 
-/* 左上角：當前情資視圖狀態標籤徽章 (Floating Status Badge) */
+/* 左上角：當前情資視圖狀態標籤徽章 (Floating & Draggable Status Badge 支援手動拖曳移動) */
 .intel-status-badge {
   position: absolute;
   top: 20px;
@@ -32,17 +32,49 @@
   z-index: 1000;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   background: rgba(13, 27, 42, 0.88);
-  border: 1px solid rgba(56, 189, 248, 0.35);
+  border: 1px solid rgba(56, 189, 248, 0.4);
   border-radius: 30px;
-  padding: 8px 18px;
+  padding: 8px 16px;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   color: #ffffff;
   pointer-events: auto;
-  transition: var(--transition-fast);
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
+}
+
+.intel-status-badge:hover {
+  border-color: #38bdf8;
+  box-shadow: 0 10px 28px rgba(2, 132, 199, 0.35);
+  transform: translateY(-1px);
+}
+
+.intel-status-badge.is-dragging {
+  cursor: grabbing !important;
+  opacity: 0.95;
+  border-color: #38bdf8;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 16px rgba(56, 189, 248, 0.5);
+  transform: scale(1.04);
+  transition: none !important;
+}
+
+.drag-grip-icon {
+  font-size: 13px;
+  color: #64748b;
+  margin-right: 2px;
+  cursor: grab;
+  transition: color var(--transition-fast);
+}
+
+.intel-status-badge:hover .drag-grip-icon,
+.intel-status-badge.is-dragging .drag-grip-icon {
+  color: #38bdf8;
 }
 
 .intel-status-badge .status-icon {

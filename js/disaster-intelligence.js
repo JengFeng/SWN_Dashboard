@@ -653,8 +653,128 @@ function initFabInteractions() {
   }
 }
 
+/**
+ * 12. 初始化左上方情資狀態徽章之手動拖曳移動 (Draggable Floating Status Badge)
+ * 支援滑鼠與觸控手勢、邊界防溢出限制、並防止地圖連帶平移
+ */
+function initDraggableStatusBadge() {
+  const badge = document.getElementById('intelStatusBadge');
+  const container = document.querySelector('.intel-workspace');
+  if (!badge || !container) return;
+
+  let isDragging = false;
+  let startX = 0;
+  let startY = 0;
+  let initialLeft = 0;
+  let initialTop = 0;
+
+  // 阻止 Leaflet 地圖在徽章上捕獲滑鼠/觸控事件（避免拖曳徽章時地圖一起滑動）
+  if (typeof L !== 'undefined' && L.DomEvent) {
+    L.DomEvent.disableClickPropagation(badge);
+    L.DomEvent.disableScrollPropagation(badge);
+  }
+
+  function onDragStart(clientX, clientY) {
+    isDragging = true;
+    badge.classList.add('is-dragging');
+
+    const badgeRect = badge.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    // 取得相對於 container 的目前 left 與 top
+    initialLeft = badgeRect.left - containerRect.left;
+    initialTop = badgeRect.top - containerRect.top;
+
+    startX = clientX;
+    startY = clientY;
+  }
+
+  function onDragMove(clientX, clientY) {
+    if (!isDragging) return;
+
+    const deltaX = clientX - startX;
+    const deltaY = clientY - startY;
+
+    const containerRect = container.getBoundingClientRect();
+    const badgeRect = badge.getBoundingClientRect();
+
+    let newLeft = initialLeft + deltaX;
+    let newTop = initialTop + deltaY;
+
+    // 邊界防溢出計算 (保持在容器內部 8px 安全間距)
+    const minLeft = 8;
+    const maxLeft = Math.max(minLeft, containerRect.width - badgeRect.width - 8);
+    const minTop = 8;
+    const maxTop = Math.max(minTop, containerRect.height - badgeRect.height - 8);
+
+    if (newLeft < minLeft) newLeft = minLeft;
+    if (newLeft > maxLeft) newLeft = maxLeft;
+    if (newTop < minTop) newTop = minTop;
+    if (newTop > maxTop) newTop = maxTop;
+
+    badge.style.left = `${newLeft}px`;
+    badge.style.top = `${newTop}px`;
+    badge.style.right = 'auto';
+    badge.style.bottom = 'auto';
+  }
+
+  function onDragEnd() {
+    if (!isDragging) return;
+    isDragging = false;
+    badge.classList.remove('is-dragging');
+  }
+
+  // 滑鼠事件監聽
+  badge.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onDragStart(e.clientX, e.clientY);
+
+    const onMouseMove = (moveEvent) => {
+      moveEvent.preventDefault();
+      onDragMove(moveEvent.clientX, moveEvent.clientY);
+    };
+
+    const onMouseUp = () => {
+      onDragEnd();
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
+
+  // 觸控手勢監聽 (行動端/平板)
+  badge.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 1) {
+      e.stopPropagation();
+      const touch = e.touches[0];
+      onDragStart(touch.clientX, touch.clientY);
+    }
+  }, { passive: false });
+
+  badge.addEventListener('touchmove', (e) => {
+    if (isDragging && e.touches.length === 1) {
+      e.preventDefault();
+      e.stopPropagation();
+      const touch = e.touches[0];
+      onDragMove(touch.clientX, touch.clientY);
+    }
+  }, { passive: false });
+
+  badge.addEventListener('touchend', () => {
+    onDragEnd();
+  });
+
+  badge.addEventListener('touchcancel', () => {
+    onDragEnd();
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initIntelMap();
   initSidebarDrawer();
   initFabInteractions();
+  initDraggableStatusBadge();
 });

@@ -13,8 +13,8 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <!-- 基礎共用與專屬樣式表 -->
-  <link rel="stylesheet" href="css/common.css?v=1788255907">
-  <link rel="stylesheet" href="css/disaster-intelligence.css?v=1788255907">
+  <link rel="stylesheet" href="css/common.css?v=1788256942">
+  <link rel="stylesheet" href="css/disaster-intelligence.css?v=1788256942">
 </head>
 <body class="layout-gis-full font-md">
 
@@ -213,8 +213,9 @@
       <!-- 底層 Leaflet / Google Map 實體容器 -->
       <div id="gisIntelMap" class="intel-gis-map"></div>
 
-      <!-- 左上角：當前情資狀態徽章 (Floating Status Badge) -->
-      <div class="intel-status-badge" id="intelStatusBadge">
+      <!-- 左上角：當前情資狀態徽章 (支援滑鼠/觸控手動拖曳移動位置) -->
+      <div class="intel-status-badge draggable-badge" id="intelStatusBadge" title="按住拖曳可自由移動位置">
+        <i class="fa-solid fa-grip-vertical drag-grip-icon" title="拖曳手把"></i>
         <i class="fa-solid fa-hurricane status-icon" id="intelStatusIcon"></i>
         <span class="status-title" id="intelStatusTitle">颱風路徑動態圖</span>
         <span class="status-tag" id="intelStatusTag">強烈颱風 (第 03 號 凱米)</span>
@@ -350,7 +351,7 @@
   </div>
 
   <!-- 引用主核心共用腳本與專屬腳本 -->
-  <script src="js/main.js?v=1788255907"></script>
-  <script src="js/disaster-intelligence.js?v=1788255907"></script>
+  <script src="js/main.js?v=1788256942"></script>
+  <script src="js/disaster-intelligence.js?v=1788256942"></script>
 </body>
 </html>
