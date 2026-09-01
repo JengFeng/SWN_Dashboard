@@ -1720,6 +1720,58 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
   }
 }
 
+/* 極窄手機螢幕 (<= 480px，如 iPhone 375px~430px) */
+@media (max-width: 480px) {
+  .main-header {
+    padding: 0 6px;
+    gap: 4px;
+    height: 56px;
+  }
+  .btn-sidebar-toggle {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+  .brand-title {
+    padding: 3px 5px;
+    gap: 4px;
+  }
+  .brand-logo-img {
+    width: 17px;
+    height: 17px;
+  }
+  .title-text {
+    font-size: 12px;
+  }
+  .primary-dropdown {
+    padding: 4px 6px;
+    font-size: 11.5px;
+    gap: 3px;
+  }
+  .header-right {
+    gap: 4px;
+  }
+  .font-size-controller {
+    padding: 2px 4px;
+    gap: 2px;
+  }
+  .fs-label {
+    display: none !important;
+  }
+  .fs-select {
+    font-size: 11px;
+    padding: 2px 16px 2px 4px;
+  }
+  .view-switch-group {
+    display: none !important;
+  }
+  .avatar-box {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+  }
+}
+
 
 
 

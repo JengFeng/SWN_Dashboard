@@ -163,11 +163,13 @@ canvas {
 
 /* 水庫蓄水半環錶 */
 .gauge-item {
+  display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
   text-align: center;
   position: relative;
-  padding: 6px 8px;
+  padding: 8px 10px;
 }
 
 .gauge-chart-container {
@@ -177,6 +179,8 @@ canvas {
   display: flex;
   justify-content: center;
   align-items: flex-end;
+  margin: 0 auto;
+  flex-shrink: 0;
 }
 
 .gauge-center-val {
@@ -712,10 +716,29 @@ canvas {
 /* 手機直向窄螢幕 (<= 600px) */
 @media (max-width: 600px) {
   .dashboard-container {
-    padding: 12px 10px 60px 10px;
+    padding: 12px 10px 100px 10px;
   }
   .kpi-grid {
     grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .kpi-item {
+    padding: 12px 14px;
+    gap: 14px;
+  }
+  .gauge-item {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    gap: 14px;
+  }
+  .gauge-chart-container {
+    margin: 0;
+  }
+  .gauge-item .kpi-body {
+    align-items: flex-start;
+    text-align: left;
   }
   .reservoir-grid {
     grid-template-columns: 1fr;
