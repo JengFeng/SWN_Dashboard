@@ -421,25 +421,27 @@
   margin-bottom: 6px;
 }
 
-/* TOP 5 橫向進度條 */
+/* TOP 5 橫向進度條 (自適應字級與容器寬度) */
 .bar-progress-list {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 8px;
 }
 
 .bar-item {
   display: flex;
   align-items: center;
   font-size: 11px;
-  gap: 6px;
+  gap: 8px;
+  width: 100%;
 }
 
 .bar-rank {
-  width: 14px;
+  width: 1.2em;
   font-weight: 700;
   color: #64748b;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .rank-1 { color: #0284c7; }
@@ -447,13 +449,15 @@
 .rank-3 { color: #0284c7; }
 
 .bar-name {
-  width: 52px;
   color: #334155;
   white-space: nowrap;
+  flex-shrink: 0;
+  min-width: fit-content;
 }
 
 .progress-track {
   flex: 1;
+  min-width: 40px;
   height: 6px;
   background: #f1f5f9;
   border-radius: var(--radius-full);
@@ -472,14 +476,15 @@
 .fill-green { background: #10b981; }
 
 .bar-value {
-  width: 78px;
   text-align: right;
   color: #64748b;
   font-size: 10px;
   white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
-/* 輿情話題 TOP 3 */
+/* 輿情話題 TOP 3 (自適應字級與容器寬度) */
 .topic-header-row {
   display: flex;
   justify-content: space-between;
@@ -494,7 +499,7 @@
 .topic-list {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 8px;
 }
 
 .topic-item {
@@ -502,18 +507,22 @@
   align-items: center;
   justify-content: space-between;
   font-size: 11px;
+  gap: 8px;
+  width: 100%;
 }
 
 .topic-rank-title {
   display: flex;
   align-items: center;
   gap: 6px;
+  min-width: 0;
+  flex: 1;
   overflow: hidden;
-  max-width: 150px;
 }
 
 .topic-rank {
   font-weight: 700;
+  flex-shrink: 0;
 }
 
 .rank-gold { color: #d97706; }
@@ -523,6 +532,8 @@
   overflow: hidden;
   text-overflow: ellipsis;
   color: #1e293b;
+  flex: 1;
+  min-width: 0;
 }
 
 .topic-meta {
@@ -530,6 +541,8 @@
   align-items: center;
   gap: 6px;
   white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .heat-time {

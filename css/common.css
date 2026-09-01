@@ -145,31 +145,31 @@ body.font-md .reservoir-name { font-size: 17px; }
 body .reservoir-stat-row .stat-num,
 body.font-md .reservoir-stat-row .stat-num { font-size: 14.5px; }
 
-/* 大（依比例再放大新字級） */
+/* 大（依比例放大新字級，兼顧版面平衡） */
 body.font-lg {
-  font-size: 20.5px;
+  font-size: 19.5px;
 }
-body.font-lg .title-text { font-size: 25px; }
-body.font-lg .card-title { font-size: 25px; }
-body.font-lg .kpi-label { font-size: 19px; }
-body.font-lg .kpi-sublabel { font-size: 16px; }
-body.font-lg .kpi-number { font-size: 34px; }
-body.font-lg .kpi-unit { font-size: 16px; }
-body.font-lg .kpi-trend { font-size: 16px; }
-body.font-lg .custom-table { font-size: 19.5px; }
+body.font-lg .title-text { font-size: 23px; }
+body.font-lg .card-title { font-size: 23px; }
+body.font-lg .kpi-label { font-size: 17.5px; }
+body.font-lg .kpi-sublabel { font-size: 14.5px; }
+body.font-lg .kpi-number { font-size: 31px; }
+body.font-lg .kpi-unit { font-size: 14.5px; }
+body.font-lg .kpi-trend { font-size: 14.5px; }
+body.font-lg .custom-table { font-size: 17.5px; }
 body.font-lg .custom-table th, 
-body.font-lg .custom-table td { padding: 15px 15px; }
-body.font-lg .stat-card-title { font-size: 21.5px; }
-body.font-lg .sub-date { font-size: 17px; }
-body.font-lg .legend-row { font-size: 17.5px; }
-body.font-lg .donut-total { font-size: 20.5px; }
-body.font-lg .big-stat-val .num { font-size: 34px; }
-body.font-lg .list-block-title { font-size: 18px; }
-body.font-lg .bar-item { font-size: 17px; }
-body.font-lg .bar-value { font-size: 16px; }
-body.font-lg .topic-item { font-size: 17px; }
-body.font-lg .reservoir-name { font-size: 20px; }
-body.font-lg .reservoir-stat-row .stat-num { font-size: 17px; }
+body.font-lg .custom-table td { padding: 13px 13px; }
+body.font-lg .stat-card-title { font-size: 19.5px; }
+body.font-lg .sub-date { font-size: 15.5px; }
+body.font-lg .legend-row { font-size: 16px; }
+body.font-lg .donut-total { font-size: 18.5px; }
+body.font-lg .big-stat-val .num { font-size: 31px; }
+body.font-lg .list-block-title { font-size: 16.5px; }
+body.font-lg .bar-item { font-size: 14.5px; }
+body.font-lg .bar-value { font-size: 13.5px; }
+body.font-lg .topic-item { font-size: 14.5px; }
+body.font-lg .reservoir-name { font-size: 18px; }
+body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
 
 /* 2. 佈局容器 */
 .app-layout {
