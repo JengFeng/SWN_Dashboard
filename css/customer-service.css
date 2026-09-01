@@ -847,7 +847,71 @@
 
 
 /* ==========================================================================
-   RWD Phase 3 極窄版 (<= 480px / <= 412px) 自適應優化與底部安全量化內距
+   字級切換控制體系 (小 font-sm / 中 font-md / 大 font-lg - 支援按鈕與手機下拉雙向聯動)
+   ========================================================================== */
+/* 小字級 (body.font-sm) */
+body.font-sm .cs-cases-header h3 { font-size: 12.5px; }
+body.font-sm .btn-cs-action { font-size: 10px; padding: 3px 6px; }
+body.font-sm .cs-cases-table { font-size: 10px; }
+body.font-sm .cs-cases-table th { font-size: 10.5px; }
+body.font-sm .cs-cases-table td { font-size: 10px; }
+body.font-sm .td-town { font-size: 10px; }
+body.font-sm .td-time { font-size: 9px; }
+body.font-sm .td-code { font-size: 9.5px; }
+body.font-sm .status-badge { font-size: 9px; padding: 1px 4px; }
+body.font-sm .legend-hdr { font-size: 11px; }
+body.font-sm .pin-label { font-size: 10px; }
+body.font-sm .sentiment-item { font-size: 10px; }
+body.font-sm .popup-title-select { font-size: 10px; }
+body.font-sm .popup-table { font-size: 9.5px; }
+body.font-sm .popup-table th, body.font-sm .popup-table td { font-size: 9.5px; }
+body.font-sm .cs-filter-select { font-size: 10px; }
+body.font-sm .news-link { font-size: 11px; }
+body.font-sm .td-news-time { font-size: 10px; }
+
+/* 中字級 (body / body.font-md - 預設基準) */
+body .cs-cases-header h3, body.font-md .cs-cases-header h3 { font-size: 14px; }
+body .btn-cs-action, body.font-md .btn-cs-action { font-size: 11.5px; padding: 4px 8px; }
+body .cs-cases-table, body.font-md .cs-cases-table { font-size: 11.5px; }
+body .cs-cases-table th, body.font-md .cs-cases-table th { font-size: 12px; }
+body .cs-cases-table td, body.font-md .cs-cases-table td { font-size: 11.5px; }
+body .td-town, body.font-md .td-town { font-size: 11.5px; }
+body .td-time, body.font-md .td-time { font-size: 10.5px; }
+body .td-code, body.font-md .td-code { font-size: 11px; }
+body .status-badge, body.font-md .status-badge { font-size: 10.5px; padding: 2px 6px; }
+body .legend-hdr, body.font-md .legend-hdr { font-size: 12.5px; }
+body .pin-label, body.font-md .pin-label { font-size: 11px; }
+body .sentiment-item, body.font-md .sentiment-item { font-size: 11.5px; }
+body .popup-title-select, body.font-md .popup-title-select { font-size: 11px; }
+body .popup-table, body.font-md .popup-table { font-size: 11px; }
+body .popup-table th, body.font-md .popup-table th,
+body .popup-table td, body.font-md .popup-table td { font-size: 11px; }
+body .cs-filter-select, body.font-md .cs-filter-select { font-size: 12px; }
+body .news-link, body.font-md .news-link { font-size: 12px; }
+body .td-news-time, body.font-md .td-news-time { font-size: 11px; }
+
+/* 大字級 (body.font-lg - 長者及無障礙友善) */
+body.font-lg .cs-cases-header h3 { font-size: 17px; }
+body.font-lg .btn-cs-action { font-size: 13.5px; padding: 5px 10px; }
+body.font-lg .cs-cases-table { font-size: 14px; }
+body.font-lg .cs-cases-table th { font-size: 14.5px; }
+body.font-lg .cs-cases-table td { font-size: 14px; }
+body.font-lg .td-town { font-size: 14px; }
+body.font-lg .td-time { font-size: 12.5px; }
+body.font-lg .td-code { font-size: 13px; }
+body.font-lg .status-badge { font-size: 12.5px; padding: 3px 8px; }
+body.font-lg .legend-hdr { font-size: 15px; }
+body.font-lg .pin-label { font-size: 13px; }
+body.font-lg .sentiment-item { font-size: 13.5px; }
+body.font-lg .popup-title-select { font-size: 13.5px; }
+body.font-lg .popup-table { font-size: 13px; }
+body.font-lg .popup-table th, body.font-lg .popup-table td { font-size: 13px; }
+body.font-lg .cs-filter-select { font-size: 14px; }
+body.font-lg .news-link { font-size: 14px; }
+body.font-lg .td-news-time { font-size: 13px; }
+
+/* ==========================================================================
+   RWD Phase 3 極窄版 (<= 480px / <= 412px) 自適應優化與字級動態切換
    ========================================================================== */
 @media (max-width: 480px) {
   .cs-workspace {
@@ -857,7 +921,55 @@
   .cs-cases-table th,
   .cs-cases-table td {
     padding: 5px 3px !important;
+  }
+
+  /* 手機 RWD 字級動態切換支援 (徹底解除固定鎖死字級) */
+  body.font-sm .cs-cases-table th,
+  body.font-sm .cs-cases-table td {
+    font-size: 9.5px !important;
+  }
+  body.font-md .cs-cases-table th,
+  body.font-md .cs-cases-table td,
+  body .cs-cases-table th,
+  body .cs-cases-table td {
+    font-size: 11px !important;
+  }
+  body.font-lg .cs-cases-table th,
+  body.font-lg .cs-cases-table td {
+    font-size: 13.5px !important;
+  }
+
+  body.font-sm .td-town { font-size: 9.5px !important; }
+  body.font-md .td-town, body .td-town { font-size: 11px !important; }
+  body.font-lg .td-town { font-size: 13.5px !important; }
+
+  body.font-sm .td-time { font-size: 8.5px !important; }
+  body.font-md .td-time, body .td-time { font-size: 10px !important; }
+  body.font-lg .td-time { font-size: 12px !important; }
+
+  body.font-sm .td-code { font-size: 9px !important; }
+  body.font-md .td-code, body .td-code { font-size: 10.5px !important; }
+  body.font-lg .td-code { font-size: 12.5px !important; }
+
+  body.font-sm .status-badge { font-size: 9px !important; }
+  body.font-md .status-badge, body .status-badge { font-size: 10px !important; }
+  body.font-lg .status-badge { font-size: 12px !important; }
+
+  body.font-sm .cs-cases-header h3 { font-size: 12px !important; }
+  body.font-md .cs-cases-header h3, body .cs-cases-header h3 { font-size: 13.5px !important; }
+  body.font-lg .cs-cases-header h3 { font-size: 16px !important; }
+
+  body.font-sm .btn-cs-action {
+    padding: 2px 5px !important;
+    font-size: 9.5px !important;
+  }
+  body.font-md .btn-cs-action, body .btn-cs-action {
+    padding: 3px 6px !important;
     font-size: 10.5px !important;
+  }
+  body.font-lg .btn-cs-action {
+    padding: 4px 8px !important;
+    font-size: 12.5px !important;
   }
 
   .cs-filter-bar {
@@ -868,11 +980,6 @@
   .cs-filter-select {
     font-size: 11px !important;
     padding: 3px 14px 3px 4px !important;
-  }
-
-  .btn-cs-action {
-    padding: 3px 6px !important;
-    font-size: 10.5px !important;
   }
 
   .cs-trend-card,

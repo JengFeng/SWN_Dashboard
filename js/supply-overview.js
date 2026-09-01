@@ -967,50 +967,119 @@ function initPanelCollapse() {
 }
 
 /**
- * 9. 浮動 FAB 按鈕互動 (支援切換 Google 衛星地圖與 Google 道路地圖)
+ * 9. 浮動 FAB 按鈕互動與面板開闔 (全面對齊應變事件情資圖台規格)
  */
 function initFabButtons() {
-  const fabBtns = document.querySelectorAll('.map-fab-group .fab-btn');
-  const fabLayerBtn = fabBtns[0];
-  const fabAiBtn = fabBtns[1];
+  const fabLayerBtn = document.getElementById('fabLayerBtn');
+  const fabAiBtn = document.getElementById('fabAiBtn');
+  const layerControlPanel = document.getElementById('layerControlPanel');
+  const aiAssistantPanel = document.getElementById('aiAssistantPanel');
+  const closeLayerPanelBtn = document.getElementById('closeLayerPanelBtn');
+  const closeAiPanelBtn = document.getElementById('closeAiPanelBtn');
+  const baseMapSelect = document.getElementById('baseMapSelect');
 
-  let currentTileMode = 'satellite';
-
-  if (fabLayerBtn) {
+  // 1. 圖層開關按鈕點擊 -> 開闔圖層面板 (與 AI 面板互斥)
+  if (fabLayerBtn && layerControlPanel) {
     fabLayerBtn.addEventListener('click', () => {
-      if (!gisMapInstance) return;
-
-      gisMapInstance.eachLayer(layer => {
-        if (layer instanceof L.TileLayer) {
-          gisMapInstance.removeLayer(layer);
-        }
-      });
-
-      if (currentTileMode === 'satellite') {
-        // 切換至 Google 標準道路地圖
-        L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-          maxZoom: 19,
-          subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-        }).addTo(gisMapInstance);
-        currentTileMode = 'roadmap';
-        alert('已切換圖層：Google Maps 標準道路地圖');
-      } else {
-        // 切換回 Google 衛星混合地圖
-        L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
-          maxZoom: 19,
-          subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-        }).addTo(gisMapInstance);
-        currentTileMode = 'satellite';
-        alert('已切換圖層：Google Maps 衛星混合地圖');
+      const isHide = layerControlPanel.classList.toggle('hide');
+      fabLayerBtn.classList.toggle('active', !isHide);
+      if (!isHide && aiAssistantPanel) {
+        aiAssistantPanel.classList.add('hide');
+        if (fabAiBtn) fabAiBtn.classList.remove('active');
       }
     });
   }
 
-  if (fabAiBtn) {
-    fabAiBtn.addEventListener('click', () => {
-      alert('【智慧水網 AI 助理】已就緒：\n當前檢測到「第三區管理處」總供水量（939,000 CMD）較去年同日短少 49,000 CMD，已自動為您調出北水南送應變排程。');
+  // 關閉圖層面板按鈕
+  if (closeLayerPanelBtn && layerControlPanel) {
+    closeLayerPanelBtn.addEventListener('click', () => {
+      layerControlPanel.classList.add('hide');
+      if (fabLayerBtn) fabLayerBtn.classList.remove('active');
     });
   }
+
+  // 2. AI 助手按鈕點擊 -> 開闔 AI 面板 (與圖層面板互斥)
+  if (fabAiBtn && aiAssistantPanel) {
+    fabAiBtn.addEventListener('click', () => {
+      const isHide = aiAssistantPanel.classList.toggle('hide');
+      fabAiBtn.classList.toggle('active', !isHide);
+      if (!isHide && layerControlPanel) {
+        layerControlPanel.classList.add('hide');
+        if (fabLayerBtn) fabLayerBtn.classList.remove('active');
+      }
+    });
+  }
+
+  // 關閉 AI 面板按鈕
+  if (closeAiPanelBtn && aiAssistantPanel) {
+    closeAiPanelBtn.addEventListener('click', () => {
+      aiAssistantPanel.classList.add('hide');
+      if (fabAiBtn) fabAiBtn.classList.remove('active');
+    });
+  }
+
+  // 3. 底圖樣式切換 (支援全臺供水狀態、跨區調度、水庫蓄水量三大空間圖台同步切換)
+  if (baseMapSelect) {
+    baseMapSelect.addEventListener('change', (e) => {
+      const mode = e.target.value;
+      switchBaseMapTiles(mode);
+    });
+  }
+
+  // 4. 圖層勾選切換反饋
+  const layerCheckboxes = document.querySelectorAll('.layer-control-panel .layer-checkbox');
+  layerCheckboxes.forEach(cb => {
+    cb.addEventListener('change', (e) => {
+      const layerName = e.target.dataset.layer;
+      const isChecked = e.target.checked;
+      handleLayerVisibilityToggle(layerName, isChecked);
+    });
+  });
+
+  // 5. AI 面板快捷操作按鈕
+  const btnAiSummary = document.getElementById('btnAiSummary');
+  const btnAiOptimize = document.getElementById('btnAiOptimize');
+  if (btnAiSummary) {
+    btnAiSummary.addEventListener('click', () => {
+      alert('【供水速報生成中】已自動彙整目前全台供水量、重點水庫庫容比與跨區調度淨流量，產生即時供水戰情報導！');
+    });
+  }
+  if (btnAiOptimize) {
+    btnAiOptimize.addEventListener('click', () => {
+      alert('【AI 智能調度運算】綜合氣象降雨預測與各區尖離峰需水量，已計算出最佳供水調度決策路徑！');
+    });
+  }
+}
+
+/**
+ * 切換空間圖台 Leaflet 底圖樣式 (Google 衛星混合 vs Google 標準道路)
+ */
+function switchBaseMapTiles(mode) {
+  const tileUrl = mode === 'roadmap'
+    ? 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}'
+    : 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}';
+
+  const mapInstances = [gisMapInstance, dispatchGisMapInstance, reservoirGisMapInstance];
+  mapInstances.forEach(map => {
+    if (!map) return;
+    map.eachLayer(layer => {
+      if (layer instanceof L.TileLayer) {
+        map.removeLayer(layer);
+      }
+    });
+    L.tileLayer(tileUrl, {
+      maxZoom: 19,
+      subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+    }).addTo(map);
+  });
+}
+
+/**
+ * 處理圖層顯示/隱藏切換
+ */
+function handleLayerVisibilityToggle(layerName, isVisible) {
+  // 可根據勾選項控制地圖上的相應圖層或標記顯示狀態
+  console.log(`圖層 [${layerName}] 狀態更新:`, isVisible ? '開啟' : '關閉');
 }
 
 /**

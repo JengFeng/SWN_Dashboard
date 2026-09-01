@@ -94,7 +94,7 @@
           <div class="brand-logo">
             <img src="logo/Taiwan_Water_Corporation_Seal.svg.webp" alt="台灣自來水公司標誌" class="brand-logo-img">
           </div>
-          <span class="title-text" id="headerTitleText">總管理處-平時</span>
+          <span class="title-text" id="headerTitleText">總管理處 - 平時</span>
           <button id="globalSearchBtn" class="btn-icon search-trigger-btn" title="選擇應變事件">
             <i class="fa-solid fa-magnifying-glass"></i>
           </button>
@@ -157,7 +157,7 @@
           <span class="pulse-dot"></span>
         </div>
         <div class="announcement-content">
-          <span class="announcement-text" id="announcementTicker">全臺供水狀態整體正常。</span>
+          <span class="announcement-text" id="announcementTicker">全台供水情形整體正常，請持續留意最新供水與氣象資訊。</span>
         </div>
       </div>
 
@@ -195,7 +195,7 @@
         <div class="user-profile" id="userProfileBtn" title="點擊登入緊急應變戰情儀表板" role="button" tabindex="0">
           <div class="user-meta">
             <span class="user-role" id="headerUserRole">一般使用者</span>
-            <span class="system-time" id="systemClock">2026/09/01 10:02</span>
+            <span class="system-time" id="systemClock">2025/05/23 14:45</span>
           </div>
           <div class="avatar-box" id="userAvatarBtn">
             <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="使用者頭像">
@@ -317,17 +317,19 @@
           </div>
         </div>
 
-        <!-- 8. 操作按鈕群 (查詢 / 檢視案件明細 / 報表匯出) -->
+        <!-- 8. 操作按鈕群 (第一排: 查詢 + 檢視案件明細; 第二排: 報表匯出) -->
         <div class="filter-actions-group">
-          <button type="button" class="btn-action-primary" id="btnQuerySubmit">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <span>查詢</span>
-          </button>
-          <button type="button" class="btn-action-outline" id="btnViewCaseDetail">
-            <span>檢視案件明細</span>
-          </button>
-          <button type="button" class="btn-action-outline" id="btnExportReport">
-            <i class="fa-solid fa-magnifying-glass"></i>
+          <div class="actions-row-top">
+            <button type="button" class="btn-action-primary" id="btnQuerySubmit">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <span>查詢</span>
+            </button>
+            <button type="button" class="btn-action-outline" id="btnViewCaseDetail">
+              <span>檢視案件明細</span>
+            </button>
+          </div>
+          <button type="button" class="btn-action-outline btn-full-width" id="btnExportReport">
+            <i class="fa-solid fa-file-arrow-down"></i>
             <span>報表匯出</span>
           </button>
         </div>
@@ -386,13 +388,13 @@
           <!-- 卡片 2: 案件分布統計 (多色圓餅圖 + 分頁圖例) -->
           <div class="analysis-card card-case-distribution">
             <div class="card-header-bar">
-              <h3 class="card-title-txt">案件分布統計</h3>
+              <h3 class="card-title-txt" id="caseDistCardTitle">案件分布統計</h3>
               <div class="header-ctrl-group">
-                <button type="button" class="btn-ctrl-pill active" id="btnTotalCasesMode">總案件</button>
+                <button type="button" class="btn-ctrl-pill active" id="btnTotalCasesMode" title="切換縣市視角">縣市</button>
                 <div class="custom-select-wrap mini-select">
                   <select class="form-select-ctrl" id="caseDistSelect">
-                    <option value="case">依案件</option>
-                    <option value="region">依區域</option>
+                    <option value="city" selected>依縣市</option>
+                    <option value="district">依管轄區</option>
                   </select>
                   <i class="fa-solid fa-caret-down select-arrow"></i>
                 </div>
@@ -432,71 +434,89 @@
                 <!-- 台灣熱度圖高保真向量套疊底圖 -->
                 <svg class="taiwan-heat-svg" viewBox="0 0 450 550" xmlns="http://www.w3.org/2000/svg">
                   <defs>
-                    <!-- 高斯發光熱區濾鏡 -->
-                    <filter id="heat-glow-high" x="-50%" y="-50%" width="200%" height="200%">
-                      <feGaussianBlur in="SourceGraphic" stdDeviation="14" result="blur1" />
-                      <feGaussianBlur in="SourceGraphic" stdDeviation="24" result="blur2" />
+                    <!-- 精緻熱區多層高斯擴散濾鏡 (對齊截圖 2 紅黃綠漸層) -->
+                    <filter id="heat-glow-heavy" x="-60%" y="-60%" width="220%" height="220%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="16" result="blur1" />
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="28" result="blur2" />
                       <feMerge>
                         <feMergeNode in="blur2" />
                         <feMergeNode in="blur1" />
                         <feMergeNode in="SourceGraphic" />
                       </feMerge>
                     </filter>
-                    <filter id="heat-glow-mid" x="-50%" y="-50%" width="200%" height="200%">
+                    <filter id="heat-glow-soft" x="-50%" y="-50%" width="200%" height="200%">
                       <feGaussianBlur in="SourceGraphic" stdDeviation="12" />
                     </filter>
-                    <!-- 漸層填色 -->
-                    <radialGradient id="heat-core-red" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stop-color="#ef4444" stop-opacity="0.95" />
-                      <stop offset="45%" stop-color="#f97316" stop-opacity="0.85" />
-                      <stop offset="75%" stop-color="#eab308" stop-opacity="0.6" />
-                      <stop offset="100%" stop-color="#22c55e" stop-opacity="0" />
+                    <!-- 熱點深紅核心漸層 -->
+                    <radialGradient id="heat-core-hot" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#cc0000" stop-opacity="1" />
+                      <stop offset="35%" stop-color="#ff2200" stop-opacity="0.95" />
+                      <stop offset="65%" stop-color="#ff9900" stop-opacity="0.85" />
+                      <stop offset="85%" stop-color="#ffdd00" stop-opacity="0.65" />
+                      <stop offset="95%" stop-color="#33cc33" stop-opacity="0.4" />
+                      <stop offset="100%" stop-color="#0099ff" stop-opacity="0" />
                     </radialGradient>
-                    <radialGradient id="heat-core-orange" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stop-color="#f97316" stop-opacity="0.9" />
-                      <stop offset="50%" stop-color="#eab308" stop-opacity="0.7" />
-                      <stop offset="85%" stop-color="#38bdf8" stop-opacity="0.4" />
-                      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0" />
+                    <!-- 次級熱區 (黃綠光環) -->
+                    <radialGradient id="heat-core-sub" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#ff6600" stop-opacity="0.9" />
+                      <stop offset="50%" stop-color="#ffcc00" stop-opacity="0.75" />
+                      <stop offset="80%" stop-color="#66cc33" stop-opacity="0.5" />
+                      <stop offset="100%" stop-color="#3399ff" stop-opacity="0" />
                     </radialGradient>
-                    <radialGradient id="heat-core-green" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stop-color="#10b981" stop-opacity="0.85" />
-                      <stop offset="60%" stop-color="#38bdf8" stop-opacity="0.5" />
-                      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0" />
+                    <!-- 外海離散小熱點 (藍綠環) -->
+                    <radialGradient id="heat-core-bluegreen" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#00cc88" stop-opacity="0.85" />
+                      <stop offset="60%" stop-color="#33bbff" stop-opacity="0.5" />
+                      <stop offset="100%" stop-color="#0066cc" stop-opacity="0" />
                     </radialGradient>
                   </defs>
 
-                  <!-- 淺色台灣海陸輪廓線 -->
-                  <g class="map-boundaries" stroke="#60a5fa" stroke-width="0.8" fill="rgba(186, 230, 253, 0.15)">
-                    <!-- 領海界線 -->
-                    <path d="M 120,40 C 260,30 380,80 410,220 C 430,350 370,480 300,520 C 200,540 100,480 80,350 Z" fill="none" stroke="#bae6fd" stroke-dasharray="4 3" stroke-width="0.8"/>
-                    <!-- 台灣主島輪廓 -->
-                    <path d="M 285,125 C 310,130 335,160 325,220 C 315,260 295,330 270,390 C 250,440 235,465 220,460 C 205,430 200,370 205,310 C 210,250 230,170 265,135 Z" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.2"/>
+                  <!-- 淺藍海域背景網格 -->
+                  <rect width="100%" height="100%" fill="#dff0fc" />
+
+                  <!-- 海岸線經緯虛線界標 -->
+                  <g class="map-boundaries" stroke="#bae6fd" stroke-width="1">
+                    <line x1="160" y1="0" x2="160" y2="550" stroke-dasharray="3 3" />
+                    <line x1="320" y1="0" x2="320" y2="550" stroke-dasharray="3 3" />
+                    <line x1="0" y1="180" x2="450" y2="180" stroke-dasharray="3 3" />
+                    <line x1="0" y1="360" x2="450" y2="360" stroke-dasharray="3 3" />
                   </g>
 
-                  <!-- 地名標籤文字 -->
-                  <text x="75" y="105" class="map-place-lbl">福州市</text>
-                  <text x="50" y="185" class="map-place-lbl">莆田市</text>
-                  <text x="245" y="325" class="map-center-lbl">中華民國</text>
+                  <!-- 台灣主島精準輪廓 (填滿明亮淺灰綠色 #e2ebd8) -->
+                  <path d="M 282,105 C 305,115 320,135 324,155 C 328,180 322,210 315,245 C 308,280 292,325 278,365 C 265,405 248,440 236,462 C 228,475 220,470 216,455 C 212,435 208,395 206,355 C 204,310 206,260 212,215 C 218,175 235,140 255,118 C 268,105 275,100 282,105 Z" fill="#e2ecd6" stroke="#90c888" stroke-width="1.2" />
 
-                  <!-- 案件熱點高斯光暈圖層 (依據截圖西部密集熱區排列) -->
-                  <!-- 北部熱區 (大台北 / 桃園) -->
-                  <circle cx="295" cy="155" r="32" fill="url(#heat-core-red)" filter="url(#heat-glow-high)"/>
-                  <circle cx="280" cy="180" r="26" fill="url(#heat-core-red)" filter="url(#heat-glow-high)"/>
-                  
-                  <!-- 中部熱區 (台中 / 彰化 / 苗栗) -->
-                  <circle cx="245" cy="240" r="34" fill="url(#heat-core-red)" filter="url(#heat-glow-high)"/>
-                  <circle cx="235" cy="275" r="28" fill="url(#heat-core-red)" filter="url(#heat-glow-high)"/>
-                  
-                  <!-- 南部熱區 (台南 / 高雄) -->
-                  <circle cx="218" cy="335" r="36" fill="url(#heat-core-red)" filter="url(#heat-glow-high)"/>
-                  <circle cx="210" cy="385" r="34" fill="url(#heat-core-red)" filter="url(#heat-glow-high)"/>
-                  <circle cx="225" cy="435" r="22" fill="url(#heat-core-orange)" filter="url(#heat-glow-mid)"/>
+                  <!-- 澎湖群島輪廓 -->
+                  <circle cx="152" cy="328" r="7" fill="#d9e6cc" stroke="#90c888" stroke-width="1" />
+                  <circle cx="158" cy="336" r="4" fill="#d9e6cc" stroke="#90c888" stroke-width="1" />
 
-                  <!-- 東部與外島次熱區 (宜蘭/花蓮/台東/澎湖) -->
-                  <circle cx="315" cy="195" r="14" fill="url(#heat-core-green)"/>
-                  <circle cx="295" cy="285" r="14" fill="url(#heat-core-green)"/>
-                  <circle cx="265" cy="380" r="12" fill="url(#heat-core-green)"/>
-                  <circle cx="155" cy="330" r="16" fill="url(#heat-core-green)"/>
+                  <!-- 大陸東南沿岸地名 -->
+                  <text x="60" y="85" font-size="11" fill="#78909c" font-weight="600">福州市</text>
+                  <text x="35" y="170" font-size="11" fill="#78909c" font-weight="600">莆田市</text>
+                  <!-- 台灣本島中心標記 -->
+                  <text x="250" y="325" font-size="13" fill="#37474f" font-weight="800" text-anchor="middle" letter-spacing="1">中華民國</text>
+
+                  <!-- 熱度圖熱區連續帶 (完全仿照截圖 2：西部沿海紅橙高熱區連貫帶) -->
+                  <!-- 1. 北部高熱區 (台北/新北/桃園) -->
+                  <circle cx="285" cy="135" r="30" fill="url(#heat-core-hot)" filter="url(#heat-glow-heavy)" />
+                  <circle cx="300" cy="150" r="26" fill="url(#heat-core-hot)" filter="url(#heat-glow-heavy)" />
+
+                  <!-- 2. 中部高熱區 (台中/彰化/南投/雲林) -->
+                  <circle cx="250" cy="210" r="34" fill="url(#heat-core-hot)" filter="url(#heat-glow-heavy)" />
+                  <circle cx="240" cy="245" r="38" fill="url(#heat-core-hot)" filter="url(#heat-glow-heavy)" />
+                  <circle cx="230" cy="280" r="35" fill="url(#heat-core-hot)" filter="url(#heat-glow-heavy)" />
+
+                  <!-- 3. 南部高熱區 (嘉義/台南/高雄/屏東) -->
+                  <circle cx="218" cy="335" r="38" fill="url(#heat-core-hot)" filter="url(#heat-glow-heavy)" />
+                  <circle cx="212" cy="380" r="36" fill="url(#heat-core-hot)" filter="url(#heat-glow-heavy)" />
+                  <circle cx="225" cy="430" r="28" fill="url(#heat-core-hot)" filter="url(#heat-glow-heavy)" />
+
+                  <!-- 4. 宜蘭/花蓮次熱點 -->
+                  <circle cx="308" cy="185" r="18" fill="url(#heat-core-sub)" filter="url(#heat-glow-soft)" />
+                  <circle cx="282" cy="270" r="16" fill="url(#heat-core-sub)" filter="url(#heat-glow-soft)" />
+
+                  <!-- 5. 外海次熱點 (澎湖/海峽) -->
+                  <circle cx="152" cy="330" r="20" fill="url(#heat-core-bluegreen)" filter="url(#heat-glow-soft)" />
+                  <circle cx="236" cy="460" r="18" fill="url(#heat-core-hot)" filter="url(#heat-glow-soft)" />
                 </svg>
 
                 <!-- 地圖左下角比例尺 -->
@@ -543,13 +563,13 @@
           <!-- 卡片 2: 案件趨勢圖-依縣市鄉鎮 (多折線走勢圖) -->
           <div class="analysis-card card-town-trend">
             <div class="card-header-bar">
-              <h3 class="card-title-txt">案件趨勢圖-依縣市鄉鎮</h3>
+              <h3 class="card-title-txt" id="townTrendCardTitle">案件趨勢圖-依縣市鄉鎮</h3>
               <div class="header-ctrl-group">
-                <button type="button" class="btn-ctrl-pill active" id="btnRegionAdmin">行政區</button>
+                <button type="button" class="btn-ctrl-pill active" id="btnRegionAdmin" title="切換縣市視角">縣市</button>
                 <div class="custom-select-wrap mini-select">
                   <select class="form-select-ctrl" id="regionCtrlSelect">
-                    <option value="jurisdiction">管轄區</option>
-                    <option value="supply_zone">供水區</option>
+                    <option value="city" selected>依縣市鄉鎮</option>
+                    <option value="jurisdiction">依管轄區</option>
                   </select>
                   <i class="fa-solid fa-caret-down select-arrow"></i>
                 </div>
@@ -587,7 +607,7 @@
   <!-- ========================================================================= -->
   <!-- 彈窗 1：檢視案件明細 Modal (Case Detail Modal) -->
   <!-- ========================================================================= -->
-  <div class="case-modal-overlay" id="caseDetailModal">
+  <div class="case-modal-overlay hide" id="caseDetailModal">
     <div class="case-modal-box">
       <div class="case-modal-header">
         <div class="modal-title-wrap">
@@ -656,7 +676,7 @@
   <!-- ========================================================================= -->
   <!-- 彈窗 2：報表匯出 Modal (Export Modal) -->
   <!-- ========================================================================= -->
-  <div class="case-modal-overlay" id="exportReportModal">
+  <div class="case-modal-overlay hide" id="exportReportModal">
     <div class="case-modal-box modal-box-sm">
       <div class="case-modal-header">
         <div class="modal-title-wrap">

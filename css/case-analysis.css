@@ -1,3 +1,4 @@
+
 /* ==========================================================================
    綜合案件分析 (case-analysis.html) - 專屬樣式表 (css/case-analysis.css)
    ========================================================================== */
@@ -178,11 +179,28 @@
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  right: 7px;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 5px 24px 5px 8px;
+  font-size: 12px;
+  color: #1e293b;
+  outline: none;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.form-select-ctrl:focus {
+  border-color: #0284c7;
+}
+
+.select-arrow {
+  position: absolute;
+  right: 8px;
   top: 50%;
   transform: translateY(-50%);
   color: #64748b;
-  font-size: 10px;
+  font-size: 11px;
   pointer-events: none;
 }
 
@@ -211,6 +229,24 @@
 }
 
 /* 篩選面板底部操作按鈕群 */
+
+.actions-row-top {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+}
+
+.actions-row-top .btn-action-primary,
+.actions-row-top .btn-action-outline {
+  flex: 1;
+  padding: 6px 4px;
+}
+
+.btn-full-width {
+  width: 100%;
+  padding: 6px 0;
+}
+
 .filter-actions-group {
   margin-top: auto;
   padding-top: 10px;
@@ -265,28 +301,7 @@
   color: #0369a1;
 }
 
-/* ==========================================================================
-   3. 右側大盤分析儀表板工作區 (Analysis Workspace)
-  padding: 7px 0;
-  background: #ffffff;
-  border: 1.5px solid #0284c7;
-  border-radius: 6px;
-  color: #0284c7;
-  font-size: 13.5px;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  transition: var(--transition-fast);
-}
 
-.btn-action-outline:hover {
-  background: #f0f9ff;
-  border-color: #0369a1;
-  color: #0369a1;
-}
 
 /* ==========================================================================
    3. 右側大盤分析儀表板工作區 (Analysis Workspace)
@@ -427,18 +442,6 @@
   cursor: pointer;
 }
 
-}
-
-.btn-mini-dropdown {
-  background: #f8fafc;
-  border: 1px solid #cbd5e1;
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-size: 10px;
-  color: #64748b;
-  cursor: pointer;
-}
-
 .card-body-content {
   flex: 1;
   padding: 8px 12px;
@@ -459,7 +462,7 @@
 /* 3.2 中段統計分析區 (3 欄佈局：服務類別圓餅 + 案件分布多色圓餅 + 案件熱點 GIS 地圖) */
 .middle-charts-grid {
   display: grid;
-  grid-template-columns: 28% 44% 28%;
+  grid-template-columns: 25% 45% 30%;
   gap: 10px;
   flex: 1.15;
   min-height: 310px;
@@ -572,6 +575,32 @@
   background: radial-gradient(circle at center, #0f2744 0%, #061220 100%);
 }
 
+
+/* 地圖淺海與島嶼精準高保真配色 (仿截圖 2) */
+.card-hotspot-map .map-heat-container {
+  background: #e8f4fd !important;
+}
+
+.card-hotspot-map .heat-map-canvas-wrap {
+  background: #d4eefd !important;
+}
+
+.map-coord-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  font-size: 11px;
+  color: #334155;
+  font-family: 'Roboto', 'Noto Sans TC', sans-serif;
+  font-weight: 500;
+  z-index: 5;
+}
+
+.map-coord-badge span {
+  font-weight: 700;
+  color: #0f172a;
+}
+
 .taiwan-heat-svg {
   width: 100%;
   height: 100%;
@@ -592,24 +621,58 @@
   opacity: 0.8;
 }
 
+
+/* 3.3 下段趨勢分析區 (2 欄等寬佈局) */
+.bottom-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  flex: 1.1;
+  min-height: 280px;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.card-connection-trend,
+.card-town-trend {
+  min-height: 260px;
+  height: 100%;
+}
+
+.line-chart-wrap {
+  width: 100%;
+  height: 100%;
+  min-height: 210px;
+  position: relative;
+}
+
 .map-scale-badge {
   position: absolute;
   bottom: 8px;
   left: 8px;
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid rgba(56, 189, 248, 0.4);
-  padding: 2px 6px;
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid #94a3b8;
+  padding: 1px 6px;
+  border-radius: 2px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   z-index: 5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .scale-bar-line {
-  width: 20px;
-  min-height: 0;
-  position: relative;
+  width: 28px;
+  height: 4px;
+  border: 1px solid #334155;
+  border-top: none;
+  background: repeating-linear-gradient(90deg, #334155, #334155 14px, #ffffff 14px, #ffffff 28px);
+}
+
+.scale-text {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #334155;
 }
 
 /* ==========================================================================
@@ -618,145 +681,168 @@
 .case-modal-overlay {
   position: fixed;
   inset: 0;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.case-modal-overlay.hide {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.case-modal-overlay.show {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+.case-modal-box {
+  background: #ffffff;
+  border-radius: 12px;
+  width: 920px;
+  max-width: 95vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-box-sm {
+  width: 480px;
+  max-width: 92vw;
+}
+
+@keyframes modalPop {
+  0% { transform: scale(0.95); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.case-modal-header {
+  padding: 12px 18px;
+  background: #0284c7;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.modal-title-wrap h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.badge-total-count {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.btn-modal-close {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.btn-modal-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.case-modal-body {
+  padding: 16px 20px;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.search-input-box {
+  position: relative;
+  flex: 1;
+}
+
+.search-input-box i {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.search-input-box input {
+  width: 100%;
+  padding: 6px 10px 6px 30px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 12px;
+  outline: none;
+}
+
+.search-input-box input:focus {
+  border-color: #0284c7;
+}
+
+.modal-filter-selects .form-select-sm {
+  padding: 6px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 12px;
+  background: #ffffff;
+  color: #334155;
+  outline: none;
+}
+
+.modal-table-wrap {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  overflow-x: auto;
+  max-height: 460px;
+}
+
+.case-detail-table {
+  width: 100%;
   border-collapse: collapse;
   font-size: 12px;
 }

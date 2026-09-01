@@ -364,7 +364,16 @@ function bindEventListeners() {
     if (fontSizeSelect && fontSizeSelect.value !== size) {
       fontSizeSelect.value = size;
     }
+
+    // 本地持久化儲存使用者字級偏好
+    try {
+      localStorage.setItem('user-font-size', size);
+    } catch (e) {}
   }
+
+  // 讀取持久化字級設定或預設為 md
+  const initialFontSize = localStorage.getItem('user-font-size') || 'md';
+  setFontSize(initialFontSize);
 
   fsButtons.forEach(btn => {
     btn.addEventListener('click', () => {

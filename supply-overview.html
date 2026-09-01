@@ -880,16 +880,6 @@
             </div>
           </div>
 
-          <!-- 右下角浮動工具按鈕群 (FAB) -->
-          <div class="map-fab-group">
-            <button class="fab-btn" id="fabLayerBtn" title="圖層切換">
-              <i class="fa-solid fa-layer-group"></i>
-            </button>
-            <button class="fab-btn fab-robot" id="fabAiBtn" title="智慧管網 AI 助理">
-              <i class="fa-solid fa-robot"></i>
-            </button>
-          </div>
-
           <!-- 區處懸浮數值浮動窗 (Tooltip) -->
           <div id="districtTooltip" class="district-tooltip hide">
             <div class="tooltip-title" id="ttTitle">區處名稱</div>
@@ -1208,16 +1198,6 @@
               </div>
 
             </div>
-          </div>
-
-          <!-- 右下角浮動工具按鈕群 (FAB) -->
-          <div class="map-fab-group">
-            <button class="fab-btn" title="圖層切換">
-              <i class="fa-solid fa-layer-group"></i>
-            </button>
-            <button class="fab-btn fab-robot" title="智慧管網 AI 助理">
-              <i class="fa-solid fa-robot"></i>
-            </button>
           </div>
 
         </div>
@@ -1634,6 +1614,122 @@
                 </div>
               </div>
 
+            </div>
+          </div>
+        </div>
+
+        <!-- 右下角浮動工具按鈕群 (FAB Group - 仿照應變事件情資圖台規範) -->
+        <div class="intel-fab-group" id="mapFabGroup">
+          <!-- 1. 圓形圖層開關圖示按鈕 (點擊開闔套疊圖層清單) -->
+          <button type="button" class="intel-fab-btn" id="fabLayerBtn" title="開啟/關閉套疊圖層清單">
+            <i class="fa-solid fa-layer-group"></i>
+          </button>
+
+          <!-- 2. 智慧水網 AI 助手圖示按鈕 (點擊開闔 AI 智慧情資助理) -->
+          <button type="button" class="intel-fab-btn fab-ai-btn" id="fabAiBtn" title="智慧水網 AI 供水調度小助手">
+            <i class="fa-solid fa-robot"></i>
+            <span class="fab-badge-pulse"></span>
+          </button>
+        </div>
+
+        <!-- 浮動面板 1：空間套疊圖層開關清單面板 (可勾選圖層) -->
+        <div class="layer-control-panel hide" id="layerControlPanel">
+          <div class="layer-panel-header">
+            <div class="layer-panel-title">
+              <i class="fa-solid fa-layer-group text-cyan"></i>
+              <span>空間套疊圖層清單</span>
+            </div>
+            <button type="button" class="btn-panel-close" id="closeLayerPanelBtn" title="關閉面板">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <div class="layer-panel-body">
+            <div class="layer-group-box">
+              <div class="layer-group-title">自來水供水設施與圖層</div>
+              <div class="layer-list">
+                <label class="layer-item">
+                  <div class="layer-item-left">
+                    <i class="fa-solid fa-map-location-dot layer-item-icon"></i>
+                    <span>全台區處供水分區界線</span>
+                  </div>
+                  <input type="checkbox" class="layer-checkbox" data-layer="districts" checked>
+                </label>
+                <label class="layer-item">
+                  <div class="layer-item-left">
+                    <i class="fa-solid fa-faucet-drip layer-item-icon"></i>
+                    <span>淨水場與主要加壓站</span>
+                  </div>
+                  <input type="checkbox" class="layer-checkbox" data-layer="stations" checked>
+                </label>
+                <label class="layer-item">
+                  <div class="layer-item-left">
+                    <i class="fa-solid fa-arrows-split-up-and-left layer-item-icon"></i>
+                    <span>跨區調度幹管拓撲路徑</span>
+                  </div>
+                  <input type="checkbox" class="layer-checkbox" data-layer="pipes" checked>
+                </label>
+                <label class="layer-item">
+                  <div class="layer-item-left">
+                    <i class="fa-solid fa-water layer-item-icon"></i>
+                    <span>全台重點水庫與取水口</span>
+                  </div>
+                  <input type="checkbox" class="layer-checkbox" data-layer="reservoirs" checked>
+                </label>
+                <label class="layer-item">
+                  <div class="layer-item-left">
+                    <i class="fa-solid fa-gauge-high layer-item-icon"></i>
+                    <span>供水管網水壓監測點位</span>
+                  </div>
+                  <input type="checkbox" class="layer-checkbox" data-layer="telemetry">
+                </label>
+              </div>
+            </div>
+
+            <div class="layer-group-box">
+              <div class="layer-group-title">底圖樣式切換</div>
+              <select id="baseMapSelect" class="fs-select" style="width:100%; padding:7px 10px; border-radius:6px; background:#0f172a; color:#f8fafc; border:1px solid #38bdf8; font-size:12.5px;">
+                <option value="satellite" selected>Google 衛星混合底圖</option>
+                <option value="roadmap">Google 標準道路底圖</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 浮動面板 2：智慧水網 AI 供水調度小助手面板 -->
+        <div class="ai-assistant-panel hide" id="aiAssistantPanel">
+          <div class="ai-panel-header">
+            <div class="ai-header-left">
+              <div class="ai-avatar-icon">
+                <i class="fa-solid fa-robot"></i>
+              </div>
+              <div class="ai-header-title">
+                <span class="ai-name">智慧水網 AI 供水調度小助手</span>
+                <span class="ai-status">即時情報分析在線</span>
+              </div>
+            </div>
+            <button type="button" class="btn-panel-close" id="closeAiPanelBtn" title="關閉小助手">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <div class="ai-panel-body" id="aiAssistantBody">
+            <div class="ai-msg-box">
+              <p><strong>全台供水動態綜合研判：</strong></p>
+              <p>目前全台各區處供水燈號皆維持<strong>「正常」</strong>，總供水量穩定在 886.7 萬 CMD 區間運轉中。</p>
+            </div>
+
+            <div class="ai-highlight-card">
+              <div class="ai-highlight-title"><i class="fa-solid fa-triangle-exclamation"></i> 水庫蓄水量關注提示</div>
+              <div style="font-size:12px; color:#fca5a5;">白河水庫蓄水率 68.4%、新山水庫蓄水率 72.8%，建議依調度準則落實聯通管備援支援。</div>
+            </div>
+
+            <div class="ai-msg-box">
+              <p><strong>跨區水源調度情資：</strong></p>
+              <p>今日翡翠水庫支援新北 73.5 萬 CMD；南化水庫聯通管支援高雄 1,802 CMD，各管路水壓平穩無異常。</p>
+            </div>
+
+            <div class="ai-actions-row">
+              <button type="button" class="btn-ai-action" id="btnAiSummary"><i class="fa-solid fa-file-lines"></i> 產出供水速報</button>
+              <button type="button" class="btn-ai-action" id="btnAiOptimize"><i class="fa-solid fa-sliders"></i> 調度策略建議</button>
             </div>
           </div>
         </div>
