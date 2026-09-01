@@ -1689,34 +1689,67 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
 
 @media (max-width: 768px) {
   .main-header {
-    padding: 0 10px;
-    gap: 8px;
+    padding: 0 8px;
+    gap: 6px;
+    height: 58px;
   }
   .header-left {
     gap: 6px;
+    min-width: 0;
+    flex-shrink: 1;
+  }
+  .btn-sidebar-toggle {
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
+    flex-shrink: 0;
   }
   .brand-title {
-    padding: 4px 8px;
-    gap: 5px;
+    padding: 3px 6px;
+    gap: 4px;
+    flex-shrink: 0;
   }
   .brand-logo-img {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
   }
   .title-text {
-    font-size: 13.5px;
+    font-size: 12.5px;
   }
   .primary-dropdown {
-    padding: 5px 8px;
-    font-size: 12.5px;
+    padding: 4px 8px;
+    font-size: 12px;
     gap: 4px;
+    flex-shrink: 0;
   }
   .header-right {
     gap: 6px;
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+  .view-switch-group {
+    display: none !important;
+  }
+  .font-size-controller .fs-options {
+    display: none !important;
+  }
+  .font-size-controller .fs-select-wrap {
+    display: inline-flex !important;
+  }
+  .fs-label {
+    display: none !important;
+  }
+  .fs-select {
+    font-size: 11.5px;
+    padding: 2px 18px 2px 5px;
+  }
+  .user-meta {
+    display: none !important;
   }
   .avatar-box {
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
   }
 }
 
@@ -1725,7 +1758,7 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
   .main-header {
     padding: 0 6px;
     gap: 4px;
-    height: 56px;
+    height: 54px;
   }
   .btn-sidebar-toggle {
     width: 28px;
@@ -1733,42 +1766,24 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
     font-size: 12px;
   }
   .brand-title {
-    padding: 3px 5px;
-    gap: 4px;
-  }
-  .brand-logo-img {
-    width: 17px;
-    height: 17px;
-  }
-  .title-text {
-    font-size: 12px;
-  }
-  .primary-dropdown {
-    padding: 4px 6px;
-    font-size: 11.5px;
+    padding: 2px 4px;
     gap: 3px;
   }
-  .header-right {
-    gap: 4px;
+  .title-text {
+    font-size: 11.5px;
   }
-  .font-size-controller {
-    padding: 2px 4px;
-    gap: 2px;
-  }
-  .fs-label {
-    display: none !important;
+  .primary-dropdown {
+    padding: 3px 6px;
+    font-size: 11px;
+    gap: 3px;
   }
   .fs-select {
     font-size: 11px;
-    padding: 2px 16px 2px 4px;
-  }
-  .view-switch-group {
-    display: none !important;
+    padding: 2px 14px 2px 4px;
   }
   .avatar-box {
     width: 30px;
     height: 30px;
-    flex-shrink: 0;
   }
 }
 
