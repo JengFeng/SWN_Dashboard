@@ -396,6 +396,7 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
 }
 
 .menu-parent-item:hover .cascading-menu-level2,
+.menu-parent-item.open .cascading-menu-level2,
 .menu-parent-item.active .cascading-menu-level2 {
   display: block;
 }
@@ -1750,6 +1751,39 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
     width: 32px;
     height: 32px;
     flex-shrink: 0;
+  }
+
+  /* 行動端與窄螢幕：二級子選單轉為手風琴內嵌向下展開，防止向右飛出視窗 */
+  .cascading-menu-wrapper {
+    right: 0;
+    left: auto;
+    max-width: 95vw;
+  }
+  .cascading-menu-level1 {
+    width: 220px;
+    max-width: 90vw;
+  }
+  .menu-parent-item {
+    flex-wrap: wrap;
+  }
+  .cascading-menu-level2 {
+    position: static !important;
+    width: 100% !important;
+    background: #142838 !important;
+    border-radius: var(--radius-sm);
+    box-shadow: none !important;
+    padding: 4px 0 !important;
+    margin-top: 6px !important;
+    margin-left: 0 !important;
+    border-left: 3px solid #0ea5e9;
+  }
+  .menu-parent-item.open .cascading-menu-level2,
+  .menu-parent-item:hover .cascading-menu-level2 {
+    display: block !important;
+  }
+  .menu-parent-item.open i.fa-caret-right {
+    transform: rotate(90deg) !important;
+    color: #38bdf8;
   }
 }
 

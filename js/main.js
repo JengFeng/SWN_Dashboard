@@ -270,11 +270,18 @@ function bindEventListeners() {
       viewDropdownMenu.classList.remove('show');
     });
 
-    // 供水營運概況 (具備子選單) 的 hover 效果
+    // 供水營運概況 (具備子選單) 的 hover 與 click 支援 (桌機與行動端手風琴切換)
     document.querySelectorAll('.menu-parent-item').forEach(parentItem => {
       parentItem.addEventListener('mouseenter', () => {
         document.querySelectorAll('.menu-parent-item, .menu-direct-item').forEach(i => i.classList.remove('active'));
         parentItem.classList.add('active');
+      });
+
+      parentItem.addEventListener('click', (e) => {
+        // 若點擊的是子選項自身，由子選項事件處理
+        if (e.target.closest('.menu-sub-item')) return;
+        e.stopPropagation();
+        parentItem.classList.toggle('open');
       });
     });
 
