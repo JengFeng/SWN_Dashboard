@@ -2021,3 +2021,21 @@ body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
   display: flex !important;
   pointer-events: auto !important;
 }
+
+/* ==========================================================================
+   RWD Phase 2 全域圖表穿透與表格滾動防卡滯
+   ========================================================================== */
+canvas {
+  touch-action: pan-y !important;
+  max-width: 100%;
+}
+
+.table-responsive,
+.table-scroll-wrap,
+.sidebar-table-scroll,
+.dispatch-panel-scroll,
+.reservoir-panel-scroll {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}

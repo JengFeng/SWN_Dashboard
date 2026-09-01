@@ -1262,3 +1262,40 @@ body.font-lg .case-detail-table { font-size: 14.5px !important; }
   }
 }
 
+
+/* ==========================================================================
+   RWD Phase 3 極窄版 (<= 480px / <= 412px) 自適應優化與底部安全量化內距
+   ========================================================================== */
+@media (max-width: 480px) {
+  .case-analysis-workspace {
+    padding: 8px !important;
+    padding-bottom: calc(clamp(60px, 12vh, 120px) + env(safe-area-inset-bottom, 0px)) !important;
+    gap: 10px !important;
+  }
+
+  .kpi-metrics-row {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  .kpi-metric-box {
+    padding: 8px 10px !important;
+  }
+
+  .metric-val-num {
+    font-size: 18px !important;
+  }
+
+  .card-service-category .pie-chart-wrap,
+  .card-case-distribution .pie-dist-chart-wrap,
+  .card-connection-trend .line-chart-wrap,
+  .card-town-trend .line-chart-wrap {
+    height: 200px !important;
+    min-height: 200px !important;
+  }
+
+  .card-hotspot-map .map-heat-container {
+    height: 220px !important;
+    min-height: 220px !important;
+  }
+}
