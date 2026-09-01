@@ -4,7 +4,7 @@
 
 .layout-dashboard .dashboard-container,
 .dashboard-container {
-  padding: 16px 20px 80px 20px;
+  padding: 16px 20px 120px 20px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -577,6 +577,7 @@ canvas {
 /* 9. 底部主要水庫蓄水情況 */
 .reservoir-card {
   padding: 16px 20px;
+  margin-bottom: 40px;
 }
 
 .reservoir-grid {
