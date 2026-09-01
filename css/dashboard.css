@@ -1,0 +1,698 @@
+/* ==========================================================================
+   今日營運概況 (首頁儀表板) - 專屬樣式表 (css/dashboard.css)
+   ========================================================================== */
+
+.dashboard-container {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 1920px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid #eaedf3;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header-clean {
+  margin-bottom: 12px;
+}
+
+.card-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.card-title {
+  font-size: 16.5px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+/* 上半部左右 50% : 50% 網格對稱 */
+.dashboard-top-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.left-main-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.right-stats-column {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* 供水 KPI 卡片 */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.kpi-item {
+  background: #fafcff;
+  border: 1px solid #eef2f8;
+  border-radius: var(--radius-md);
+  padding: 12px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.kpi-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.water-blue { background: #e0f2fe; color: #0284c7; }
+.water-teal { background: #ccfbf1; color: #0d9488; }
+.water-gray { background: #f1f5f9; color: #64748b; }
+
+.kpi-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.kpi-label {
+  font-size: 12.5px;
+  color: #334155;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.kpi-sublabel {
+  font-size: 10.5px;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.kpi-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin: 1px 0;
+}
+
+.kpi-number {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.text-primary { color: #0284c7; }
+.text-teal { color: #0d9488; }
+.text-dark { color: #1e293b; }
+.text-danger { color: #ef4444; }
+
+.kpi-unit {
+  font-size: 10.5px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.kpi-trend {
+  font-size: 10.5px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+}
+
+.trend-down { color: #10b981; }
+.trend-up { color: #10b981; }
+.trend-up-red { color: #ef4444; }
+.trend-delta { color: #94a3b8; font-size: 10px; }
+
+/* 水庫蓄水半環錶 */
+.gauge-item {
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+  padding: 6px 8px;
+}
+
+.gauge-chart-container {
+  position: relative;
+  width: 100px;
+  height: 55px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.gauge-center-val {
+  position: absolute;
+  bottom: 0;
+  font-weight: 800;
+  display: flex;
+  align-items: baseline;
+  color: #0d9488;
+}
+
+.gauge-num { font-size: 18px; }
+.gauge-pct { font-size: 11px; }
+
+/* 重要停水表格卡片 */
+.table-card {
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.table-responsive {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.custom-table th {
+  background: #f8fafc;
+  color: #475569;
+  font-weight: 600;
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.custom-table td {
+  padding: 11px 12px;
+  color: #1e293b;
+  border-bottom: 1px solid #f1f5f9;
+  white-space: nowrap;
+}
+
+.custom-table tr:hover td {
+  background: #fafcff;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-danger { background: #fee2e2; color: #ef4444; }
+.badge-success { background: #d1fae5; color: #10b981; }
+
+/* 右側統計卡片樣式 */
+.stat-card-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #1e293b;
+  white-space: nowrap;
+}
+
+.sub-date {
+  font-size: 11.5px;
+  color: var(--gray-text);
+  font-weight: normal;
+}
+
+.spot-filter-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.select-box-styled {
+  position: relative;
+  display: inline-block;
+}
+
+.mini-select {
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  padding: 3px 20px 3px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #334155;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.select-arrow {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 9px;
+  color: #64748b;
+  pointer-events: none;
+}
+
+.quick-chip-label {
+  font-size: 10.5px;
+  color: #0284c7;
+  background: #e0f2fe;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  border: 1px solid #bae6fd;
+  white-space: nowrap;
+}
+
+/* 甜甜圈統計區塊 */
+.donut-stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 6px 0;
+  gap: 10px;
+}
+
+.donut-chart-box {
+  position: relative;
+  width: 95px;
+  height: 95px;
+  flex-shrink: 0;
+}
+
+.donut-center-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.donut-title { font-size: 9.5px; color: var(--gray-text); }
+.donut-total { font-size: 13.5px; font-weight: 800; color: #0f172a; line-height: 1.1; }
+.donut-unit { font-size: 9px; color: var(--gray-text); }
+
+.donut-legend-box {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+
+.legend-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.dot-blue { background: #0284c7; }
+.dot-orange { background: #f97316; }
+.dot-red { background: #ef4444; }
+.dot-green { background: #10b981; }
+
+.legend-name { color: #475569; flex: 1; margin-left: 2px; }
+.legend-val { color: #0f172a; font-weight: 700; margin-left: 6px; }
+
+/* 客服與輿情專屬排版 */
+.customer-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.customer-stat-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.icon-label-row {
+  font-size: 11.5px;
+  color: #475569;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.big-stat-val .num {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.big-stat-val .unit {
+  font-size: 11px;
+  color: var(--gray-text);
+  margin-left: 2px;
+}
+
+.customer-donut-box {
+  width: 55px;
+  height: 55px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.customer-case-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 10px;
+  color: #475569;
+  white-space: nowrap;
+}
+
+.case-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sub-section-divider {
+  height: 1px;
+  background: #f1f5f9;
+  margin: 10px 0 8px 0;
+}
+
+.list-block-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 6px;
+}
+
+/* TOP 5 橫向進度條 */
+.bar-progress-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.bar-item {
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  gap: 6px;
+}
+
+.bar-rank {
+  width: 14px;
+  font-weight: 700;
+  color: #64748b;
+  text-align: center;
+}
+
+.rank-1 { color: #0284c7; }
+.rank-2 { color: #f97316; }
+.rank-3 { color: #0284c7; }
+
+.bar-name {
+  width: 52px;
+  color: #334155;
+  white-space: nowrap;
+}
+
+.progress-track {
+  flex: 1;
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+}
+
+.fill-blue { background: #0284c7; }
+.fill-orange { background: #ef4444; }
+.fill-blue-light { background: #38bdf8; }
+.fill-blue-soft { background: #60a5fa; }
+.fill-green { background: #10b981; }
+
+.bar-value {
+  width: 78px;
+  text-align: right;
+  color: #64748b;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+/* 輿情話題 TOP 3 */
+.topic-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.topic-heat-head {
+  font-size: 10.5px;
+  color: #94a3b8;
+}
+
+.topic-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.topic-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+}
+
+.topic-rank-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  max-width: 150px;
+}
+
+.topic-rank {
+  font-weight: 700;
+}
+
+.rank-gold { color: #d97706; }
+
+.topic-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #1e293b;
+}
+
+.topic-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.heat-time {
+  color: #64748b;
+  font-size: 10px;
+}
+
+.trend-indicator {
+  font-weight: 700;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.trend-up { color: #ef4444; }
+.trend-down-green { color: #10b981; }
+
+/* 9. 底部主要水庫蓄水情況 */
+.reservoir-card {
+  padding: 16px 20px;
+}
+
+.reservoir-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 14px;
+}
+
+.reservoir-item {
+  background: #fafcff;
+  border: 1px solid #eef2f8;
+  border-radius: var(--radius-md);
+  padding: 12px 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.circle-progress-box {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.progress-ring {
+  transform: rotate(-90deg);
+  width: 58px;
+  height: 58px;
+}
+
+.ring-bg {
+  fill: transparent;
+  stroke: #e2e8f0;
+  stroke-width: 6;
+}
+
+.ring-fill {
+  fill: transparent;
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+.ring-blue { stroke: #0284c7; }
+.ring-green { stroke: #10b981; }
+
+.ring-center-val {
+  position: absolute;
+  font-weight: 800;
+  font-size: 12.5px;
+  color: #0f172a;
+}
+
+.reservoir-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.reservoir-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.reservoir-stat-row {
+  display: flex;
+  flex-direction: column;
+  font-size: 10px;
+  color: #64748b;
+}
+
+.reservoir-stat-row .stat-num {
+  font-weight: 700;
+  color: #334155;
+  font-size: 11px;
+}
+
+.reservoir-stat-row .unit {
+  font-size: 9.5px;
+  font-weight: normal;
+  color: #94a3b8;
+}
+
+.sub-row {
+  margin-top: 2px;
+}
+
+
+@media (max-width: 1440px) {
+  .reservoir-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1200px) {
+  .dashboard-top-grid {
+    grid-template-columns: 1fr;
+  }
+  .right-stats-column {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .header-center {
+    display: none;
+  }
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .right-stats-column {
+    grid-template-columns: 1fr;
+  }
+  .reservoir-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .main-header {
+    padding: 0 12px;
+  }
+  .dashboard-container {
+    padding: 12px 10px;
+  }
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+  .reservoir-grid {
+    grid-template-columns: 1fr;
+  }
+  .user-meta {
+    display: none;
+  }
+  .font-size-controller {
+    display: none;
+  }
+}
+
