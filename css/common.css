@@ -71,6 +71,111 @@ body {
   transition: font-size 0.2s ease;
 }
 
+
+/* ==========================================================================
+   全域字級大小階梯切換 (小 / 中[預設] / 大)
+   原【中】改為【小】；原【大】改為【中】；依比例放大新【大】字級
+   ========================================================================== */
+
+/* 小（原中字級） */
+body.font-sm {
+  font-size: 14px;
+}
+body.font-sm .title-text { font-size: 16px; }
+body.font-sm .card-title { font-size: 16px; }
+body.font-sm .kpi-label { font-size: 12px; }
+body.font-sm .kpi-sublabel { font-size: 10.5px; }
+body.font-sm .kpi-number { font-size: 22px; }
+body.font-sm .kpi-unit { font-size: 10px; }
+body.font-sm .kpi-trend { font-size: 10.5px; }
+body.font-sm .custom-table { font-size: 12px; }
+body.font-sm .custom-table th, 
+body.font-sm .custom-table td { padding: 7px 8px; }
+body.font-sm .stat-card-title { font-size: 13.5px; }
+body.font-sm .sub-date { font-size: 11px; }
+body.font-sm .legend-row { font-size: 11.5px; }
+body.font-sm .donut-total { font-size: 13.5px; }
+body.font-sm .big-stat-val .num { font-size: 22px; }
+body.font-sm .list-block-title { font-size: 12px; }
+body.font-sm .bar-item { font-size: 11px; }
+body.font-sm .bar-value { font-size: 10px; }
+body.font-sm .topic-item { font-size: 11px; }
+body.font-sm .reservoir-name { font-size: 13px; }
+body.font-sm .reservoir-stat-row .stat-num { font-size: 11px; }
+
+/* 中（原大字級，目前全站標準預設值） */
+body.font-md, body {
+  font-size: 17.5px;
+}
+body .title-text,
+body.font-md .title-text { font-size: 20px; }
+body .card-title,
+body.font-md .card-title { font-size: 20px; }
+body .kpi-label,
+body.font-md .kpi-label { font-size: 15px; }
+body .kpi-sublabel,
+body.font-md .kpi-sublabel { font-size: 13px; }
+body .kpi-number,
+body.font-md .kpi-number { font-size: 27px; }
+body .kpi-unit,
+body.font-md .kpi-unit { font-size: 13px; }
+body .kpi-trend,
+body.font-md .kpi-trend { font-size: 13px; }
+body .custom-table,
+body.font-md .custom-table { font-size: 15px; }
+body .custom-table th, 
+body .custom-table td,
+body.font-md .custom-table th, 
+body.font-md .custom-table td { padding: 10px 10px; }
+body .stat-card-title,
+body.font-md .stat-card-title { font-size: 17px; }
+body .sub-date,
+body.font-md .sub-date { font-size: 13.5px; }
+body .legend-row,
+body.font-md .legend-row { font-size: 14px; }
+body .donut-total,
+body.font-md .donut-total { font-size: 16px; }
+body .big-stat-val .num,
+body.font-md .big-stat-val .num { font-size: 27px; }
+body .list-block-title,
+body.font-md .list-block-title { font-size: 14.5px; }
+body .bar-item,
+body.font-md .bar-item { font-size: 13.5px; }
+body .bar-value,
+body.font-md .bar-value { font-size: 12px; }
+body .topic-item,
+body.font-md .topic-item { font-size: 13.5px; }
+body .reservoir-name,
+body.font-md .reservoir-name { font-size: 15.5px; }
+body .reservoir-stat-row .stat-num,
+body.font-md .reservoir-stat-row .stat-num { font-size: 13.5px; }
+
+/* 大（依比例放大新字級，兼顧版面平衡） */
+body.font-lg {
+  font-size: 19.5px;
+}
+body.font-lg .title-text { font-size: 23px; }
+body.font-lg .card-title { font-size: 23px; }
+body.font-lg .kpi-label { font-size: 17.5px; }
+body.font-lg .kpi-sublabel { font-size: 14.5px; }
+body.font-lg .kpi-number { font-size: 31px; }
+body.font-lg .kpi-unit { font-size: 14.5px; }
+body.font-lg .kpi-trend { font-size: 14.5px; }
+body.font-lg .custom-table { font-size: 17.5px; }
+body.font-lg .custom-table th, 
+body.font-lg .custom-table td { padding: 13px 13px; }
+body.font-lg .stat-card-title { font-size: 19.5px; }
+body.font-lg .sub-date { font-size: 15.5px; }
+body.font-lg .legend-row { font-size: 16px; }
+body.font-lg .donut-total { font-size: 18.5px; }
+body.font-lg .big-stat-val .num { font-size: 31px; }
+body.font-lg .list-block-title { font-size: 16.5px; }
+body.font-lg .bar-item { font-size: 14.5px; }
+body.font-lg .bar-value { font-size: 13.5px; }
+body.font-lg .topic-item { font-size: 14.5px; }
+body.font-lg .reservoir-name { font-size: 18px; }
+body.font-lg .reservoir-stat-row .stat-num { font-size: 15px; }
+
 .app-layout {
   width: 100%;
   min-height: 100vh;
